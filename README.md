@@ -1,66 +1,69 @@
-# Allegorize-textbook-content · 寓言化知识内容
+**[English](./README.md)** | [简体中文](./README.zh-CN.md)
 
-> 一套把技术教材和知识库改写成"零基础可读"学习故事的工作流。**输出消除循环术语解释** — 永远不用更专业的词来解释一个术语。
+---
 
-## 这是什么
+# Allegorize Textbook Content
 
-把抽象、术语密集的 AI / 智能体教材,改写成**明朝背景 + 太子成长**的连贯寓言。每章 600-1000 行,主角从 14 岁小书童一路升级到 23 岁太子,横跨 12 章,跨越 6 个虚构朝廷机构(钦天监 / 翰林院 / 通政司 / 会同馆 / 礼部 / 国子监)。
+> A complete workflow that converts technical textbooks and knowledge bases into learning stories for absolute beginners. The output eliminates circular jargon — it never defines a term using other specialized vocabulary.
 
-**核心方法论**: 第一遍用受众已知的概念解释;第二遍用第一遍的解释解释新概念。永远不出现"用 A 解释 A"。
+## What this is
 
-## 章节列表
+A collection of **12 allegorical chapters** that turn abstract, jargon-heavy AI / agent material into a coherent Ming-Dynasty story about a prince growing up. Each chapter runs 600-1000 lines. The protagonist progresses from a 14-year-old page boy to a 23-year-old crown prince, rotating through six fictional imperial institutions (the Astronomical Bureau, the Hanlin Academy, the Office of Memorials, the Tributary Reception Court, the Ministry of Rites, the Imperial Academy).
 
-按学习顺序阅读,每章独立 HTML 离线可读。
+**Core methodology**: the first pass explains using concepts the audience already knows; the second pass uses the first-pass explanation to explain new concepts. No "A is explained by A" anywhere.
 
-| # | 章节 | 主题 | 寓言场景 |
-|---|------|------|----------|
-| 01 | [初识智能体](第01章-初识智能体.html) | 智能体是什么 | 太子的第一位老师 |
-| 02 | [智能体发展史](第02章-智能体发展史-v3.html) | 从符号主义到大模型 | 问道书院三派之争 |
-| 03 | [大语言模型基础](第03章-大语言模型基础-v4.html) | Transformer / 注意力 / 训练 | 翰林院造字与刻书 |
-| 04 | [智能体经典范式构建](第04章-智能体经典范式构建-v1.html) | ReAct / Reflexion / 计划-执行 | 六部衙门公文流转 |
-| 05 | [低代码平台搭建](第05章-低代码平台搭建-v1.html) | 织造局四机并用 | 江南织造局改革 |
-| 06 | [框架开发实践](第06章-框架开发实践-v1.html) | 框架设计 / 模块解耦 | 京城四部联席调研 |
-| 07 | [从零开始造一个智能体框架](第07章-从零开始造一个智能体框架.html) | 自研框架全流程 | 钦天监算法房自造 HelloAgents |
-| 08 | [记忆与检索](第08章-记忆与检索-v2.html) | RAG / 向量库 / 记忆分层 | 翰林院文献阁装记簿与查档机件 |
-| 09 | [上下文工程](第09章-上下文工程-v1.html) | Context 编排 / 压缩 / 路由 | 通政司奏章房造编排机件 |
-| 10 | [智能体通信协议](第10章-智能体通信协议-v1.html) | MCP / Agent-to-Agent | 会同馆番使院造"接话"机件 |
-| 11 | [评估与迭代](第11章-评估与迭代-v1.html) | 评估循环 / 指标设计 | 礼部试院造"评估循环"机件 |
-| 12 | [训练与对齐](第12章-训练与对齐-v1.html) | RLHF / DPO / 奖励建模 | 国子监训习造"训习机件" |
+## Chapter list
 
-## 寓言化方法论(给改写者)
+Read in order. Each chapter is a self-contained HTML, readable offline.
 
-如果你想用同样的工作流改写其他教材,核心三条:
+| # | Chapter | Topic | Allegorical setting |
+|---|---------|-------|---------------------|
+| 01 | [What is an Agent](第01章-初识智能体.html) | Agent definition | The prince's first tutor |
+| 02 | [History of Agents](第02章-智能体发展史-v3.html) | Symbolism to LLMs | Three-school debate at the Daoist Academy |
+| 03 | [LLM Foundations](第03章-大语言模型基础-v4.html) | Transformer, attention, training | Type-cutting and book-carving at the Hanlin Academy |
+| 04 | [Classic Agent Patterns](第04章-智能体经典范式构建-v1.html) | ReAct, Reflexion, plan-execute | Memorial flow through the Six Ministries |
+| 05 | [Low-Code Platform](第05章-低代码平台搭建-v1.html) | Platform building | Jiangnan Weaving Bureau reform with four looms |
+| 06 | [Framework Development](第06章-框架开发实践-v1.html) | Framework design, decoupling | Joint investigation of the four capital ministries |
+| 07 | [Build an Agent Framework from Scratch](第07章-从零开始造一个智能体框架.html) | Full framework implementation | The Astronomical Bureau builds HelloAgents |
+| 08 | [Memory and Retrieval](第08章-记忆与检索-v2.html) | RAG, vector DB, memory tiers | Ledger and archive machines in the Hanlin Academy |
+| 09 | [Context Engineering](第09章-上下文工程-v1.html) | Context orchestration, compression, routing | Memorial-orchestrating machine in the Office of Memorials |
+| 10 | [Agent Communication Protocols](第10章-智能体通信协议-v1.html) | MCP, agent-to-agent | "Connector" machine in the Tributary Reception Court |
+| 11 | [Evaluation and Iteration](第11章-评估与迭代-v1.html) | Evaluation loops, metric design | "Evaluation-cycle" machine in the Ministry of Rites |
+| 12 | [Training and Alignment](第12章-训练与对齐-v1.html) | RLHF, DPO, reward modeling | "Training" machine in the Imperial Academy |
 
-1. **不循环解释** — 解释"注意力机制"时不用"Q/K/V 矩阵"再解释一次,改用"皇帝批阅奏章时分三摞"
-2. **跨章主角升级** — 同一主角跨章成长(14 → 23 岁),让读者有连续感而不是每章重学
-3. **反派有"善的主张"** — 每个反派不是坏人,是有道理的反对派,被打脸靠实证不靠嘴炮
+## Allegorical methodology (for rewriters)
 
-## 主角
+If you want to apply the same workflow to other textbooks, three rules:
 
-**太子**:14 岁入钦天监当小书童 → 23 岁训习训习机件监生。每章长 1 岁,跨章在翰林院 / 通政司 / 会同馆 / 礼部 / 国子监 5 个机构轮岗。
+1. **No circular definitions** — never explain "attention mechanism" with "Q/K/V matrices"; use "the emperor sorting memorials into three piles"
+2. **Cross-chapter protagonist growth** — same protagonist across chapters (14 → 23), giving continuity rather than re-learning
+3. **Antagonists with valid positions** — every villain is a principled opposition, refuted by evidence not by monologue
 
-**梁王**: 崇洋派,贯穿 7/8/9/10 章,4 次反转(从轻视 → 好奇 → 借鉴 → 折服),是"反派有善主张"的代表。
+## Characters
 
-## 沉淀包
+**The Prince**: enters the Astronomical Bureau at 14 as a page boy, rises to 23 as a senior trainee. Grows one year per chapter, rotating through 5 institutions (Hanlin / Memorials / Tributary / Rites / Imperial Academy).
 
-- [`fable-skills.zip`](fable-skills.zip) — 完整自包含复现包(12 步 SOP + 回归脚本 + 清单 + 环境),任何 agent 拿到后改 4 处命名即可渲染新章节
+**Prince Liang**: the pro-Western faction. Appears in 7/8/9/10 with four reversals (dismissive → curious → borrowing → convinced). Embodiment of the "villain with valid position" rule.
 
-## 怎么读
+## Bundled package
 
-**零基础路径**(给完全外行): 1 → 2 → 3 → 7 → 8 → 12,跟着太子从入门到训习训习机件监生。
+- [`fable-skills.zip`](fable-skills.zip) — fully self-contained reproduction package (12-step SOP + regression scripts + checklists + environment guide). Any agent can copy, change 4 names, and render new chapters
 
-**从业者路径**(给已经懂 AI 的): 跳读 4 / 7 / 8 / 10 / 12,看"框架设计 / 自研框架 / RAG / MCP / 训练"5 个工程落地点。
+## How to read
 
-**教研路径**(给想用同样方法论改写其他教材的): 先读 `fable-skills.zip` 里的 `01-sop/fable-write-sop.md`(12 步 SOP),再读 02 章和 07 章(v1→v2 修复实战)。
+**Zero-background path** (for complete outsiders): 1 → 2 → 3 → 7 → 8 → 12. Follow the prince from novice to senior trainee.
 
-## 许可
+**Practitioner path** (for those who already know AI): skip-read 4 / 7 / 8 / 10 / 12. Focus on framework design, self-built framework, RAG, MCP, training.
 
-本仓库所有 HTML 内容采用 **CC BY-NC-SA 4.0**(署名-非商业-相同方式共享)。
+**Authoring path** (for those who want to apply this methodology to other textbooks): start with `fable-skills.zip` → `01-sop/fable-write-sop.md` (12-step SOP), then read chapters 2 and 7 (the v1→v2 fix case studies).
 
-`fable-skills.zip` 内的代码与脚本采用 **MIT** 许可。
+## License
 
-## 来源
+- HTML content: **CC BY-NC-SA 4.0** (attribution, non-commercial, share-alike)
+- Code/scripts inside `fable-skills.zip`: **MIT**
 
-- 原始教材:datawhalechina/hello-agents
-- 寓言化:WellInsight 团队,2026-06 起
-- 沉淀包最后更新:2026-06-29
+## Origin
+
+- Source textbook: datawhalechina/hello-agents
+- Allegorization: WellInsight team, from 2026-06
+- Last update of bundled package: 2026-06-29
