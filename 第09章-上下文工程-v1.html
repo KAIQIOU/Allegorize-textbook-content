@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第09章 · 上下文工程 · WellInsight 学习材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2EDE6;--bg-card:#FAF7F2;--bg-elevated:#FFFCF7;--bg-deep:#E8DFD3;--text-primary:#3D3833;--text-secondary:#6B6157;--text-muted:#998E81;--accent-sage:#8B9D83;--accent-sage-soft:#D8E2D2;--accent-sage-faint:#ECF1E8;--accent-terracotta:#C49B8E;--accent-terracotta-soft:#E6D2C8;--accent-blue:#8A9AA8;--accent-blue-soft:#C8D2DA;--accent-amber:#C9A878;--accent-amber-soft:#E8D7B7;--accent-mauve:#A89098;--accent-mauve-soft:#DCCCD0;--border:#D9D2C7;--border-light:#E8E0D3;--shadow:0 2px 8px rgba(61,56,51,.06), 0 1px 2px rgba(61,56,51,.04);--shadow-lg:0 8px 24px rgba(61,56,51,.10), 0 2px 6px rgba(61,56,51,.05);}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.78;font-size:16px;font-weight:400;-webkit-font-smoothing:antialiased;letter-spacing:.01em;}
+.container{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+.sticky-toc{position:fixed;top:24px;right:24px;width:240px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);font-size:13px;z-index:50;max-height:calc(100vh - 48px);overflow-y:auto;}
+.sticky-toc-title{font-weight:600;color:var(--text-secondary);margin-bottom:8px;font-size:12px;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+.sticky-toc ol{list-style:none;counter-reset:toc;padding:0}
+.sticky-toc li{counter-increment:toc;margin:4px 0}
+.sticky-toc a{color:var(--text-secondary);text-decoration:none;display:block;padding:4px 0 4px 8px;margin-left:6px;border-left:2px solid transparent;font-size:12.5px;font-weight:500;transition:all .2s;}
+.sticky-toc a:hover{color:var(--accent-sage);border-left-color:var(--accent-sage)}
+.sticky-toc a::before{content:counter(toc) ".";color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px;margin-right:4px}
+.hero{background:linear-gradient(135deg,#FAF7F2 0%,#F2EDE6 100%);border:1px solid var(--border);border-radius:12px;padding:48px 40px 40px;margin-bottom:48px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent-sage) 0%,var(--accent-terracotta) 33%,var(--accent-blue) 66%,var(--accent-amber) 100%);}
+.hero-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text-muted);margin-bottom:16px;font-weight:500;letter-spacing:.5px;}
+.hero-meta-dot{width:4px;height:4px;background:var(--text-muted);border-radius:50%}
+.hero h1{font-size:46px;font-weight:700;line-height:1.15;color:var(--text-primary);margin-bottom:10px;letter-spacing:-1px;}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);margin-bottom:22px;font-weight:500;}
+.hero-fable{display:inline-block;padding:2px 10px;margin-right:4px;background:var(--accent-sage-soft);color:var(--accent-sage);border-radius:12px;font-size:14px;font-weight:600;letter-spacing:.5px;}
+.hero-desc{font-size:14.5px;color:var(--text-secondary);margin-bottom:24px;line-height:1.7;font-weight:400;}
+.hero-source{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);background:var(--bg-card);padding:6px 12px;border-radius:20px;border:1px solid var(--border-light);font-weight:500;}
+section{margin-bottom:56px;scroll-margin-top:80px}
+.chapter-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--accent-sage);background:var(--accent-sage-soft);padding:4px 12px;border-radius:12px;margin-bottom:14px;letter-spacing:1px;}
+h2{font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:14px;letter-spacing:-.3px;display:flex;align-items:baseline;gap:12px;line-height:1.3;}
+h2 .num{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--accent-terracotta);font-weight:500}
+h2-hook{display:block;font-size:15px;font-weight:500;color:var(--text-secondary);margin-top:8px;margin-bottom:24px;padding:12px 16px;background:var(--bg-card);border-left:3px solid var(--accent-amber);border-radius:0 6px 6px 0;font-style:italic;}
+h3{font-size:19px;font-weight:600;color:var(--text-primary);margin:24px 0 10px;padding-left:14px;border-left:3px solid var(--accent-amber);letter-spacing:-.2px;}
+h4{font-size:16px;font-weight:600;color:var(--accent-sage);margin:20px 0 10px}
+p{margin-bottom:14px;color:var(--text-primary);text-align:left;font-weight:400}
+strong{color:var(--text-primary);font-weight:600}
+em{color:var(--text-secondary);font-style:normal;font-weight:600}
+.lead{font-size:17px;color:var(--text-secondary);padding:18px 22px;background:var(--bg-card);border-left:3px solid var(--accent-terracotta);border-radius:0 6px 6px 0;margin-bottom:28px;font-weight:500;line-height:1.85;}
+.callout{background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:18px 22px;margin:20px 0;box-shadow:var(--shadow);}
+.callout-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--accent-sage);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.pullquote{background:linear-gradient(135deg,var(--accent-amber-soft) 0%,var(--bg-card) 100%);border:1px solid var(--accent-amber-soft);border-radius:8px;padding:22px 26px;margin:24px 0;font-size:16.5px;font-weight:500;color:var(--text-primary);position:relative;}
+.pullquote::before{content:"\201C";position:absolute;top:-6px;left:16px;font-size:48px;color:var(--accent-amber);font-family:Georgia,serif;line-height:1;font-weight:700;}
+.stats-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0 8px}
+.stat-cell{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:18px 16px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--accent-terracotta);line-height:1.1;margin-bottom:4px}
+.stat-label{font-size:13px;color:var(--text-secondary);font-weight:500;line-height:1.45}
+.stat-cell.victory{border-top:3px solid var(--accent-sage)}
+.stat-cell.defeat{border-top:3px solid var(--accent-mauve)}
+.stat-num.green{color:var(--accent-sage)}
+.stat-num.red{color:var(--accent-mauve)}
+.doctors-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0 8px}
+.doctor-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;transition:transform .2s;}
+.doctor-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.doctor-card.role-1{border-top:3px solid var(--accent-sage)}
+.doctor-card.role-2{border-top:3px solid var(--accent-terracotta)}
+.doctor-card.role-3{border-top:3px solid var(--accent-blue)}
+.doctor-card.role-4{border-top:3px solid var(--accent-amber)}
+.doctor-name{font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:2px;display:flex;align-items:center;gap:8px;letter-spacing:-.2px;}
+.doctor-age{font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:10px}
+.doctor-quote{font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:12px;line-height:1.6;padding-bottom:12px;border-bottom:1px dashed var(--border-light)}
+.doctor-behaviors{list-style:none;padding:0;margin:0;font-size:12.5px;color:var(--text-secondary);line-height:1.7}
+.doctor-behaviors li{padding:3px 0 3px 14px;position:relative}
+.doctor-behaviors li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--accent-amber)}
+.annotation{background:linear-gradient(135deg,var(--accent-sage-faint) 0%,var(--bg-card) 100%);border:1px solid var(--accent-sage-soft);border-left:3px solid var(--accent-sage);border-radius:0 8px 8px 0;padding:18px 22px;margin:32px 0 8px;position:relative;}
+.annotation-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--accent-sage-soft);}
+.annotation-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;letter-spacing:1.5px;}
+.annotation-hint{font-size:12px;color:var(--text-muted);font-weight:500;font-style:italic}
+.annotation dl{display:grid;grid-template-columns:minmax(140px,max-content) 1fr;gap:8px 18px;margin:0}
+.annotation dt{font-weight:600;color:var(--text-primary);font-size:13px;line-height:1.65}
+.annotation dd{margin:0;color:var(--text-secondary);font-size:13px;line-height:1.65}
+.annotation dd .who{color:var(--accent-terracotta);font-weight:700;margin-right:4px}
+.annotation dd .what{color:var(--text-secondary)}
+.dialog{background:var(--bg-deep);border-radius:6px;padding:14px 18px;margin:14px 0;font-size:14.5px;color:var(--text-primary);border-left:3px solid var(--accent-amber);}
+.dialog-speaker{font-weight:700;color:var(--accent-terracotta)}
+.table-wrap{margin:20px 0;background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:var(--bg-deep)}
+th{padding:12px 16px;text-align:left;font-weight:600;color:var(--text-primary);font-size:13px;letter-spacing:.3px;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border-light);color:var(--text-secondary);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(232,223,211,.3)}
+.coverage{background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:32px 0}
+.coverage-title{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px;padding-bottom:12px;border-bottom:2px dashed var(--border)}
+.quiz-list{display:flex;flex-direction:column;gap:14px;margin:18px 0}
+.quiz-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);border-left:4px solid var(--accent-sage)}
+.quiz-card-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.quiz-num{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent-sage);background:var(--accent-sage-soft);padding:2px 8px;border-radius:6px}
+.quiz-q{margin:0 0 8px;font-size:14.5px;color:var(--text-primary);font-weight:500;line-height:1.7}
+.quiz-options{list-style:none;padding:0;margin:0 0 6px;display:flex;flex-direction:column;gap:3px}
+.quiz-options li{padding:5px 10px;font-size:13.5px;color:var(--text-secondary);line-height:1.6;border-radius:5px;background:var(--bg-card);border:1px solid var(--border-light)}
+.quiz-answer{margin-top:10px;background:var(--bg-card);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text-secondary);border:1px dashed var(--border)}
+.quiz-answer summary{cursor:pointer;font-weight:600;color:var(--accent-sage);font-size:13px;padding:2px 0;list-style:none}
+.quiz-answer summary::before{content:"▶ "}
+.quiz-answer[open] summary{margin-bottom:6px}
+.summary-box{background:linear-gradient(135deg,var(--accent-sage-soft) 0%,var(--bg-card) 50%,var(--accent-amber-soft) 100%);border:1px solid var(--accent-sage);border-radius:12px;padding:32px 36px;margin:40px 0;position:relative;}
+.summary-box-title{font-size:13px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.summary-text{font-size:18px;color:var(--text-primary);line-height:1.85;font-weight:500}
+.footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);font-size:12.5px;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-weight:500}
+.footer-link{color:var(--accent-sage);text-decoration:none;font-weight:600}
+.back-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:justify-content:center;cursor:pointer;box-shadow:var(--shadow);transition:all .2s;z-index:40}
+.icon{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+code{background:var(--bg-deep);padding:2px 7px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent-terracotta);font-weight:500}
+@media (max-width:1100px){.sticky-toc{display:none}}
+@media (max-width:768px){.container{padding:24px 16px 60px}.hero{padding:32px 20px}.hero h1{font-size:32px}h2{font-size:22px}.doctors-grid,.stats-card{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="sticky-toc" aria-label="目录">
+  <div class="sticky-toc-title">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    目录
+  </div>
+  <ol>
+    <li><a href="#ch0">开篇 · 奏章房堆成山</a></li>
+    <li><a href="#ch1">第一幕 · "塞派"登场</a></li>
+    <li><a href="#ch2">第二幕 · 奏章房编排局挂牌</a></li>
+    <li><a href="#ch3">第三幕 · 周海四术</a></li>
+    <li><a href="#ch4">第四幕 · 上下文四件套</a></li>
+    <li><a href="#ch5">第五幕 · 陈守一"考校"成"拜师"</a></li>
+    <li><a href="#finale">终章 · 题匾"纸不在多,在排"</a></li>
+    <li><a href="#summary">一句话总结</a></li>
+    <li><a href="#coverage">概念地图</a></li>
+    <li><a href="#think">太子五条心得</a></li>
+    <li><a href="#quiz">自测十问</a></li>
+  </ol>
+</nav>
+
+<div class="container">
+
+<header class="hero">
+  <div class="hero-meta">
+    <span>WellInsight 学习材料</span>
+    <span class="hero-meta-dot"></span>
+    <span>来源教材 · 第09章 · 寓言版</span>
+    <span class="hero-meta-dot"></span>
+    <span>2026-06-25 · v1</span>
+  </div>
+  <h1>第09章 · 上下文工程</h1>
+  <p class="hero-subtitle"><span class="hero-fable">通政司奏章房</span> · 20 岁太子造"编排"机件 · 纸不在多,在排</p>
+  <p class="hero-desc">建议读法:先看故事,<strong>不要查名词</strong>;每章末尾有"本节专业名词对照",可倒回去对比。</p>
+  <span class="hero-source">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    原文 · datawhalechina/hello-agents · 第09章
+  </span>
+</header>
+
+<main id="content">
+
+<section id="ch0">
+  <span class="chapter-tag">开篇 · 景和十年五月</span>
+  <h2><span class="num">00</span>奏章房堆成山 —— 找一份"盐税专章"翻半个时辰</h2>
+  <span class="h2-hook">"通政司大殿堆着 800 里加急奏章,小吏找一份'盐税专章'翻半个时辰 —— 右通政范纯之说:'加宽纸面,塞满即可。'主事老吏笑:'殿下,反着堆才找得快。'"</span>
+
+  <p class="lead">景和十年五月。二十岁的太子刚办完文献阁的差事,正准备歇几日,小李匆匆迎上来:"殿下,通政司大殿堆了 800 里加急奏章,户部、工部、礼部三家的奏章全塞在一起,小吏找一份'盐税专章'翻半个时辰 —— 范右通政上奏,说要'加宽纸面',奏章一字不删。右通政说:'反正朝廷纸多,何必费人工去排?'"</p>
+
+  <p>太子赶到通政司大殿。大殿里奏章堆得齐人高,户部、工部、礼部按"先来后到"竖着堆,最底下那批已落了灰。范纯之正让小吏用三尺宽的大纸重新誊抄奏章,小吏叫苦不迭:"殿下,这哪是改奏章,这是把奏章房改成造纸坊。"</p>
+
+  <p>太子走到后院,发现一位六十来岁的老档头 —— 周海 —— 正在"反着堆":他把每天的奏章按"户部 / 工部 / 礼部 / 兵部"四家分柜,每家再按"主旨"分小摞。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">周海:</span>"殿下,老朽在通政司四十年,奏章的妙处不在'多',在'分'。一份奏章,只要头一行写明'某部 / 某事',找起来就快。塞满一面墙,不如分成四柜。"
+  </div>
+
+  <p>太子沉吟片刻,道:"<strong>范右通政主张'加宽纸面',是想着'纸大,装得下';周档头主张'分柜',是想着'排好,找得快'。通政司改组,要改的不是纸的多少,是排的章法</strong>。"</p>
+
+  <p>小李低声问:"殿下,灵机的'临时脑'也这样 —— 一次只能装几千字,塞太满就前后互冲。" 太子点头:"所以我们今天在通政司做的事,就是给灵机的'临时脑'装一套'分柜'的章法 —— <strong>这叫'上下文工程'</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">对照开篇的两大症结</span>
+    </div>
+    <dl>
+      <dt>奏章堆山 · 翻半时辰</dt>
+      <dd><span class="who">通政司大殿的现状</span><span class="what">—— 灵机的"上下文过载"(context overload):把太多信息塞进灵机"纸条",灵机找不到关键,前后信息互冲,准确率暴跌。</span></dd>
+      <dt>加宽纸面 · 塞满即可</dt>
+      <dd><span class="who">范纯之的"塞派"主张</span><span class="what">—— "加宽上下文窗口"(expand context window):试图用更大的窗口解决一切 —— 但窗口再大也有限,关键不在大,在排。</span></dd>
+      <dt>分柜 · 按主旨排</dt>
+      <dd><span class="who">周海的"排派"主张</span><span class="what">—— "上下文工程"(context engineering):不靠窗口大小,靠精心排版 —— 把最重要的放最上,次要放中段,最末放进折叠。</span></dd>
+      <dt>灵机临时脑 · 几千字</dt>
+      <dd><span class="who">小李的提示</span><span class="what">—— 灵机的"上下文窗口"(context window):单次对话能装下的字数(几千到几万字),会话外全忘。这是上下文工程要解决的核心限制。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch1">
+  <span class="chapter-tag">第一幕 · 塞派登场</span>
+  <h2><span class="num">01</span>范纯之:"纸大,装得下;何必费人工去排?"</h2>
+  <span class="h2-hook">"范右通政不是为反而反 —— 他是真心的:他心疼纸墨钱,想让小吏轻松。'加宽纸面'是他的善念。但他的善念,害了灵机。"</span>
+
+  <p class="lead">五月初三早朝。范纯之刚把"加宽纸面"的联名奏本呈上,户部侍郎先接话:"范右通政的好意臣懂 —— 但臣的奏章塞 2000 字,灵机看完还是答错。"</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">范纯之:</span>"<strong>殿下,臣不是为反而反。臣是想,反正朝廷纸多,纸面加宽,一卷奏章一字不删,灵机全看见,何必费人工去排?排要费人,排错还更糟</strong>。"
+  </div>
+
+  <p>这话有几分道理,朝堂上几位老臣点头。户部侍郎反驳:"可是臣的奏章塞 2000 字,关键'盐税'藏在第 1800 字,灵机看完答错 —— 不是看不见,是看见了找不到。"</p>
+
+  <p>太子示意户部侍郎说完,然后慢慢开口。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">太子:</span>"<strong>范右通政问得好。纸大不等于记得清,看得全不等于找得对。灵机的'临时脑'有限 —— 塞 2000 字,前 1000 字还没消化完,后 1000 字又来;关键'盐税'藏第 1800 字,灵机读到第 500 字就把它压到'脑底'去了。塞字塞多了,关键反而被埋没。范右通政的'加宽纸面',是让灵机记性更差,不是更好</strong>。"
+  </div>
+
+  <p>范纯之愣了半晌,半晌,拂袖而去。临走丢下一句:"臣的'加宽纸面'也是为朝廷省人工 —— 臣不省灵机的力,省小吏的力。"</p>
+
+  <p>太子望着他背影,对小李说:"<strong>范右通政不是坏人。他是想让小吏轻松 —— 这种善念,我们要尊重。但善念若不讲究章法,反而害事。我们今天的功课,是给范右通政一个'排法',让他看了服气</strong>。"</p>
+
+  <h3>通政司改组 · 三条铁规</h3>
+  <p>五月初五,太子在通政司后院挂"奏章房编排局"匾。三条铁规贴在正堂:</p>
+  <ul>
+    <li><strong>编排</strong> —— 把奏章按"卷首提要 / 段间标引 / 段末呼应 / 过滤杂字"四种章法排好,灵机一眼看穿 —— 三个月内拿出第一版</li>
+    <li><strong>四件套</strong> —— 给灵机"系统词 / 角色卡 / 近段 / 远段"四件套,临时脑里排得明明白白 —— 三个月内跑通端到端</li>
+    <li><strong>万器归一</strong> —— 沿用第07/08章机件规范,新机件按统一接驳口接入</li>
+  </ul>
+
+  <p>太子在匾旁另立一段话:"<strong>纸不在多,在排 —— 给灵机的临时脑排好章法,不是不信它,是让有限空间里读到最有用的信息</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">塞派 vs 排派</span>
+    </div>
+    <dl>
+      <dt>加宽纸面 · 塞满即可</dt>
+      <dd><span class="who">范纯之的塞派主张</span><span class="what">—— "加宽上下文窗口"思路:试图用更大窗口解决一切 —— 但窗口再大也有限,且大窗口反而拉低准确率(关键信息被埋没)。</span></dd>
+      <dt>中部遗忘</dt>
+      <dd><span class="who">太子指出的核心难题</span><span class="what">—— "Lost in the Middle"现象:灵机对上下文中间段的注意力最低,头尾反而记得清。把关键藏中间 = 故意让灵机答错。</span></dd>
+      <dt>排好章法</dt>
+      <dd><span class="who">太子的排派主张</span><span class="what">—— "上下文工程"(context engineering):用排版提升信息密度,把关键放最显眼位置,次要折叠。</span></dd>
+      <dt>塞派 vs 排派</dt>
+      <dd><span class="who">本章反派冲突</span><span class="what">—— 范纯之"加宽纸面"(工程简单,治标不治本) vs 周海"四术编排"(工程复杂,治本)。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch2">
+  <span class="chapter-tag">第二幕 · 立项</span>
+  <h2><span class="num">02</span>奏章房编排局挂牌,三匠人入驻</h2>
+  <span class="h2-hook">"记簿是'自己记自己',查档是'借别人的记忆',编排是'怎么排给灵机看' —— 一内一外一排,合起来才是完整的'上下文'。"</span>
+
+  <p class="lead">五月初七。太子召见三位主笔匠人:翰林院编修吕坤(四十出头,第08章记簿主笔),国子监祭酒苏望(三十五岁,第08章查档主笔),通政司老档头周海(六十二岁,整理卷宗四十年)。三人领命入局,太子当面给图纸,三月为期。</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num green">4</div>
+      <div class="stat-label">种编排术(顶/间/末/滤)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num green">3</div>
+      <div class="stat-label">序奏章排(提要/指纹/详文)</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num red">90</div>
+      <div class="stat-label">日为期,三月期满交付</div>
+    </div>
+  </div>
+
+  <h3>节点 1 · 周海主编排 · 依《周礼》"治弊要则"立"三序"</h3>
+  <p>周海的方案最独特 —— 他不直接造机,他先翻《周礼·天官》"治弊要则",找到卷宗排版的三层结构:</p>
+  <ul>
+    <li><strong>提要(顶序)</strong> —— 卷首写"主旨 + 关键三问",读者一眼看穿</li>
+    <li><strong>指纹(中序)</strong> —— 段间标引,让读者跳读</li>
+    <li><strong>详文(底序)</strong> —— 段末呼应 + 折叠,需要时再翻</li>
+  </ul>
+
+  <p>周海说:"<strong>老朽在通政司四十年,奏章的妙处不在'多',在'排'。一份奏章,只要头一行写明'某部 / 某事',中间分小标,末尾呼应,读者找起来就快</strong>。"</p>
+
+  <h3>节点 2 · 吕坤主段间 · 把记簿四柜搬进"间术"</h3>
+  <p>吕坤说:"第08章我们造了'记簿四柜' —— 案头纸/历事簿/通典/图音阁。这四柜现在可以派新用场:在奏章里,每段头加 4 字小标,标明'这段属于哪柜'。"</p>
+
+  <p>"<strong>段间标引</strong> —— 不是简单加目录,是要让灵机读段头就知道'这段是不是该记的',是不是'案头纸临时事',是不是'通典抽象知识'。"</p>
+
+  <h3>节点 3 · 苏望主指纹 · 把查档指纹搬进"末术"</h3>
+  <p>苏望说:"第08章我们造了'语义指纹坊'。现在派新用场:每段末尾加一句'对应户部某档' —— 灵机读到段末,自动召回相关档案。"</p>
+
+  <p>"<strong>段末呼应</strong> —— 不是简单列引用,是要让灵机读段末就能'查回去',把上下文连成一张网。"</p>
+
+  <p>太子点头:"这便是'编排'二字的本意 —— 不是把所有信息塞进灵机脑里,是按'提要 / 段间 / 段末'三序,让灵机'按图索骥'。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">编排三序 + 跨章机件复用</span>
+    </div>
+    <dl>
+      <dt>《周礼》"治弊要则"</dt>
+      <dd><span class="who">周海的设计依据</span><span class="what">—— 上下文工程的设计原则:不靠加宽窗口,靠精心排版 —— 头一行定主旨,中间分段,末尾呼应,杂字过滤。</span></dd>
+      <dt>三序 · 提要 / 指纹 / 详文</dt>
+      <dd><span class="who">周海的朝代比喻</span><span class="what">—— "上下文结构"(context structure):顶部系统词 + 角色卡 → 中部近段 → 底部远段 / 折叠。这是灵机"纸条"的标准三段式。</span></dd>
+      <dt>记簿四柜搬进段间</dt>
+      <dd><span class="who">吕坤的方案</span><span class="what">—— "段间标引"(section labeling):用第08章记簿分类(临时/历事/抽象/图音)给灵机每段加 4 字小标,让灵机跳读。</span></dd>
+      <dt>查档指纹搬进段末</dt>
+      <dd><span class="who">苏望的方案</span><span class="what">—— "段末呼应"(reference recall):用第08章指纹坊给灵机每段加"对应某档"标注,段末触发召回相关档案。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch3">
+  <span class="chapter-tag">第三幕 · 编排四术</span>
+  <h2><span class="num">03</span>周海造四术:顶术提要、间术标引、末术呼应、滤术过滤</h2>
+  <span class="h2-hook">"奏章的毛病,不在'少',在'乱'。四术不是让奏章变多,是让奏章变'清'。"</span>
+
+  <p class="lead">五月中。周海依《周礼》"治弊要则",把编排分为四大术法,每术有自己的"用途"和"边界" —— 治不同的奏章,用不同的术。</p>
+
+  <div class="doctors-grid">
+    <div class="doctor-card role-1">
+      <div class="doctor-name">顶术</div>
+      <div class="doctor-age">卷首提要</div>
+      <div class="doctor-quote">"卷首头一行,定主旨 + 关键三问。"</div>
+      <ul class="doctor-behaviors">
+        <li>卷首第一行,永远置顶</li>
+        <li>写明"某部 / 某事 / 三问"</li>
+        <li>适用:户部税奏 / 兵部军报 / 礼部礼单</li>
+        <li>边界:只管"主旨",不管"细节"</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-2">
+      <div class="doctor-name">间术</div>
+      <div class="doctor-age">段间标引</div>
+      <div class="doctor-quote">"每段头加 4 字小标,让灵机跳读。"</div>
+      <ul class="doctor-behaviors">
+        <li>每段头加 4 字小标(如"盐引减三成")</li>
+        <li>标明"这段属于哪柜"</li>
+        <li>适用:长奏章 / 多议题奏章</li>
+        <li>边界:不写段意,只写小标</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-3">
+      <div class="doctor-name">末术</div>
+      <div class="doctor-age">段末呼应</div>
+      <div class="doctor-quote">"段末加一句'对应户部某档',召回相关档案。"</div>
+      <ul class="doctor-behaviors">
+        <li>每段末加"对应户部 / 兵部某档"</li>
+        <li>触发灵机自动召回</li>
+        <li>适用:跨部奏章 / 历史奏章</li>
+        <li>边界:不写摘要,只写档案号</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-4">
+      <div class="doctor-name">滤术</div>
+      <div class="doctor-age">过滤杂字</div>
+      <div class="doctor-quote">"把'臣/谨/奏/钦此'客气话全删,只留干货。"</div>
+      <ul class="doctor-behaviors">
+        <li>删客气话(臣/谨/奏/钦此)</li>
+        <li>删套话(伏乞圣裁/惶恐待命)</li>
+        <li>适用:老奏章 / 旧式奏章</li>
+        <li>边界:不删关键事实</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>节点 4 · 四术小试 · 1800 字 vs 240 字</h3>
+  <p>五月二十。小吏挑了一份户部税奏章做测试 —— 原奏 1800 字,关键"盐税"藏在第 1800 字。周海让小吏按四术排版:</p>
+  <ul>
+    <li><strong>顶术</strong>:卷首加一行"户部税奏 / 景和九年盐税 / 关键三问:何为新规 / 入城登记 / 处罚"</li>
+    <li><strong>间术</strong>:每段头加 4 字小标(盐引减三成 / 入城登记 / 处罚加严 / 旧制对比)</li>
+    <li><strong>末术</strong>:每段末加"对应《景和八年旧制》第 X 条"</li>
+    <li><strong>滤术</strong>:把"臣 / 谨 / 奏 / 钦此 / 伏乞圣裁"全删</li>
+  </ul>
+
+  <p>排完,原本 1800 字,变成 240 字提要 + 4 段标引段。太子让灵机读 240 字提要答"景和九年盐税新规",灵机 3 秒答出"据新规第 7 条删'过路费'、第 19 条改'灶户税'为'产销税'" —— 丝毫不差。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">小吏:</span>"殿下,这 1800 字我看了半个时辰,灵机只读 240 字,3 秒答出 —— 这不是灵机快了,是奏章排好了。"
+  </div>
+
+  <p>周海补一句:"<strong>少 1/3 字,准 1 倍 —— 这就是'排'的妙处</strong>。"</p>
+
+  <p>范纯之正好走进来(本来想看看笑话),看到这一幕,愣了半晌,低声问:"周档头,这 240 字,真能答出 1800 字的内容?" 周海答:"<strong>右通政善意的'加宽纸面',是让灵机记性更差;周某费力的'排版',是让灵机记性更好。善心是善心,章法是章法</strong>。"</p>
+
+  <p>范纯之脸一红,没说话,走了。</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">四术的工程映射</span>
+    </div>
+    <dl>
+      <dt>顶术 · 卷首提要</dt>
+      <dd><span class="who">对应系统提示</span><span class="what">—— System Prompt / Role Definition:在上下文最顶端放"系统词"(身份/任务/约束),灵机最先读到,决定后续所有行为。</span></dd>
+      <dt>间术 · 段间标引</dt>
+      <dd><span class="who">对应文档切片</span><span class="what">—— Chunking + Section Header:把长文档切小段,每段加小标,让灵机跳读不重要的段。</span></dd>
+      <dt>末术 · 段末呼应</dt>
+      <dd><span class="who">对应引用召回</span><span class="what">—— Reference / Citation:段末加档案号或来源,触发灵机自动召回相关上下文。</span></dd>
+      <dt>滤术 · 过滤杂字</dt>
+      <dd><span class="who">对应噪声过滤</span><span class="what">—— Noise Filtering / Denoising:删客气话、套话、重复内容,只留关键事实。</span></dd>
+      <dt>四术配比</dt>
+      <dd><span class="who">实操原则</span><span class="what">—— 顶术放"主旨"(≤200 字) + 间术加"小标"(每段头 4 字) + 末术加"档案号"(段末 1 行) + 滤术删"杂字"(可删 1/3)。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch4">
+  <span class="chapter-tag">第四幕 · 上下文四件套</span>
+  <h2><span class="num">04</span>四匠人合议:系统词、角色卡、近段、远段</h2>
+  <span class="h2-hook">"灵机纸条四件套 —— 顶要紧的放最上,次要紧的放中段,最末的才放进折叠里。装不下,不如排好。"</span>
+
+  <p class="lead">六月初。四匠人(周海 + 吕坤 + 苏望 + 太子)在奏章房后院合议 —— 四术只是"排法",但灵机"纸条"上,具体放什么、放哪、占多少,还要定规矩。</p>
+
+  <p>周海翻出第08章记簿的"案头纸"(临时脑)规格:"案头纸默认 50 张,会话结束自动清空 —— 这就是灵机的'临时脑'上限。5000 字,塞不下,得排。"</p>
+
+  <p>四匠人合议出"上下文四件套":</p>
+
+  <h3>四件套 · 1. 系统词(永远置顶)</h3>
+  <p>周海立规矩:"<strong>系统词(永远置顶)</strong> —— 写明'你是谁,答必有据'。比如:'你是太子督办通政司奏章的匠人,通政司档头周海,40 年不误。答必有据,据必有档,无据不答。'"</p>
+  <p>规格:系统词 ≤ 200 字,放在纸条最顶端,灵机最先读到。</p>
+
+  <h3>四件套 · 2. 角色卡(系统词后)</h3>
+  <p>吕坤立规矩:"<strong>角色卡</strong> —— 在系统词后,写明'你现在是某角色'。比如:'老档头周海,40 年不误。'角色卡告诉灵机'用什么身份答'。"</p>
+  <p>规格:角色卡 ≤ 100 字,放在系统词后。</p>
+
+  <h3>四件套 · 3. 近段(段间)</h3>
+  <p>苏望立规矩:"<strong>近段</strong> —— 段间放'问句相关'的档案段。指纹排序找出最相关的 5 段,塞进纸条中段。"</p>
+  <p>规格:近段 ≤ 800 字,排在中段,每段带 4 字小标(间术)。</p>
+
+  <h3>四件套 · 4. 远段(段底)</h3>
+  <p>太子立规矩:"<strong>远段</strong> —— 段底放'可能相关'的档案段,折叠起来,需要时再翻。"</p>
+  <p>规格:远段 ≤ 2000 字,折叠,默认隐藏,问句触发召回才展开。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>件套</th><th>位置</th><th>字数</th><th>作用</th><th>由谁立</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>系统词</td><td>纸条顶</td><td>≤ 200</td><td>定身份 / 定任务 / 定约束</td><td>周海</td></tr>
+        <tr><td>角色卡</td><td>系统词后</td><td>≤ 100</td><td>告诉灵机"用什么身份答"</td><td>吕坤</td></tr>
+        <tr><td>近段</td><td>纸条中段</td><td>≤ 800</td><td>问句相关的 5 段(指纹排序)</td><td>苏望</td></tr>
+        <tr><td>远段</td><td>纸条底</td><td>≤ 2000(折叠)</td><td>可能相关的档案,默认折叠</td><td>太子</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>节点 5 · 四件套实战 · 户部侍郎考校</h3>
+  <p>六月初八早朝,户部侍郎亲自来考校,问刁钻题:"<strong>景和九年盐税与八年有何不同?</strong>"</p>
+
+  <p>巧手机按四件套作答:</p>
+  <div class="callout">
+    <p style="margin:0"><strong>盐税新规对比:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">① 据新税法第 7 条,删"过路费",改"入城税"为统一征收;<br>② 据第 19 条,改"灶户税"为"产销税",按产量而非按户收;<br>③ 据第 24 条,处罚加严,三犯以上取消盐引资格三年;<br>故新法比八年薄 <strong>23%</strong>(据户部算册),严 <strong>40%</strong>(据刑部复核)。</p>
+    <p style="margin:6px 0 0;font-size:13px;color:var(--text-muted)">—— 系统词:"你是通政司档头,答必有据";近段:第 7/19/24 条原文;远段:户部算册 + 刑部复核。</p>
+  </div>
+
+  <p>户部侍郎愣了半晌:"这'23%'和'40%'......我都没算过。灵机怎么知道的?" 周海笑:"<strong>系统词定角色(我是档头),近段定事实(第 7/19/24 条原文),远段定细节(户部算册 + 刑部复核),三件配齐,灵机自己算的</strong>。"</p>
+
+  <p>小李低声对太子说:"殿下,这是'少 1/3 字,准 1 倍'的真正意思 —— 不是字少,是字排得妙。" 太子点头:"<strong>这才是老档头的活 —— 四十年的经验不在脑里,在'怎么排'上</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">四件套的工程定义</span>
+    </div>
+    <dl>
+      <dt>系统词</dt>
+      <dd><span class="who">纸条顶</span><span class="what">—— System Prompt:在上下文最顶端设置"系统身份 / 任务 / 约束"指令,灵机最先读到,决定后续所有行为模式。</span></dd>
+      <dt>角色卡</dt>
+      <dd><span class="who">系统词后</span><span class="what">—— Role Definition:在系统词后追加"你现在是某角色",让灵机用特定身份回答。</span></dd>
+      <dt>近段</dt>
+      <dd><span class="who">纸条中段</span><span class="what">—— In-context Examples / Retrieved Chunks:问句最相关的几段内容,经指纹排序后塞入中段。</span></dd>
+      <dt>远段</dt>
+      <dd><span class="who">纸条底</span><span class="what">—— Folded Context / Long-tail References:可能相关的档案,默认折叠,需要时召回展开。</span></dd>
+      <dt>23% / 40%</dt>
+      <dd><span class="who">巧手机自算</span><span class="what">—— "推理增强":四件套给齐数据后,灵机自己算(少 1/3 字,准 1 倍),这是上下文工程的连锁效应。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch5">
+  <span class="chapter-tag">第五幕 · 实战与反转</span>
+  <h2><span class="num">05</span>陈守一"考校"成"拜师"—— 省纸派反转</h2>
+  <span class="h2-hook">"陈守一从西市舶司赶来'考校'灵机 —— 一道刁题'边贸茶盐互市新规',灵机按四件套答得丝毫不差,陈守一反倒问:'怎么教我?'"</span>
+
+  <p class="lead">六月十二早朝。范纯之又上一奏:"<strong>奏章房编排机件,费人工,不如加宽纸面</strong>。"</p>
+
+  <p>梁王(第08章三反转后任"文献阁对外联络大臣")在朝堂上求情:"殿下,范右通政不是坏人 —— 他的'加宽纸面'是想让小吏轻松,善念可悯。让他再想想。"</p>
+
+  <p>太子正要开口,门外传来一封急奏 —— 朝廷派西市舶司"省纸派"主事陈守一前来"考校"。陈守一是范纯之的老友,两人在"省纸"上意见一致,但陈守一更彻底 —— 他主张"<strong>不光纸要省,连灵机的'纸条'也要省</strong>"。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">陈守一:</span>"殿下,臣从西市舶司赶来,不为别的,只想出一道刁题考校编排局 —— 听说是新设的,臣没见过,心里没底。题是:'<strong>景和十年边贸茶盐互市新规,与旧制冲突吗</strong>?'"
+  </div>
+
+  <p>太子示意周海,周海立"四件套纸条"贴在通政司正堂墙上:</p>
+  <ul>
+    <li><strong>系统词</strong>:"你是西市舶司主事陈守一,精通边贸,答必有据,据必有档。"</li>
+    <li><strong>角色卡</strong>:"通政司老档头周海,40 年不误。"</li>
+    <li><strong>近段</strong>:《景和十年边贸茶盐互市新规》第 1-7 条原文(指纹排序找出)</li>
+    <li><strong>远段</strong>:《景和八年旧制》第 3/7 条(默认折叠)</li>
+  </ul>
+
+  <p>巧手机"想"了半晌,吐答:</p>
+  <div class="callout">
+    <p style="margin:0"><strong>茶盐互市新规 vs 旧制:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">① 据新规第 3 条"茶入北口须持盐引",与旧制"茶盐分道"<strong>不冲突</strong>(旧制不禁止盐引,只是要求分道);<br>② 但据新规第 7 条"盐入南口减三成",与旧制"南口不减"<strong>冲突</strong>(南口减税将冲击旧盐商利益),需户部复议。</p>
+    <p style="margin:6px 0 0;font-size:13px;color:var(--text-muted)">—— 系统词:"答必有据";近段:新规第 3/7 条;远段:旧制第 3/7 条。</p>
+  </div>
+
+  <p>陈守一看了半晌,问:"灵机,你答得对 —— 但我问你,你<strong>怎么答得这么清</strong>?"</p>
+
+  <p>周海代灵机答:"<strong>系统词定角色(我是档头,答必有据),近段定事实(新规第 3/7 条原文),远段定细节(旧制第 3/7 条默认折叠,问时才展开)。四件配齐,灵机自己比对的</strong>。"</p>
+
+  <p>陈守一又问:"那—— 我能不能也学这套?" 周海答:"<strong>陈主事是省纸派,以为'省字=省力' —— 其实'省字≠省力','排字=省力'</strong>。学了四术,你的'省纸'主张才真正落地。"</p>
+
+  <p>陈守一长叹一声,主动请缨:"<strong>殿下,臣愿任'通政司奏章房外派督办',把这套编排,推给西市舶司十二衙门</strong>。臣的'省纸派',从此改'排派'。"</p>
+
+  <p>范纯之在一旁看着,脸色复杂。</p>
+
+  <h3>太子金句 · 编排三戒</h3>
+  <p>太子在奏章房匾旁贴上"编排三戒":</p>
+  <ul>
+    <li><strong>戒塞满</strong> —— 灵机临时脑有限,塞满则前后互冲,关键被埋没</li>
+    <li><strong>戒无序</strong> —— 不是排得多就好,要"提要在顶、间标在中、末呼在底、滤杂在全"</li>
+    <li><strong>戒忘排</strong> —— 排好之后还要常维护,四件套不是一锤子买卖</li>
+  </ul>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">实战 + 三戒 + 反派反转</span>
+    </div>
+    <dl>
+      <dt>陈守一"考校"成"拜师"</dt>
+      <dd><span class="who">本章反派反转</span><span class="what">—— 上下文工程实战:西市舶司主事带"省纸派"立场来考校,反被编排四件套答服,主动请缨任外派督办,把"排"字诀推十二衙门。</span></dd>
+      <dt>茶盐互市 · 冲突对比</dt>
+      <dd><span class="who">灵机四件套作答</span><span class="what">—— 上下文推理:新规 vs 旧制,4 段档案(新第 3/7 + 旧第 3/7)合并比对,灵机自己判断"哪个冲突 / 哪个不冲突"。</span></dd>
+      <dt>省字≠省力 · 排字=省力</dt>
+      <dd><span class="who">周海总结</span><span class="what">—— 上下文工程金句:省字不等于省灵机的力(临时脑有限);但排字 = 让灵机少算 = 真正省力。</span></dd>
+      <dt>编排三戒</dt>
+      <dd><span class="who">太子立的规矩</span><span class="what">—— 上下文工程设计三原则:① 不塞满(戒塞满)② 要有序(戒无序)③ 常维护(戒忘排)。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="finale">
+  <span class="chapter-tag">终章 · 景和十年七月</span>
+  <h2><span class="num">06</span>三月期满,奏章房匾"纸不在多,在排"</h2>
+
+  <p class="lead">景和十年七月。三月期满,奏章房正式挂牌。太子题匾四字:"<strong>纸不在多,在排</strong>"。</p>
+
+  <p>这天早朝,周海、吕坤、苏望、陈守一、范纯之、梁王同堂。太子当众演示:把一张户部新送来的《景和十年秋粮调度令》当场入库(切段、盖指纹、建索引),再按四件套(系统词+角色卡+近段+远段)排成"纸条",然后问巧手机:"秋粮调度令中,受灾县如何减免赋税?" —— 巧手机从刚入库的 23 段档案中精准找出 5 段,答得丝毫不差。</p>
+
+  <p>周海带头鼓掌。奏章房编修们从此不再说灵机是"金鱼"或"塞派"。</p>
+
+  <div class="pullquote">
+    "灵机的脑不大,纸面再宽,装得下的也有限。<br><br>
+    真正的功夫,不在塞多少纸条,在<strong>排什么纸条放在哪</strong> —— <br><br>
+    顶要紧的放最上,次要紧的放中段,最末的才放进折叠里。<br><br>
+    <strong>上下文不是塞得多,是排得好。</strong>"
+    <footer style="margin-top:14px;font-size:13px;color:var(--text-muted)">—— 太子,景和十年七月,20 岁,奏章房挂牌三月</footer>
+  </div>
+
+  <h3>跨章承接 · 下一章预告</h3>
+  <ul>
+    <li><strong>第10章 · MCP 协议</strong> —— 奏章房排好的"纸条",如何让"别家巧手机"也能读懂?基于第07章工具系统,扩展"机件对机件"的说话规矩。</li>
+    <li><strong>第11章 · 评估与迭代</strong> —— 灵机答得好不好,谁来打分?怎么打分?第08章记簿 + 第09章编排如何"被评估"?</li>
+  </ul>
+</section>
+
+<section id="summary">
+  <div class="summary-box">
+    <div class="summary-box-title">一句话总结</div>
+    <p class="summary-text">第09章讲的是:<strong>灵机"纸条"堆成山 —— 通政司范纯之主张"加宽纸面"(塞派),老档头周海主张"排版提要"(排派),二十岁太子在通政司下设奏章房,造出"编排四术"(顶/间/末/滤)与"上下文四件套"(系统词/角色卡/近段/远段),三月为期,纸不在多,在排</strong>。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px">太子金句:"<strong>灵机的脑不大,纸面再宽,装得下的也有限。真正的功夫,不在塞多少纸条,在排什么纸条放在哪 —— 上下文不是塞得多,是排得好</strong>"。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px;color:var(--text-muted)">反派(陈守一)反转:西市舶司"省纸派"主事从"考校"成"拜师",主动请缨任"奏章房外派督办",把"排派"推十二衙门。母题连续 7 连击复用(反派转友)。</p>
+  </div>
+</section>
+
+<section id="coverage">
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" style="color:var(--accent-sage)"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      概念地图 · 25 个名词索引
+    </div>
+
+    <h4 style="margin:0 0 12px">📜 编排四术 · 四种"排法"</h4>
+    <div class="doctors-grid">
+      <div class="doctor-card role-1">
+        <div class="doctor-name">顶术</div>
+        <div class="doctor-quote">"卷首提要,主旨 + 关键三问。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应系统提示</li>
+          <li>≤ 200 字,置顶</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-2">
+        <div class="doctor-name">间术</div>
+        <div class="doctor-quote">"段间标引,4 字小标,让灵机跳读。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应文档切片</li>
+          <li>每段头 4 字</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-3">
+        <div class="doctor-name">末术</div>
+        <div class="doctor-quote">"段末呼应,召回相关档案。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应引用召回</li>
+          <li>段末加档案号</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-4">
+        <div class="doctor-name">滤术</div>
+        <div class="doctor-quote">"过滤杂字,删客气话套话。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应噪声过滤</li>
+          <li>可删 1/3 字</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4 style="margin:24px 0 12px">📖 上下文四件套 · "纸条"标准格式</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>件套</th><th>位置</th><th>字数</th><th>作用</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>系统词</td><td>纸条顶</td><td>≤ 200</td><td>定身份 / 定任务 / 定约束</td></tr>
+          <tr><td>角色卡</td><td>系统词后</td><td>≤ 100</td><td>告诉灵机"用什么身份答"</td></tr>
+          <tr><td>近段</td><td>纸条中段</td><td>≤ 800</td><td>问句相关的 5 段</td></tr>
+          <tr><td>远段</td><td>纸条底</td><td>≤ 2000(折叠)</td><td>可能相关的档案,默认折叠</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin:24px 0 12px">📜 奏章三序 · 卷宗排版</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>序</th><th>朝代叙事</th><th>对应概念</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>提要(顶序)</td><td>卷首写明"某部 / 某事 / 三问"</td><td>系统词(见 annotation)</td></tr>
+          <tr><td>指纹(中序)</td><td>段间标引 4 字小标</td><td>段间小标(见 annotation)</td></tr>
+          <tr><td>详文(底序)</td><td>段末呼应 + 折叠</td><td>段末呼应(见 annotation)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin:24px 0 12px">🔧 编排 vs 第 08 章记簿(机件对比)</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>维度</th><th>第 08 章记簿</th><th>第 09 章编排</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>管什么</td><td>"什么值得记"</td><td>"怎么排给灵机看"</td></tr>
+          <tr><td>位置</td><td>档案库(永久存储)</td><td>纸条(临时脑)</td></tr>
+          <tr><td>主笔</td><td>吕坤</td><td>周海</td></tr>
+          <tr><td>核心</td><td>评分规矩 + 五际循环</td><td>四术 + 四件套</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="think">
+  <span class="chapter-tag">太子的五条心得</span>
+  <h2><span class="num">心</span>二十岁太子的五条心得(白话版)</h2>
+  <span class="h2-hook">"故事听完了,太子想跟你掏心窝子说几句 —— 都是大白话,不必查名词。"</span>
+
+  <h3>心得一 · 塞字的毛病不是字多,是字乱</h3>
+  <p>灵机临时脑有限,塞 2000 字不如排 240 字 —— 不是字少就够,是字<strong>排得对</strong>。<strong>少 1/3 字,准 1 倍</strong>。</p>
+
+  <h3>心得二 · 排字的妙处不是好看,是好找</h3>
+  <p>四术(顶/间/末/滤)不是为美观,是为让灵机"按图索骥" —— <strong>顶要紧的放最上,次要紧的放中段,最末的才放进折叠里</strong>。</p>
+
+  <h3>心得三 · 四件套是"纸条"的标准格式</h3>
+  <p>系统词定身份(我是谁),角色卡定身份(用什么身份答),近段定事实(答什么),远段定细节(可能要答什么) —— <strong>四件配齐,灵机自己算</strong>。</p>
+
+  <h3>心得四 · 范右通政的"加宽纸面"不是错,是省错了地方</h3>
+  <p>他想让小吏轻松 —— 这种善念我们要尊重。但善念不讲究章法,反而害事。<strong>排字才是真省力,塞字不是</strong>。</p>
+
+  <h3>心得五 · 陈守一从"省纸派"改"排派" —— 这就是章法的胜利</h3>
+  <p>西市舶司"省纸派"主事从"考校"成"拜师" —— 不是他认输,是他看见<strong>省字≠省力,排字=省力</strong>。<strong>章法对了,善念才真正落地</strong>。</p>
+
+  <div class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">这五条心得对应到编排机件上就是</span>
+    </div>
+    <dl>
+      <dt>心得一</dt><dd>→ 上下文过载(塞字)与上下文工程(排字)的核心区别:字不在多,在排</dd>
+      <dt>心得二</dt><dd>→ 四术 = 把"塞"改成"排":顶/间/末/滤 各管一处</dd>
+      <dt>心得三</dt><dd>→ 四件套 = "纸条"标准格式:系统词 + 角色卡 + 近段 + 远段</dd>
+      <dt>心得四</dt><dd>→ "省纸派"误区:省字不等于省力(临时脑有限,塞字反而费灵机的力)</dd>
+      <dt>心得五</dt><dd>→ "排派"胜利:陈守一从"省纸"转"排字",这是反派转友母题 7 连击复用</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="quiz">
+  <span class="chapter-tag">自测十问</span>
+  <h2><span class="num">测</span>读完了?来试试这十问</h2>
+  <span class="h2-hook">"题目和选项直接展开看,答案藏在每题底部的小箭头里 —— 自己先想,再看答案。"</span>
+
+  <div class="quiz-list">
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q1</span>
+        <span style="font-size:13px;color:var(--text-muted)">考开篇两大症结</span>
+      </div>
+      <p class="quiz-q">范纯之的"加宽纸面"和周海的"分柜",分别对应上下文工程的哪两个思路?</p>
+      <ul class="quiz-options">
+        <li>A. 加宽上下文窗口 / 上下文工程(排版)</li>
+        <li>B. 增大人工 / 减少人工</li>
+        <li>C. 用云端 / 用本地</li>
+        <li>D. 加钱 / 省钱</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 加宽上下文窗口 / 上下文工程(排版)</strong></p>
+        <p style="margin:4px 0">A 对 —— 范纯之"加宽纸面"= "加宽临时脑"(试图用更大窗口解决一切);周海"分柜"= "上下文工程"(靠排版提升信息密度),两者是上下文工程的两条思路。</p>
+        <p style="margin:4px 0">B 错 —— "增大人工/减少人工"是工程成本思路,不是上下文工程的核心思路。</p>
+        <p style="margin:4px 0">C 错 —— "用云端/用本地"是部署思路,跟本章主线无关。</p>
+        <p style="margin:4px 0">D 错 —— "加钱/省钱"是预算思路,不是上下文工程思路。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q2</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四术之"顶术"</span>
+      </div>
+      <p class="quiz-q">周海"顶术"对应上下文工程的哪个要素?</p>
+      <ul class="quiz-options">
+        <li>A. 系统词 / 系统提示(置顶)</li>
+        <li>B. 段间标引(中段)</li>
+        <li>C. 段末呼应(段底)</li>
+        <li>D. 过滤杂字(全文)</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 系统词(置顶)</strong></p>
+        <p style="margin:4px 0">A 对 —— "顶术"卷首提要,放在纸条最顶,灵机最先读到 —— 这就是"系统词":在上下文顶端设置身份/任务/约束。</p>
+        <p style="margin:4px 0">B 错 —— "段间标引"是"间术",放在中段每段头加 4 字小标。</p>
+        <p style="margin:4px 0">C 错 —— "段末呼应"是"末术",放在每段末加档案号。</p>
+        <p style="margin:4px 0">D 错 —— "过滤杂字"是"滤术",删客气话套话,管全文。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q3</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四术之"间术"</span>
+      </div>
+      <p class="quiz-q">周海"间术"的核心是?</p>
+      <ul class="quiz-options">
+        <li>A. 把奏章改短</li>
+        <li>B. 把奏章改长</li>
+        <li>C. 每段头加 4 字小标,让灵机跳读</li>
+        <li>D. 把奏章改用诗写</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 每段头加 4 字小标,让灵机跳读</strong></p>
+        <p style="margin:4px 0">A 错 —— "改短"是滤术的活,不是间术。</p>
+        <p style="margin:4px 0">B 错 —— "改长"是反方向,跟排版思路相反。</p>
+        <p style="margin:4px 0">C 对 —— "间术" = 段间标引:每段头加 4 字小标(如"盐引减三成"),让灵机跳读不重要的段。这是"文档切片 + Section Header"的工程实现。</p>
+        <p style="margin:4px 0">D 错 —— "改用诗写"是文体变化,不是排版思路。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q4</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四术之"滤术"</span>
+      </div>
+      <p class="quiz-q">周海"滤术"删的是?</p>
+      <ul class="quiz-options">
+        <li>A. 关键事实</li>
+        <li>B. 数字</li>
+        <li>C. 客气话、套话、重复内容(可删 1/3 字)</li>
+        <li>D. 所有动词</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 客气话、套话、重复内容(可删 1/3 字)</strong></p>
+        <p style="margin:4px 0">A 错 —— "关键事实"是绝对不能删的。删了关键事实,排版再好也答错。</p>
+        <p style="margin:4px 0">B 错 —— "数字"通常也是关键,不能删。</p>
+        <p style="margin:4px 0">C 对 —— 滤术 = 噪声过滤:删"臣/谨/奏/钦此"客气话,"伏乞圣裁/惶恐待命"套话,以及重复内容。可删约 1/3 字,给关键事实腾位置。</p>
+        <p style="margin:4px 0">D 错 —— "所有动词"删了奏章就读不通了。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q5</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四件套</span>
+      </div>
+      <p class="quiz-q">"上下文四件套"指什么?</p>
+      <ul class="quiz-options">
+        <li>A. 茶 / 盐 / 算盘 / 笔</li>
+        <li>B. 系统词 / 角色卡 / 近段 / 远段</li>
+        <li>C. 户部 / 工部 / 礼部 / 兵部</li>
+        <li>D. 顶术 / 间术 / 末术 / 滤术</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 系统词 / 角色卡 / 近段 / 远段</strong></p>
+        <p style="margin:4px 0">A 错 —— 茶盐算盘笔是朝代小品的实物,不是四件套。</p>
+        <p style="margin:4px 0">B 对 —— 四件套 = 灵机"纸条"的标准格式:系统词(定身份/任务/约束) + 角色卡(定用什么身份答) + 近段(问句相关的 5 段,经指纹排序) + 远段(可能相关的档案,默认折叠)。</p>
+        <p style="margin:4px 0">C 错 —— 户部/工部/礼部/兵部是朝廷四部,不是上下文工程概念。</p>
+        <p style="margin:4px 0">D 错 —— 顶/间/末/滤 是"四术"(排法),不是"四件套"(格式)。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q6</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四件套字数</span>
+      </div>
+      <p class="quiz-q">系统词 / 角色卡 / 近段 / 远段,字数规格分别是?</p>
+      <ul class="quiz-options">
+        <li>A. ≤ 200 / ≤ 100 / ≤ 800 / ≤ 2000(折叠)</li>
+        <li>B. ≤ 100 / ≤ 200 / ≤ 2000 / ≤ 800</li>
+        <li>C. ≤ 800 / ≤ 200 / ≤ 2000 / ≤ 100</li>
+        <li>D. 都一样,各占 1/4</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · ≤ 200 / ≤ 100 / ≤ 800 / ≤ 2000(折叠)</strong></p>
+        <p style="margin:4px 0">A 对 —— 系统词 ≤ 200 字(定身份不能太长);角色卡 ≤ 100 字(简明);近段 ≤ 800 字(放最相关 5 段);远段 ≤ 2000 字(默认折叠,问时才展开)。</p>
+        <p style="margin:4px 0">B 错 —— 把"系统词 200"和"角色卡 100"反过来了 —— 系统词应比角色卡长,因为系统词包含任务/约束。</p>
+        <p style="margin:4px 0">C 错 —— 顺序不对,且"近段"应比"远段"短(近段是放展开的)。</p>
+        <p style="margin:4px 0">D 错 —— 四件套字数规格不一样,不是各占 1/4。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q7</span>
+        <span style="font-size:13px;color:var(--text-muted)">考太子金句</span>
+      </div>
+      <p class="quiz-q">太子金句"纸不在多,在排",完整版是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 纸不在多,在排 —— 顶要紧的放最上,次要紧的放中段,最末的才放进折叠里</li>
+        <li>B. 纸不在多,在省</li>
+        <li>C. 纸不在多,在合</li>
+        <li>D. 纸不在多,在巧</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 顶要紧的放最上,次要紧的放中段,最末的才放进折叠里</strong></p>
+        <p style="margin:4px 0">A 对 —— 完整版是:纸不在多,在排 —— 顶要紧的放最上(系统词),次要紧的放中段(近段),最末的才放进折叠里(远段)。这是上下文工程的金句。</p>
+        <p style="margin:4px 0">B 错 —— "在省"是范纯之"加宽纸面"的对立,不是太子的金句。</p>
+        <p style="margin:4px 0">C 错 —— "在合"是合并的思路,不是上下文工程核心。</p>
+        <p style="margin:4px 0">D 错 —— "在巧"是陈守一"省纸派"的思路,不是太子的金句。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q8</span>
+        <span style="font-size:13px;color:var(--text-muted)">考编排三戒</span>
+      </div>
+      <p class="quiz-q">太子立的"编排三戒",不包括下列哪一条?</p>
+      <ul class="quiz-options">
+        <li>A. 戒塞满</li>
+        <li>B. 戒无序</li>
+        <li>C. 戒多问</li>
+        <li>D. 戒忘排</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · "戒多问"不在三戒之列</strong></p>
+        <p style="margin:4px 0">A 对(在三戒中) —— "戒塞满":灵机临时脑有限,塞满则前后互冲,关键被埋没。</p>
+        <p style="margin:4px 0">B 对(在三戒中) —— "戒无序":不是排得多就好,要"提要在顶、间标在中、末呼在底、滤杂在全"。</p>
+        <p style="margin:4px 0">C 错(不在三戒中) —— "戒多问"不是编排三戒之一。多问是灵机的功能,不是编排设计原则。三戒是塞满/无序/忘排,不是问得多不多。</p>
+        <p style="margin:4px 0">D 对(在三戒中) —— "戒忘排":排好之后还要常维护,四件套不是一锤子买卖。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q9</span>
+        <span style="font-size:13px;color:var(--text-muted)">考反派母题</span>
+      </div>
+      <p class="quiz-q">陈守一在本章中反对的是什么?后来为什么反转?</p>
+      <ul class="quiz-options">
+        <li>A. 反对自造 → 因为看见本土灵机比洋货好</li>
+        <li>B. 反对外挂记簿 → 因为看见查档机演示后,理解了"内典+外典"</li>
+        <li>C. 反对"省纸派"本身,主张更彻底的省 → 因为看见四件套排字 = 真省力,从"考校"成"拜师"</li>
+        <li>D. 反对奏章房 → 因为他被免职</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 反对"省纸派"本身,主张更彻底的省 → 看见四件套后排字=真省力,反转</strong></p>
+        <p style="margin:4px 0">A 错 —— "反对自造"是第07章梁王的事,不是本章。第07章梁王"反对自造,被本土灵机演示说服后转对外联络大臣"。</p>
+        <p style="margin:4px 0">B 错 —— "反对外挂记簿"是第08章梁王的事,不是本章。第08章梁王"反对外挂记簿,被查档机演示说服后转对外联络"。</p>
+        <p style="margin:4px 0">C 对 —— 第09章陈守一(西市舶司"省纸派"主事)主张"省纸派"立场,带刁题"茶盐互市新规"来考校,反被四件套答服,主动请缨任"奏章房外派督办",从"考校"成"拜师"。母题 7 连击复用。</p>
+        <p style="margin:4px 0">D 错 —— "反对奏章房"不是本章情节,陈守一反而来当外派督办。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q10</span>
+        <span style="font-size:13px;color:var(--text-muted)">考跨章呼应</span>
+      </div>
+      <p class="quiz-q">第 09 章的"编排"机件,跟第 08 章的"记簿"机件是什么关系?</p>
+      <ul class="quiz-options">
+        <li>A. 编排替代记簿</li>
+        <li>B. 记簿替代编排</li>
+        <li>C. 编排 ≠ 记簿:记簿管"什么值得记"(永久存储),编排管"怎么排给灵机看"(临时纸条)</li>
+        <li>D. 两者完全一样</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 记簿管"什么值得记",编排管"怎么排给灵机看"</strong></p>
+        <p style="margin:4px 0">A 错 —— "编排替代记簿"不对 —— 两者是互补关系,不是替代。记簿决定"档案库里存什么",编排决定"灵机纸条上放什么"。</p>
+        <p style="margin:4px 0">B 错 —— "记簿替代编排"也不对 —— 同上,两者互补不替代。</p>
+        <p style="margin:4px 0">C 对 —— 记簿是"档案库"(永久存储),管"什么值得记"—— 第 08 章案头纸/历事簿/通典/图音阁都是档案库里的柜。编排是"纸条"(临时脑),管"怎么排给灵机看"—— 第 09 章顶/间/末/滤四术都是纸条上的排法。位置不同,主笔不同(吕坤 vs 周海),核心不同(评分规矩 vs 四件套)。</p>
+        <p style="margin:4px 0">D 错 —— 两者完全不同 —— 一个管永久存储,一个管临时排版。</p>
+      </details>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text-secondary)">WellInsight</strong> · 学习材料 · 第09章 v1.0 · 2026-06-25
+  </div>
+  <div>
+    原文:<a class="footer-link" href="https://raw.githubusercontent.com/datawhalechina/hello-agents/main/docs/chapter9/Chapter9-Context-Engineering.md" target="_blank">datawhalechina/hello-agents · Chapter 9</a>
+  </div>
+</footer>
+
+</div>
+
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin:round"><path d="M18 15l6-6-6-6"/></svg>
+</button>
+
+</body>
+</html>

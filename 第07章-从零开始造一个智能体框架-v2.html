@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第07章 · 从零开始造一个智能体框架 · WellInsight 学习材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============== Morandi Palette ============== */
+:root{
+  --bg:#F2EDE6;--bg-card:#FAF7F2;--bg-elevated:#FFFCF7;--bg-deep:#E8DFD3;
+  --text-primary:#3D3833;--text-secondary:#6B6157;--text-muted:#998E81;
+  --accent-sage:#8B9D83;--accent-sage-soft:#D8E2D2;--accent-sage-faint:#ECF1E8;
+  --accent-terracotta:#C49B8E;--accent-terracotta-soft:#E6D2C8;
+  --accent-blue:#8A9AA8;--accent-blue-soft:#C8D2DA;
+  --accent-amber:#C9A878;--accent-amber-soft:#E8D7B7;
+  --accent-mauve:#A89098;--accent-mauve-soft:#DCCCD0;
+  --border:#D9D2C7;--border-light:#E8E0D3;
+  --shadow:0 2px 8px rgba(61,56,51,.06), 0 1px 2px rgba(61,56,51,.04);
+  --shadow-lg:0 8px 24px rgba(61,56,51,.10), 0 2px 6px rgba(61,56,51,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;
+  background:var(--bg);color:var(--text-primary);line-height:1.78;font-size:16px;font-weight:400;
+  -webkit-font-smoothing:antialiased;letter-spacing:.01em;}
+.container{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+.sticky-toc{position:fixed;top:24px;right:24px;width:240px;background:var(--bg-elevated);
+  border:1px solid var(--border);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);
+  font-size:13px;z-index:50;max-height:calc(100vh - 48px);overflow-y:auto;}
+.sticky-toc-title{font-weight:600;color:var(--text-secondary);margin-bottom:8px;font-size:12px;
+  letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+.sticky-toc ol{list-style:none;counter-reset:toc;padding:0}
+.sticky-toc li{counter-increment:toc;margin:4px 0}
+.sticky-toc a{color:var(--text-secondary);text-decoration:none;display:block;padding:4px 0 4px 8px;
+  margin-left:6px;border-left:2px solid transparent;font-size:12.5px;font-weight:500;transition:all .2s;}
+.sticky-toc a:hover{color:var(--accent-sage);border-left-color:var(--accent-sage)}
+.sticky-toc a::before{content:counter(toc) ".";color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px;margin-right:4px}
+
+.hero{background:linear-gradient(135deg,#FAF7F2 0%,#F2EDE6 100%);border:1px solid var(--border);
+  border-radius:12px;padding:48px 40px 40px;margin-bottom:48px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--accent-sage) 0%,var(--accent-terracotta) 33%,var(--accent-blue) 66%,var(--accent-amber) 100%);}
+.hero-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text-muted);
+  margin-bottom:16px;font-weight:500;letter-spacing:.5px;}
+.hero-meta-dot{width:4px;height:4px;background:var(--text-muted);border-radius:50%}
+.hero h1{font-size:46px;font-weight:700;line-height:1.15;color:var(--text-primary);margin-bottom:10px;letter-spacing:-1px;}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);margin-bottom:22px;font-weight:500;}
+.hero-fable{display:inline-block;padding:2px 10px;margin-right:4px;background:var(--accent-sage-soft);
+  color:var(--accent-sage);border-radius:12px;font-size:14px;font-weight:600;letter-spacing:.5px;}
+.hero-desc{font-size:14.5px;color:var(--text-secondary);margin-bottom:24px;line-height:1.7;font-weight:400;}
+.hero-source{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);
+  background:var(--bg-card);padding:6px 12px;border-radius:20px;border:1px solid var(--border-light);font-weight:500;}
+
+section{margin-bottom:56px;scroll-margin-top:80px}
+.chapter-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+  color:var(--accent-sage);background:var(--accent-sage-soft);padding:4px 12px;border-radius:12px;
+  margin-bottom:14px;letter-spacing:1px;}
+h2{font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:14px;letter-spacing:-.3px;
+  display:flex;align-items:baseline;gap:12px;line-height:1.3;}
+h2 .num{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--accent-terracotta);font-weight:500}
+h2-hook{display:block;font-size:15px;font-weight:500;color:var(--text-secondary);margin-top:8px;
+  margin-bottom:24px;padding:12px 16px;background:var(--bg-card);border-left:3px solid var(--accent-amber);
+  border-radius:0 6px 6px 0;font-style:italic;}
+h3{font-size:19px;font-weight:600;color:var(--text-primary);margin:24px 0 10px;padding-left:14px;
+  border-left:3px solid var(--accent-amber);letter-spacing:-.2px;}
+h4{font-size:16px;font-weight:600;color:var(--accent-sage);margin:20px 0 10px}
+p{margin-bottom:14px;color:var(--text-primary);text-align:justify;font-weight:400}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+em{color:var(--text-secondary);font-style:normal;font-weight:600}
+
+.lead{font-size:17px;color:var(--text-secondary);padding:18px 22px;background:var(--bg-card);
+  border-left:3px solid var(--accent-terracotta);border-radius:0 6px 6px 0;margin-bottom:28px;
+  font-weight:500;line-height:1.85;}
+.callout{background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;
+  padding:18px 22px;margin:20px 0;box-shadow:var(--shadow);}
+.callout-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;
+  color:var(--accent-sage);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.pullquote{background:linear-gradient(135deg,var(--accent-amber-soft) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-amber-soft);border-radius:8px;padding:22px 26px;margin:24px 0;
+  font-size:16.5px;font-weight:500;color:var(--text-primary);position:relative;}
+.pullquote::before{content:"\201C";position:absolute;top:-6px;left:16px;font-size:48px;color:var(--accent-amber);
+  font-family:Georgia,serif;line-height:1;font-weight:700;}
+
+/* ============== Stats card ============== */
+.stats-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0 8px}
+.stat-cell{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;
+  padding:18px 16px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;
+  color:var(--accent-terracotta);line-height:1.1;margin-bottom:4px}
+.stat-label{font-size:13px;color:var(--text-secondary);font-weight:500;line-height:1.45}
+.stat-cell.victory{border-top:3px solid var(--accent-sage)}
+.stat-cell.defeat{border-top:3px solid var(--accent-mauve)}
+.stat-num.green{color:var(--accent-sage)}
+.stat-num.red{color:var(--accent-mauve)}
+
+/* ============== Doctor cards (用作文本/章节分类展示) ============== */
+.doctors-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0 8px}
+.doctor-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;
+  padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;transition:transform .2s;}
+.doctor-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.doctor-card.role-1{border-top:3px solid var(--accent-sage)}
+.doctor-card.role-2{border-top:3px solid var(--accent-terracotta)}
+.doctor-card.role-3{border-top:3px solid var(--accent-blue)}
+.doctor-card.role-4{border-top:3px solid var(--accent-amber)}
+.doctor-name{font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:2px;
+  display:flex;align-items:center;gap:8px;letter-spacing:-.2px;}
+.doctor-age{font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:10px}
+.doctor-quote{font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:12px;
+  line-height:1.6;padding-bottom:12px;border-bottom:1px dashed var(--border-light)}
+.doctor-behaviors{list-style:none;padding:0;margin:0;font-size:12.5px;color:var(--text-secondary);line-height:1.7}
+.doctor-behaviors li{padding:3px 0 3px 14px;position:relative}
+.doctor-behaviors li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--accent-amber)}
+
+/* ============== Annotation ============== */
+.annotation{background:linear-gradient(135deg,var(--accent-sage-faint) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-sage-soft);border-left:3px solid var(--accent-sage);
+  border-radius:0 8px 8px 0;padding:18px 22px;margin:32px 0 8px;position:relative;}
+.annotation-header{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--accent-sage-soft);}
+.annotation-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;
+  color:var(--accent-sage);text-transform:uppercase;letter-spacing:1.5px;}
+.annotation-hint{font-size:12px;color:var(--text-muted);font-weight:500;font-style:italic}
+.annotation dl{display:grid;grid-template-columns:minmax(150px,max-content) 1fr;gap:8px 18px;margin:0}
+.annotation dt{font-weight:600;color:var(--text-primary);font-size:13px;line-height:1.65}
+.annotation dd{margin:0;color:var(--text-secondary);font-size:13px;line-height:1.65}
+.annotation dd .who{color:var(--accent-terracotta);font-weight:700;margin-right:4px}
+.annotation dd .what{color:var(--text-secondary)}
+
+/* ============== Dialog ============== */
+.dialog{background:var(--bg-deep);border-radius:6px;padding:14px 18px;margin:14px 0;
+  font-size:14.5px;color:var(--text-primary);border-left:3px solid var(--accent-amber);}
+.dialog-speaker{font-weight:700;color:var(--accent-terracotta)}
+
+/* ============== Tables ============== */
+.table-wrap{margin:20px 0;background:var(--bg-card);border:1px solid var(--border-light);
+  border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:var(--bg-deep)}
+th{padding:12px 16px;text-align:left;font-weight:600;color:var(--text-primary);font-size:13px;
+  letter-spacing:.3px;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border-light);color:var(--text-secondary);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(232,223,211,.3)}
+td:first-child{font-weight:600;color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:12.5px}
+
+/* ============== Coverage (改用 doctor-card 类,不用 coverage-item flex) ============== */
+.coverage{background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;
+  padding:24px 28px;margin:32px 0}
+.coverage-title{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;
+  color:var(--text-primary);margin-bottom:16px;padding-bottom:12px;border-bottom:2px dashed var(--border)}
+
+/* ============== Quiz ============== */
+.quiz-list{display:flex;flex-direction:column;gap:14px;margin:18px 0}
+.quiz-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;
+  padding:16px 20px;box-shadow:var(--shadow);border-left:4px solid var(--accent-sage)}
+.quiz-card-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.quiz-num{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;
+  color:var(--accent-sage);background:var(--accent-sage-soft);padding:2px 8px;border-radius:6px}
+.quiz-q{margin:0 0 8px;font-size:14.5px;color:var(--text-primary);font-weight:500;line-height:1.7}
+.quiz-options{list-style:none;padding:0;margin:0 0 6px;display:flex;flex-direction:column;gap:3px}
+.quiz-options li{padding:5px 10px;font-size:13.5px;color:var(--text-secondary);line-height:1.6;
+  border-radius:5px;background:var(--bg-card);border:1px solid var(--border-light)}
+/* .correct 已停用 */
+/* .correct 已停用 —— 题目不再预先标记答案,只有 details 解析里讲对错 */
+.quiz-answer{margin-top:10px;background:var(--bg-card);border-radius:6px;padding:8px 12px;
+  font-size:13px;color:var(--text-secondary);border:1px dashed var(--border)}
+.quiz-answer summary{cursor:pointer;font-weight:600;color:var(--accent-sage);font-size:13px;padding:2px 0;list-style:none}
+.quiz-answer summary::before{content:"💡 "}
+.quiz-answer[open] summary{margin-bottom:6px}
+.quiz-answer p{margin:4px 0;font-size:13px}
+
+/* ============== Summary box ============== */
+.summary-box{background:linear-gradient(135deg,var(--accent-sage-soft) 0%,var(--bg-card) 50%,var(--accent-amber-soft) 100%);
+  border:1px solid var(--accent-sage);border-radius:12px;padding:32px 36px;margin:40px 0;position:relative;}
+.summary-box-title{font-size:13px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:12px}
+.summary-text{font-size:18px;color:var(--text-primary);line-height:1.85;font-weight:500}
+
+/* ============== Footer ============== */
+.footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);font-size:12.5px;
+  color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-weight:500}
+.footer-link{color:var(--accent-sage);text-decoration:none;font-weight:600}
+.footer-link:hover{text-decoration:underline}
+
+.back-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;background:var(--bg-elevated);
+  border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:var(--shadow);transition:all .2s;z-index:40}
+.back-top:hover{background:var(--accent-sage);border-color:var(--accent-sage)}
+.back-top:hover svg{stroke:#fff}
+
+.icon{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+.icon-lg{width:18px;height:18px}
+code{background:var(--bg-deep);padding:2px 7px;border-radius:3px;font-family:'JetBrains Mono',monospace;
+  font-size:13px;color:var(--accent-terracotta);font-weight:500}
+
+@media (max-width:1100px){.sticky-toc{display:none}}
+@media (max-width:768px){
+  .container{padding:24px 16px 60px}
+  .hero{padding:32px 20px}
+  .hero h1{font-size:32px}
+  h2{font-size:22px}
+  .doctors-grid,.stats-grid{grid-template-columns:1fr}
+  .stats-card{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="sticky-toc" aria-label="目录">
+  <div class="sticky-toc-title">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    目录
+  </div>
+  <ol>
+    <li><a href="#ch0">开篇 · 洋匠的机器,坏了</a></li>
+    <li><a href="#ch1">第一幕 · 梁王质问"用洋货就行"</a></li>
+    <li><a href="#ch2">第二幕 · 算法房挂牌,四匠入驻</a></li>
+    <li><a href="#ch3">第三幕 · 钟子期的初号琴</a></li>
+    <li><a href="#ch4">第四幕 · 四琴合鸣</a></li>
+    <li><a href="#ch5">第五幕 · 万器归一,梁王反转</a></li>
+    <li><a href="#finale">终章 · 钦天监匾,自成一派</a></li>
+    <li><a href="#summary">一句话总结</a></li>
+    <li><a href="#coverage">概念地图</a></li>
+    <li><a href="#think">太子的五条心得</a></li>
+    <li><a href="#quiz">自测十问</a></li>
+  </ol>
+</nav>
+
+<div class="container">
+
+<header class="hero">
+  <div class="hero-meta">
+    <span>WellInsight 学习材料</span>
+    <span class="hero-meta-dot"></span>
+    <span>来源教材 · 第07章 · 寓言版</span>
+    <span class="hero-meta-dot"></span>
+    <span>2026-06-25</span>
+  </div>
+  <h1>第07章 · 从零开始造一个智能体框架</h1>
+  <p class="hero-subtitle"><span class="hero-fable">钦天监造机</span> · 18 岁太子自造框架 · 四琴合鸣 · 万器归一</p>
+  <p class="hero-desc">建议读法：先看故事，<strong>不要查名词</strong>；每章末尾有"本节专业名词对照"，可倒回去对比。</p>
+  <span class="hero-source">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    原文 · datawhalechina/hello-agents · 第07章 从零开始造一个智能体框架
+  </span>
+</header>
+
+<main id="content">
+
+<section id="ch0">
+  <span class="chapter-tag">开篇 · 景和九年三月</span>
+  <h2><span class="num">00</span>洋匠的机器,坏了</h2>
+  <span class="h2-hook">"那台从西洋买来的'巧手机',用了半年,突然报一行看不懂的字 —— 工部没人会修,西洋工匠又请不来。"</span>
+
+  <p class="lead">景和九年三月,刚过惊蛰。十八岁的太子刚从京城北衙办完差回府,茶还没喝一口,圣旨就到了 —— 钦天监急报。</p>
+
+  <p>事情要从半年前说起。去年秋天,皇上听了西洋使臣的游说,从海外采办了一台"巧手机" —— 据说是西洋百年老厂所造,内藏万千机括,能从一句话里读出命意,也能从一句问里给出答来。这台机器被安置在钦天监后院,专给翰林院和工部算学。</p>
+
+  <p>头三个月,巧手机确实好用 —— 把问题写成纸条塞进去,半晌就吐出一张答案,文辞漂亮,推理严密。翰林院的编修们如获至宝,把大半日常公文交给它。</p>
+
+  <p>第四个月开始,麻烦来了。第一桩,是新人学不会。工部新来的算学博士,听老博士讲解巧手机如何"思考",听了三天才勉强听懂"链"与"轮"的区别;学了一个月,也写不出一份能让巧手机听话的指令。工部侍郎私下叹息:"学这东西,比学八股文还难。"</p>
+
+  <p>第二桩,是出错没人会修。上月初,钦天监要用巧手机算春耕星象,巧手机忽然吐出一行洋文。钦天监的工匠看不懂,翻遍随机的说明书也没找到对应的语句;写信托西洋使臣转告厂里,等了三十日才收到回信 —— 厂里说:"这是新版本的语言,旧指令已废弃。请付银二百两购买新版说明书。"</p>
+
+  <p>误了春耕测算,工部和钦天监联名上奏。皇上看完折子,抬头对太子说:"朕意已决。京城钦天监下设'算法房',由你挂帅督办。三月为期,从零自造一台属于大齐自己的'巧手机'。能用、好懂、能改 —— 这三条缺一不可。"</p>
+
+  <p>太子接旨出殿,小李跟上:"殿下,这回不是看别人的机器,是咱们自己造一台 —— 这可比看织机难十倍。" 太子在太和殿外的石阶上站了很久,才说:"<strong>洋货买得来,洋匠请不动 —— 自己的机器,得自己造。</strong>"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">回顾一下,你的判断对上了几个?</span>
+    </div>
+    <dl>
+      <dt>巧手机</dt>
+      <dd><span class="who">西洋舶来品</span><span class="what">—— 隐喻市面上的成熟智能体框架(如 LangChain)。功能强大,但门槛高、版本迭代快、出错难排。</span></dd>
+      <dt>链与轮</dt>
+      <dd><span class="who">工部术语</span><span class="what">—— 隐喻框架内的"Chain"(调用链)/"Agent"(主控)等抽象概念,新人理解成本极高。</span></dd>
+      <dt>误了春耕测算</dt>
+      <dd><span class="who">钦天监</span><span class="what">—— 隐喻"生产事故":框架报错无人能解,等社区/原厂回复慢,直接影响业务。</span></dd>
+      <dt>算法房</dt>
+      <dd><span class="who">新设机构</span><span class="what">—— 隐喻要自建的智能体框架项目(HelloAgents)。三条规矩"能用/好懂/能改"对应设计原则。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch1">
+  <span class="chapter-tag">第一幕 · 立项之争</span>
+  <h2><span class="num">01</span>梁王质问:"洋货用着好好的,何必自己造?"</h2>
+  <span class="h2-hook">"梁王抖开一卷西洋译本,声震朝堂 —— 满朝文武屏息,太子却笑了。"</span>
+
+  <p class="lead">三月十二日早朝。太子刚把"算法房"的章程递上御案,梁王就出列了 —— 五十开外,皇帝异母弟,京城"崇洋派"掌门,手里永远捧着一卷西洋译本。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">梁王:</span>"殿下!那巧手机乃西洋百年沉淀之物,大齐直接用便是,何必费银自造?工部已有三百人在用,何必从头再来?"
+  </div>
+
+  <p>梁王话音未落,工部侍郎孙守拙已跪到殿中。这位老臣在工部二十年,从不服软,今日却红了眼眶。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">孙守拙:</span>"殿下,臣有四难。其一,巧手机门道太多 —— '链''轮''记''库'四五十个名堂,新博士学三月写不出十行有用之语;其二,洋商改版频繁,上月指令本月即废;其三,机括密封,出错翻不到内部;其四,整台机器附带数百件小器具,与工部原有器械互相排斥。"
+  </div>
+
+  <p>朝堂安静得能听见窗外的鸽哨。太子这才缓缓开口。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">太子:</span>"<strong>梁王叔说得不错,洋货确是好货。但用别人的货,只能听别人涨价;造自己的货,才能自己定价。</strong>洋匠的心思在千里之外,大齐的事,大齐人最明白。造,不是为了取代,是为了 —— 一旦洋货断供,我们不至于连自家的公文都写不出来。"
+  </div>
+
+  <p>梁王还想再说,皇上已经抬手拍板:"准。算法房,三月为期。钦天监后院那间青砖小院,即日起挂牌。匾,朕亲题。"</p>
+
+  <h3>算法房的三条铁律</h3>
+  <p>三月十五日,太子在挂牌当日写下三条铁律,贴在算法房正堂:</p>
+  <ul>
+    <li><strong>能用</strong> —— 三月内,造出一台能跑通公文问答的初号机;新人一日内可上手</li>
+    <li><strong>好懂</strong> —— 任何有算学根底的官员,三日内能读完核心图纸</li>
+    <li><strong>能改</strong> —— 除必要的铜材外,不依赖任何外来小件;出问题能直接拆开改</li>
+  </ul>
+
+  <p>同日,太子另立一条"造机总纲",挂在二堂:"<strong>除核心主控外,一切皆为机件 —— 无论记簿、查档、传讯、外联,皆以'机件'视之,不再单设门类</strong>。"这条规矩后来成了算法房最深的印记。</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">对照第一幕的四难与太子的回应</span>
+    </div>
+    <dl>
+      <dt>链/轮/记/库</dt>
+      <dd><span class="who">孙守拙的四难之一</span><span class="what">—— 隐喻 LangChain 等框架的 Chain/Agent/Memory/Retriever 等数十个抽象概念,学习曲线陡峭。</span></dd>
+      <dt>洋商改版频繁</dt>
+      <dd><span class="who">第二难</span><span class="what">—— 商业框架为抢市场,API 接口变动频繁,上月代码本月即坏。</span></dd>
+      <dt>机括密封,出错翻不到</dt>
+      <dd><span class="who">第三难</span><span class="what">—— 核心逻辑被封装为黑盒,出问题只能依赖文档与社区。</span></dd>
+      <dt>数百件小器具互相排斥</dt>
+      <dd><span class="who">第四难</span><span class="what">—— 框架依赖包体量大,易与现有项目产生依赖冲突。</span></dd>
+      <dt>除核心主控外,一切皆机件</dt>
+      <dd><span class="who">太子的造机总纲</span><span class="what">—— HelloAgents 的核心设计原则:除 Agent 类外,Memory/RAG/MCP 都视为 Tool(机件),消除不必要抽象。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch2">
+  <span class="chapter-tag">第二幕 · 算法房开局</span>
+  <h2><span class="num">02</span>算法房挂牌,四位匠人带着四种"造机心法"入驻</h2>
+  <span class="h2-hook">"一琴一弦先弹响,思而后行再力行,吾日三省吾身改,先画图来再走棋 —— 四派合一,才是大齐的'巧手机'。"</span>
+
+  <p class="lead">挂牌后第三天,太子在算法房召开"造机研讨会"。他从工部、礼部、翰林院、钦天监各请来一位青年匠人 —— 这四位,正是京城"四机四派"的代表,名字取自古琴/心学/文章/说书四大宗师。</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num green">4</div>
+      <div class="stat-label">位匠人入驻(四机四派)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num green">1</div>
+      <div class="stat-label">条造机总纲:一切皆机件</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num red">90</div>
+      <div class="stat-label">日为期,三月期满交付</div>
+    </div>
+  </div>
+
+  <h3>四匠入驻 · 四种心法</h3>
+  <p>太子给四位匠人定岗。每人都带了一套自创的"造机心法",刻在各自的工位木牌上。</p>
+
+  <div class="doctors-grid">
+    <div class="doctor-card role-1">
+      <div class="doctor-name">钟子期</div>
+      <div class="doctor-age">22 岁 · 工部算学博士 · 初号机派</div>
+      <div class="doctor-quote">"一琴一弦,先弹响再说。"</div>
+      <ul class="doctor-behaviors">
+        <li>专造基础对话机 —— 不管三七二十一,先把问与答打通</li>
+        <li>负责所有机件的统一接口与登记名册</li>
+        <li>第07章上半场的总工</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-2">
+      <div class="doctor-name">王阳明</div>
+      <div class="doctor-age">28 岁 · 翰林院编修 · 推理派</div>
+      <div class="doctor-quote">"思而后行,行而复思。"</div>
+      <ul class="doctor-behaviors">
+        <li>专造"先想再做"的巧手机</li>
+        <li>每做一步,先自问"该不该做",做完再自省"做得对不对"</li>
+        <li>第07章下半场的主力</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-3">
+      <div class="doctor-name">韩愈</div>
+      <div class="doctor-age">35 岁 · 礼部侍郎 · 自省派</div>
+      <div class="doctor-quote">"吾日三省吾身,文可顿改。"</div>
+      <ul class="doctor-behaviors">
+        <li>专造"做完再改"的巧手机</li>
+        <li>每次输出都要回头检查三遍,改到满意才放手</li>
+        <li>给推理派兜底,避免推理派卡壳</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-4">
+      <div class="doctor-name">柳敬亭</div>
+      <div class="doctor-age">40 岁 · 说书先生转行 · 统筹派</div>
+      <div class="doctor-quote">"先画图,再走棋。"</div>
+      <ul class="doctor-behaviors">
+        <li>专造"先拆后做"的巧手机</li>
+        <li>难题先拆成 3-5 小步,再一步步做</li>
+        <li>专治"一问三不知"的大问题</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>太子在墙上挂了一张大白纸,上书:<strong>"四机四派 —— 简单 / 推理 / 自省 / 统筹。先并行造四器,后合练为一套"</strong>。</p>
+
+  <p>小李看着这四人,低声问太子:"殿下,这四位以前可从没见过面,真能合得来?" 太子答:"<strong>琴瑟不同音,但合奏起来才成调。四派各有所长,合起来才是一台完整的巧手机</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">四位匠人各代表一种 Agent 范式</span>
+    </div>
+    <dl>
+      <dt>钟子期 · 初号机派</dt>
+      <dd><span class="who">SimpleAgent</span><span class="what">—— 最基础的对话型智能体:用户问一句,LLM 答一句,适合"问答/闲聊/简单任务"。一琴一弦,先弹响再说。</span></dd>
+      <dt>王阳明 · 推理派</dt>
+      <dd><span class="who">ReActAgent</span><span class="what">—— 推理+行动型:先"想"(Thought)→ 再"做"(Action)→ 看"结果"(Observation)→ 再"想"。适合"需要调用外部工具"的场景。</span></dd>
+      <dt>韩愈 · 自省派</dt>
+      <dd><span class="who">ReflectionAgent</span><span class="what">—— 自我反思型:先做一遍→ 自我评分→ 不满意就重做→ 满意才交。适合"对质量要求高"的场景(如写代码、写报告)。</span></dd>
+      <dt>柳敬亭 · 统筹派</dt>
+      <dd><span class="who">PlanAndSolveAgent</span><span class="what">—— 先规划再执行型:把大问题拆成 3-5 个小步骤,一步步走完。适合"复杂多步任务"。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch3">
+  <span class="chapter-tag">第三幕 · 初号机</span>
+  <h2><span class="num">03</span>钟子期的初号琴:一琴一弦,先把"问"与"答"打通</h2>
+  <span class="h2-hook">"最基础的对话机,听着简单 —— 真要造起来,得先立三规:问句要规范、配置要统一、机主要有定法。"</span>
+
+  <p class="lead">三月二十日。钟子期是四位匠人中最早出活的。他花了三天,先把算法房的"骨架"立起来 —— 没有骨架,后面的四派机件全无处安放。</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num green">5</div>
+      <div class="stat-label">家铜材坊可选(模拟多服务商)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num green">3</div>
+      <div class="stat-label">大骨架立起(问句/配置/机主)</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num red">1</div>
+      <div class="stat-label">个插曲:铜材不通</div>
+    </div>
+  </div>
+
+  <h3>节点 4 · 铜材的选择 · 五坊之中如何挑</h3>
+  <p>钟子期要解决的第一个问题:用哪家铜材?京城内外有五家铜材坊 —— 皇商坊(贵但稳)、江南织造局自办坊(便宜但慢)、礼部外宾坊(只供西洋规格)、钦天监内坊(只在钦天监内部)、工部军坊(只供军器)。</p>
+
+  <p>太子不答,让钟子期自己定规矩。钟子期花了一夜,在机房墙上写下"<strong>三嗅探规</strong>":</p>
+  <ul>
+    <li><strong>先闻内坊</strong> —— 若钦天监内坊有现货,优先用内坊(最稳,且账目清白)</li>
+    <li><strong>次闻皇商坊</strong> —— 若无内坊,看皇商坊能否按期交货</li>
+    <li><strong>末闻西洋坊</strong> —— 最后才向西洋采办(慢且贵,且要看是否合大齐规制)</li>
+  </ul>
+
+  <p>这三条规矩定下,算法房就不用为"今天用哪家铜材"开会讨论了 —— 每天开工前,小吏按这三条去查,查到哪家算哪家。</p>
+
+  <h3>节点 5 · 三规立基 · 问句要规范、配置要统一、机主要有定法</h3>
+  <p>韩愈在一旁看着,等钟子期定完铜材,开口:"殿下,臣以为,造机之前,先定三规。无规矩不成方圆。" 太子点头。韩愈立三规:</p>
+
+  <p><strong>第一规 · 问句要规范。</strong>每张塞进巧手机的纸条,都要写明三件事:问的人是谁、问的内容是什么、问的时间是哪一刻。这就是"纸条格式" —— 必须统一。钟子期按此做了一套"纸条样板",贴在每张工作台前。</p>
+
+  <p><strong>第二规 · 配置要统一。</strong>全算法房只许有一份"铜材供货清单"。任何机件需要用哪家铜材、哪种规格、什么价格,都从这份清单里查,不许临时改。钟子期把这清单抄了三份,一份挂堂、一份存档、一份由太子随身带。</p>
+
+  <p><strong>第三规 · 机主要有定法。</strong>每台巧手机对外都有一份"机主名帖",上写"这台机由谁开、听了什么话、做了什么事"。任何想用机的人,先读机主名帖,知道这台机是谁在管、能做什么、不能做什么。</p>
+
+  <h3>节点 6 · 初号琴跑通</h3>
+  <p>三月二十三日子时,钟子期把铜材、纸条、清单、名帖四样都备齐了。他把一张纸条塞进初号琴 —— 纸条上写着:"今日京城天气如何?"</p>
+
+  <p>半晌,初号琴吐出一张答:"京城今日多云转晴,东南风二三级,气温 18 至 25 度,出门宜着夹衣。"</p>
+
+  <p>算法房里响起一片欢呼。钟子期在日志上写下八个字:<strong>"初号琴成,听候调遣。"</strong></p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">初号琴 = HelloAgents 最简形态</span>
+    </div>
+    <dl>
+      <dt>五家铜材坊</dt>
+      <dd><span class="who">皇商坊 / 江南坊 / 礼部外宾坊 / 钦天监内坊 / 工部军坊</span><span class="what">—— 隐喻多 LLM 服务商:OpenAI / ModelScope / Zhipu / Ollama(本地) / VLLM(本地)。</span></dd>
+      <dt>三嗅探规</dt>
+      <dd><span class="who">钟子期的查铜材顺序</span><span class="what">—— 隐喻"自动嗅探机制":读环境变量(env)→ 自动决定走哪家服务商。用户不必关心用了哪家。</span></dd>
+      <dt>纸条格式(三件事)</dt>
+      <dd><span class="who">第一规</span><span class="what">—— 隐喻 Message 类(Pydantic BaseModel):role(谁问)/content(问什么)/timestamp(何时问),数据校验,杜绝脏纸条。</span></dd>
+      <dt>配置清单只一份</dt>
+      <dd><span class="who">第二规</span><span class="what">—— 隐喻 Config 类(单例模式):全局只一份配置,API_KEY 一处改处处生效。</span></dd>
+      <dt>机主名帖</dt>
+      <dd><span class="who">第三规</span><span class="what">—— 隐喻 Agent 抽象基类:run 是公开接口(对外名帖),_execute 是抽象方法(内部执行)。模板方法模式。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch4">
+  <span class="chapter-tag">第四幕 · 四琴合鸣</span>
+  <h2><span class="num">04</span>同一道题,四架琴弹四种调</h2>
+  <span class="h2-hook">"用户问'明日去江南,该带什么?',四架琴四种答法 —— 没有最好,只有最对。"</h2>
+
+  <p class="lead">四月初,钟子期的初号琴跑通后,其余三位匠人开始并行造各自的巧手机。这一幕,是"四琴合练" —— 同一道题,四架琴弹四种调。</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num green">1</div>
+      <div class="stat-label">道题测四派(明日江南出行)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num green">4</div>
+      <div class="stat-label">种答法</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num red">2</div>
+      <div class="stat-label">个坑:循环不止 / 改到满意还不放手</div>
+    </div>
+  </div>
+
+  <h3>王阳明琴 · 推理派 · 思而后行</h3>
+  <p>用户问:"明日去江南,该带什么?"</p>
+  <p>王阳明琴的应答分三步:</p>
+  <ul>
+    <li><strong>第一步 · 想</strong> —— "用户要去江南,我需要先查江南明日的天气。"</li>
+    <li><strong>第二步 · 查</strong> —— 调用"江南天气机件",得到"明日江南有雨,气温 18 度"。</li>
+    <li><strong>第三步 · 再想</strong> —— "信息够了,该答了。"</li>
+  </ul>
+  <p>最终答:"明日江南有雨,气温 18 度。建议带伞,着夹衣。"</p>
+  <p>王阳明说:"<strong>思而后行,行而复思,才是真推理。</strong>"</p>
+
+  <h3>韩愈琴 · 自省派 · 三省吾身</h3>
+  <p>用户问同样的题。韩愈琴的应答分两轮:</p>
+  <ul>
+    <li><strong>第一轮 · 初答</strong> —— "明日江南有雨,带伞。"</li>
+    <li><strong>自省</strong> —— "够了吗?用户没问气温,要不要补?用户没问交通,要不要提示?"</li>
+    <li><strong>第二轮 · 改答</strong> —— "明日江南有雨,气温 18 度,建议带伞;若走水路,风浪稍大。"</li>
+    <li><strong>再自省</strong> —— "要不要再加一句'江南蚊虫多,带点艾草'?"</li>
+  </ul>
+  <p>韩愈说:"<strong>每改一次,都是进步。但改太多次就是啰嗦,要给自省设个'够好'的线</strong>。"</p>
+
+  <h3>柳敬亭琴 · 统筹派 · 先拆后做</h3>
+  <p>用户问同样的题。柳敬亭琴的应答分四步:</p>
+  <ul>
+    <li><strong>画图</strong> —— "此题分四步:1. 查天气;2. 查交通;3. 查民俗;4. 总结建议。"</li>
+    <li><strong>走第一步</strong> —— "江南明日有雨,18 度。"</li>
+    <li><strong>走第二步</strong> —— "明日运河有雾,船家建议午后行。"</li>
+    <li><strong>走第三步</strong> —— "江南三月正赛龙舟,人多拥挤。"</li>
+    <li><strong>总结</strong> —— "带伞、夹衣、防雾眼罩;若怕挤,避龙舟段。"</li>
+  </ul>
+  <p>柳敬亭说:"<strong>复杂问题,先拆后做,每一步清清楚楚。</strong>"</p>
+
+  <h3>钟子期琴 · 初号机派 · 答了再说</h3>
+  <p>钟子期琴的应答最简:不分步、不自省、不拆解,直接答:"带伞、夹衣、防雾眼罩;明日江南有雨。"</p>
+  <p>钟子期说:"<strong>一琴一弦,问啥答啥。简单问题不必上'推理派',那反而慢。</strong>"</p>
+
+  <h3>太子总结</h3>
+  <p>太子看完四架琴的答,点头道:"<strong>四派不是互相替代,是各管一段。简单问答用初号,需要查外部用推理,要高质量输出用自省,复杂多步用统筹 —— 选错了琴,反而误事。</strong>"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">四派范式对比</span>
+    </div>
+    <dl>
+      <dt>王阳明琴 · Thought → Action → Observation</dt>
+      <dd><span class="who">推理派</span><span class="what">—— ReActAgent 的核心循环:每一步都要先想再做,做完看结果再想下一步。适合"需要调用外部工具"的场景。</span></dd>
+      <dt>韩愈琴 · 改到"够好"才放手</dt>
+      <dd><span class="who">自省派</span><span class="what">—— ReflectionAgent 的"质量分阈值":不是无限循环,是设定一个分数阈值,达到就停。避免"改太多反而啰嗦"。</span></dd>
+      <dt>柳敬亭琴 · 先拆 4 步再走</dt>
+      <dd><span class="who">统筹派</span><span class="what">—— PlanAndSolveAgent 的"Plan → Execute":复杂任务先拆成 3-5 步,一步步走完,每步结果喂给下一步。</span></dd>
+      <dt>钟子期琴 · 一琴一弦直接答</dt>
+      <dd><span class="who">初号机派</span><span class="what">—— SimpleAgent 的"轻装上阵":不分步、不自省、不拆解,直接 LLM 答。适合简单问答/闲聊/一次性的任务。</span></dd>
+      <dt>选错了琴反而误事</dt>
+      <dd><span class="who">太子的总结</span><span class="what">—— "范式即模式":不同任务选不同范式。简单问答用 SimpleAgent 是杀鸡用牛刀,复杂规划用 SimpleAgent 是赶鸭上架。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch5">
+  <span class="chapter-tag">第五幕 · 万器归一</span>
+  <h2><span class="num">05</span>柳敬亭提议万器归一,梁王亲自来看</h2>
+  <span class="h2-hook">"查档机、记账机、传讯机、外联机 ...... 原本各有各的规矩。太子一句话:'万器归一,皆为机件'。"</span>
+
+  <p class="lead">五月,四派巧手机都跑通了。柳敬亭来报:"殿下,问题来了 —— 算法房已造出十二种机件:查档、记账、传讯、外联、计时、画图、测距、译字、抄录、归档、查图、作诗。每种机件各有各的接口,新人要学十二套。"</p>
+
+  <p>太子听完,沉默片刻,说出一句:<strong>"万器归一,皆为机件。</strong>"</p>
+
+  <h3>节点 9 · 太子立四规 · 一切皆为机件</h3>
+  <p>柳敬亭依太子之言,立下"<strong>万器归一</strong>"的四条规矩:</p>
+  <ul>
+    <li><strong>机件皆有统一接口</strong> —— 任何机件,无论功能,都必须能"接纸条、给答句"。不接纸条的机件,不许挂入算法房。</li>
+    <li><strong>机件皆有名册登记</strong> —— 算法房有一本"机件总簿",新机件入册,旧机件除名。一物一名,不重不乱。</li>
+    <li><strong>机件可串联</strong> —— 一件做完,可把答句直接塞进下一件。多件串联,合成大事。</li>
+    <li><strong>机件可并行</strong> —— 互不依赖的机件,可同时开动,不必排队等。</li>
+  </ul>
+
+  <p>柳敬亭说:"这样,新人只要学一套规矩,就能用十二种机件 —— 明日再多二十种,规矩不变。" 太子点头。</p>
+
+  <h3>节点 10 · 梁王亲临 · 一行跑通</h3>
+  <p>消息传到梁王府。梁王不信 —— 自造一台巧手机,真能比洋货强?</p>
+  <p>他亲自到算法房,带着一个考题:"听闻贵房的巧手机能算天气?给我算算 —— 后日辰时,我去西山打猎,该带什么?"</p>
+
+  <p>钟子期不慌不忙,把一张纸条塞进初号琴。纸条上只写一行字:"<code>后日辰时,西山打猎,何物必备?</code>"</p>
+
+  <p>初号琴吐答:"<strong>后日西山有雾,卯时尤甚;辰时雨歇,然山路湿滑。必备:油衣、油鞋、护目镜、绳索、干粮三日份。</strong>"</p>
+
+  <p>梁王愣住。他原以为算法房要写几十页指令才能跑出这一句 —— 如今不过一行,答得还比工部旧测稳。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">梁王:</span>"......此物,确比洋货精当。"
+  </div>
+
+  <div class="dialog">
+    <span class="dialog-speaker">太子:</span>"<strong>洋货精,是因为洋匠精;我们的货精,是因为大齐的山水人情,只有大齐人自己最明白。</strong>梁王叔若不信,可与我再走一道。"
+  </div>
+
+  <p>梁王沉思片刻,突然起身,对太子深深一揖:"臣昔日主张'洋货即可',是未见自造之利。今见算法房初号琴精当至此 —— 臣请辞崇洋派掌门,转任'算法房对外联络大臣',专司把大齐的巧手机推给周边诸国。"</p>
+
+  <p>太子大喜,扶起梁王:"<strong>梁王叔肯来,大齐之幸也。</strong>"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">万器归一 = 工具系统设计</span>
+    </div>
+    <dl>
+      <dt>十二种机件各有各的接口</dt>
+      <dd><span class="who">柳敬亭的难题</span><span class="what">—— 隐喻 LangChain 等框架里 Search/Calculator/Memory/RAG 各有各的接口,新人学 4 套。HelloAgents 统一为 1 套。</span></dd>
+      <dt>机件皆有统一接口 · 接纸条给答句</dt>
+      <dd><span class="who">四规之第一规</span><span class="what">—— 隐喻 BaseTool 基类:所有工具必须实现 execute() 接口,输入是参数,输出是结果。</span></dd>
+      <dt>机件总簿</dt>
+      <dd><span class="who">四规之第二规</span><span class="what">—— 隐喻 Tool Registry(注册机制):工具名 → 工具实例,统一登记管理,Agent 按名调用。</span></dd>
+      <dt>机件可串联</dt>
+      <dd><span class="who">四规之第三规</span><span class="what">—— 隐喻 ToolChain(工具链):多工具串联,A 输出 → B 输入 → C 输出。</span></dd>
+      <dt>机件可并行</dt>
+      <dd><span class="who">四规之第四规</span><span class="what">—— 隐喻 AsyncExecutor(异步执行器):互不依赖的工具用线程池并行,节省时间。</span></dd>
+      <dt>梁王反转</dt>
+      <dd><span class="who">从崇洋派掌门</span><span class="what">→ 转任"对外联络大臣":反派转友母题复用(第04/05/06/07章 4 连击)。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="finale">
+  <span class="chapter-tag">终章 · 景和九年六月</span>
+  <h2><span class="num">06</span>三月期满,皇帝亲题匾额</h2>
+
+  <p class="lead">景和九年六月。三月期满,大齐自造的第一台巧手机正式定名 —— <strong>"钦天监一号"</strong>。四派机件齐全,十二种机件归一,梁王自请出使西域。</p>
+
+  <p>这天早朝,皇上亲临算法房。钟子期当堂演示 —— 仍是那张纸条:<code>今日京城天气如何?</code></p>
+
+  <p>初号琴吐答:"京城今日多云转晴,东南风二三级,气温 18 至 25 度。"</p>
+
+  <p>皇上点头,提笔写下四字:<strong>"钦天监造,自成一派。"</strong></p>
+
+  <p>匾挂算法房正堂。四匠与梁王在匾下列队谢恩。太子在一旁,看着这块匾,缓缓开口。</p>
+
+  <div class="pullquote">
+    "自造机器,不是为了争洋货的脸面,是为了 —— 大齐人最明白大齐的山水人情。这台巧手机,精的不是铜材,是我们的心思。<br><br>
+    各位匠人,你们造的不是一个框架,是一种"<strong>懂我们这片土地</strong>"的能力。"
+    <footer style="margin-top:14px;font-size:13px;color:var(--text-muted)">—— 太子,景和九年六月,18 岁,钦天监算法房挂牌三月</footer>
+  </div>
+
+  <p>朝会散了,小李跟着太子走出算法房。夕阳照在那块新匾上,四个字亮得晃眼。</p>
+  <p>小李问:"殿下,这台巧手机,后面还用洋货吗?"</p>
+  <p>太子答:"<strong>洋货该用还用 —— 我们不是排外,是不被外所限。懂得了原理,洋货好就用,洋货不好就改,洋货断了也能活。这才是'自造'二字的真意。</strong>"</p>
+
+  <h3>跨章承接 · 下一章预告</h3>
+  <ul>
+    <li><strong>第08章</strong> —— 算法房要给巧手机加"记簿"与"查档"两件新机件(基于万器归一的接口扩展)</li>
+    <li><strong>第09章</strong> —— 算法房要解决"纸条太多、答得太长"的烦恼(基于韩愈的"自省派"做精炼)</li>
+    <li><strong>第10章</strong> —— 算法房要造"机件对机件"的说话规矩,让不同人家的巧手机能互相配合(基于柳敬亭的"统筹派"做协议)</li>
+  </ul>
+</section>
+
+<section id="summary">
+  <div class="summary-box">
+    <div class="summary-box-title">一句话总结</div>
+    <p class="summary-text">第07章讲的是:<strong>洋匠的巧手机坏了没人会修,大齐决定自己造 —— 十八岁太子挂帅"算法房",四匠四派合造"钦天监一号",三月为期,自成一派</strong>。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px">太子金句:"<strong>自造机器,不是为了争洋货的脸面,是为了大齐人最明白大齐的山水人情</strong>"。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px;color:var(--text-muted)">反派(梁王)反转:从崇洋派掌门转任"算法房对外联络大臣",第08章起新反派"记簿守旧派"登场。</p>
+  </div>
+</section>
+
+<section id="coverage">
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" style="color:var(--accent-sage)"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      概念地图 · 25 个名词索引
+    </div>
+
+    <h4 style="margin:0 0 12px">📜 算法房的三条铁律 + 一条总纲</h4>
+    <div class="doctors-grid">
+      <div class="doctor-card role-1">
+        <div class="doctor-name">能用</div>
+        <div class="doctor-quote">三月内造出一台能跑通公文问答的初号机。</div>
+      </div>
+      <div class="doctor-card role-2">
+        <div class="doctor-name">好懂</div>
+        <div class="doctor-quote">任何有算学根底的官员,三日能读完核心图纸。</div>
+      </div>
+      <div class="doctor-card role-3">
+        <div class="doctor-name">能改</div>
+        <div class="doctor-quote">除必要铜材外,不依赖外来小件。</div>
+      </div>
+      <div class="doctor-card role-4">
+        <div class="doctor-name">一切皆机件</div>
+        <div class="doctor-quote">除主控外,记簿/查档/外联皆视为机件。</div>
+      </div>
+    </div>
+
+    <h4 style="margin:24px 0 12px">🎼 四匠四派 · 四种造机心法</h4>
+    <div class="doctors-grid">
+      <div class="doctor-card role-1">
+        <div class="doctor-name">钟子期 · 初号机派</div>
+        <div class="doctor-quote">"一琴一弦,先弹响再说。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应 SimpleAgent(基础对话)</li>
+          <li>适合:简单问答/闲聊</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-2">
+        <div class="doctor-name">王阳明 · 推理派</div>
+        <div class="doctor-quote">"思而后行,行而复思。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应 ReActAgent(想→做→看)</li>
+          <li>适合:需要调用工具的场景</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-3">
+        <div class="doctor-name">韩愈 · 自省派</div>
+        <div class="doctor-quote">"吾日三省吾身,文可顿改。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应 ReflectionAgent(执行→反思→优化)</li>
+          <li>适合:对输出质量要求高的场景</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-4">
+        <div class="doctor-name">柳敬亭 · 统筹派</div>
+        <div class="doctor-quote">"先画图,再走棋。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应 PlanAndSolveAgent(规划→执行)</li>
+          <li>适合:复杂多步任务</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4 style="margin:24px 0 12px">📐 算法房的三规立基 + 四规归一</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>立基</th><th>朝代叙事</th><th>对应现代概念</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>第一规</td><td>纸条格式(问的人/问的内容/问的时间)</td><td>Message 类(Pydantic 数据校验)</td></tr>
+          <tr><td>第二规</td><td>配置清单只一份</td><td>Config 类(单例模式)</td></tr>
+          <tr><td>第三规</td><td>机主名帖</td><td>Agent 抽象基类(模板方法模式)</td></tr>
+          <tr><td>万器归一 · 统一接口</td><td>任何机件都必须能"接纸条给答句"</td><td>BaseTool 基类</td></tr>
+          <tr><td>万器归一 · 总簿登记</td><td>机件总簿一物一名</td><td>Tool Registry(注册机制)</td></tr>
+          <tr><td>万器归一 · 可串联</td><td>多件可串联成大事</td><td>ToolChain(工具链)</td></tr>
+          <tr><td>万器归一 · 可并行</td><td>互不依赖的机件可同时开动</td><td>AsyncExecutor(异步执行)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin:24px 0 12px">🔧 三嗅探规 · 铜材的选择顺序</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>优先级</th><th>铜材坊</th><th>对应 LLM 服务商</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1 (最优先)</td><td>钦天监内坊</td><td>Ollama / VLLM(本地部署)</td></tr>
+          <tr><td>2</td><td>皇商坊</td><td>OpenAI(云端国际)</td></tr>
+          <tr><td>3 (最后)</td><td>礼部外宾坊</td><td>Zhipu / ModelScope(其他云端)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="think">
+  <span class="chapter-tag">太子的五条心得</span>
+  <h2><span class="num">心</span>十八岁太子的五条心得(白话版)</h2>
+  <span class="h2-hook">"故事听完了,太子想跟你掏心窝子说几句 —— 都是大白话,不必查名词。"</span>
+
+  <h3>心得一 · 洋货好,但自家货更要</h3>
+  <p>洋货确实精,但精在洋匠的手艺;大齐的山水人情,只有大齐人自己最明白。洋匠涨价、改版、断供,我们都不能跟着转。<strong>自家货不是为了取代洋货,是为了不被洋货绑住</strong>。</p>
+
+  <h3>心得二 · 简单就是好,少就是多</h3>
+  <p>洋匠造机器,总想"什么功能都给你加上";我们造机器,反过来 ——<strong>先做最简单的,能跑就行</strong>。新人学三日能用,就是好机器;学三月才入门,就是烂机器。</p>
+
+  <h3>心得三 · 万器归一,规矩统一</h3>
+  <p>十二种机件,十二套规矩,新人要崩溃。太子一句话:"<strong>万器归一,皆为机件</strong>" —— 一种规矩管十二种机件,以后再加一百种,规矩不变。</p>
+
+  <h3>心得四 · 四派合用,各管一段</h3>
+  <p>简单问答用初号机派,需要查外部用推理派,要高质量输出用自省派,复杂多步用统筹派。<strong>选错了琴,反而误事 —— 杀鸡用牛刀慢,赶鸭上架更慢</strong>。</p>
+
+  <h3>心得五 · 自造不是排外,是自强</h3>
+  <p>梁王一开始反对自造,后来看到初号琴精当,转过来帮我们推给西域。<strong>自造不是为了排外,是为了不被外所限</strong>。洋货好就用,洋货不好就改,洋货断了也能活。</p>
+
+  <div class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">这些心得对应到工程上就是</span>
+    </div>
+    <dl>
+      <dt>心得一</dt><dd>→ "能用好懂能改"三条铁律 + 设计哲学"标准 API 不造轮子"</dd>
+      <dt>心得二</dt><dd>→ "除核心外一切皆机件"的抽象收敛 + 教学友好型</dd>
+      <dt>心得三</dt><dd>→ BaseTool + Registry + Chain + AsyncExecutor 工具系统</dd>
+      <dt>心得四</dt><dd>→ Simple / ReAct / Reflection / PlanAndSolve 四范式适用场景</dd>
+      <dt>心得五</dt><dd>→ 自造框架不是排外,是懂原理后不被绑住(用户→建造者转型)</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="quiz">
+  <span class="chapter-tag">自测十问</span>
+  <h2><span class="num">测</span>读完了?来试试这十问</h2>
+  <span class="h2-hook">"题目和选项直接展开看,答案藏在每题底部的小箭头里 —— 自己先想,再看答案。"</span>
+
+  <div class="quiz-list">
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q1</span>
+        <span style="font-size:13px;color:var(--text-muted)">考算法房的三条铁律</span>
+      </div>
+      <p class="quiz-q">算法房立的三条铁律是哪三条?</p>
+      <ul class="quiz-options">
+        <li>A. 快、狠、准</li>
+        <li>B. 能用、好懂、能改</li>
+        <li>C. 便宜、简单、稳</li>
+        <li>D. 自动、智能、联网</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 能用、好懂、能改</strong></p>
+        <p style="margin:4px 0">A 错 —— "快、狠、准"是捕快术语,不是算法房铁律。算法房讲究的是"实用、易学、可修"。</p>
+        <p style="margin:4px 0"><strong>B 对</strong> —— 这是太子在挂牌当日写的三条铁律。"能改"是最难的一条 —— 出了问题能直接拆开改,不必等洋商回复。这才是"自造"二字的真意。</p>
+        <p style="margin:4px 0">C 错 —— "便宜"不是算法房的追求;算法房造的是机器,不是菜刀。追求"稳"没错,但"便宜简单"放在一起,容易让人造出粗糙货。</p>
+        <p style="margin:4px 0">D 错 —— "自动、智能、联网"是洋货的广告词。算法房追求的是"透明、能改",不追求越自动越好。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q2</span>
+        <span style="font-size:13px;color:var(--text-muted)">考造机总纲</span>
+      </div>
+      <p class="quiz-q">太子写的"造机总纲"是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 一切皆为铜材</li>
+        <li>B. 万器归一,皆为机件</li>
+        <li>C. 除核心主控外,一切皆为机件</li>
+        <li>D. 用心造,用心用</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 除核心主控外,一切皆为机件</strong></p>
+        <p style="margin:4px 0">A 错 —— "一切皆为铜材"是把材料当全部,本末倒置。机件不只是铜材,还有齿轮、纸契、图纸。</p>
+        <p style="margin:4px 0">B 错 —— "万器归一,皆为机件"是第五幕的四规之一(机件统一接口/总簿登记/可串联/可并行),不是"造机总纲"。两者容易混。</p>
+        <p style="margin:4px 0"><strong>C 对</strong> —— 这才是造机总纲,挂在二堂正墙。"除了主控机(Agent),其他都按'机件(Tool)'的规矩造,不再单设门类" —— 记簿、查档、外联这些不同模块就有统一的接入方式,新人不用学多套规矩。</p>
+        <p style="margin:4px 0">D 错 —— "用心造,用心用"是工匠口号,不是总纲。总纲必须能落地执行,口号不能落地。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q3</span>
+        <span style="font-size:13px;color:var(--text-muted)">考三嗅探规</span>
+      </div>
+      <p class="quiz-q">钟子期的"三嗅探规",用铜材的优先级是?</p>
+      <ul class="quiz-options">
+        <li>A. 皇商坊 → 钦天监内坊 → 西洋坊</li>
+        <li>B. 钦天监内坊 → 皇商坊 → 西洋坊</li>
+        <li>C. 西洋坊 → 皇商坊 → 内坊</li>
+        <li>D. 随便选,看心情</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 钦天监内坊 → 皇商坊 → 西洋坊</strong></p>
+        <p style="margin:4px 0">A 错 —— 把"皇商"放最优先,会让算法房依赖外部供应链。一旦皇商涨价,算法房就被掐脖子。</p>
+        <p style="margin:4px 0"><strong>B 对</strong> —— "先内坊、再皇商、末西洋"。内坊最稳且账目清白,皇商次之,西洋最贵且慢。这对应工程上的"自动嗅探机制":读环境变量 → 优先用本地部署(Ollama/VLLM)→ 次用 OpenAI → 末用其他云端。本地优先是为了数据安全和成本控制。</p>
+        <p style="margin:4px 0">C 错 —— 反过来先西洋,就是被洋商掐着脖子,违背太子"自造"的本意。</p>
+        <p style="margin:4px 0">D 错 —— "随便选"是作坊式做法,不是算法房。算法房要的是"规矩统一、谁用都一样"。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q4</span>
+        <span style="font-size:13px;color:var(--text-muted)">考三规立基</span>
+      </div>
+      <p class="quiz-q">韩愈的"三规立基",规的是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 问句规范、配置统一、机主定法</li>
+        <li>B. 早起、扫地、点灯</li>
+        <li>C. 纸条格式、配置清单、机主名帖</li>
+        <li>D. 进机房要脱鞋、出机房要洗手</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 纸条格式、配置清单、机主名帖</strong></p>
+        <p style="margin:4px 0">A 错 —— "问句规范/配置统一/机主定法"是三规的现代抽象说法,不是太子原文。原文用的是朝代物件。</p>
+        <p style="margin:4px 0">B 错 —— "早起/扫地/点灯"是书院的规矩,不是算法房的。算法房立的是"造机规矩",不是"做人规矩"。</p>
+        <p style="margin:4px 0"><strong>C 对</strong> —— 三规是"纸条格式(谁来问/问什么/何时问) + 配置清单只一份 + 机主名帖(谁能开/做什么/不能做什么)"。分别对应工程上的 Message 类(Pydantic 数据校验)/ Config 类(单例模式)/ Agent 抽象基类(模板方法模式)。</p>
+        <p style="margin:4px 0">D 错 —— 脱鞋洗手是机房卫生规矩,不是"造机三规"。机房卫生是常识,不必立为铁律。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q5</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四匠对应</span>
+      </div>
+      <p class="quiz-q">王阳明推理派的巧手机,三步循环是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 画图 → 走棋 → 复盘</li>
+        <li>B. 想 → 做 → 看(思而后行,行而复思)</li>
+        <li>C. 初答 → 自省 → 改答</li>
+        <li>D. 问 → 答 → 收</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 想 → 做 → 看</strong></p>
+        <p style="margin:4px 0">A 错 —— "画图→走棋→复盘"是统筹派(柳敬亭)的做法,先把任务拆成图,再一步步走。推理派不画图,只边想边做。</p>
+        <p style="margin:4px 0"><strong>B 对</strong> —— "想(Thought)→ 做(Action)→ 看(Observation)"。这是 ReActAgent 的核心循环 —— 每做一步都要先想,做完看结果再想下一步。适合"需要调用外部工具"的场景(如查天气、查档案)。王阳明说:"思而后行,行而复思"。</p>
+        <p style="margin:4px 0">C 错 —— "初答→自省→改答"是自省派(韩愈)的循环,推理派不做"自省"这一步。推理派是边想边做,自省派是做完再改。</p>
+        <p style="margin:4px 0">D 错 —— "问→答→收"是初号机派(钟子期)的做法,简单直接不分步。推理派比分步多。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q6</span>
+        <span style="font-size:13px;color:var(--text-muted)">考自省派</span>
+      </div>
+      <p class="quiz-q">韩愈自省派最大的坑是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 算得太慢</li>
+        <li>B. 答得太短</li>
+        <li>C. 改到满意还不放手(没有"够好"线)</li>
+        <li>D. 不肯自省</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 改到满意还不放手</strong></p>
+        <p style="margin:4px 0">A 错 —— "算得太慢"是统筹派(复杂多步)和推理派(查外部)的坑,自省派的坑不是慢,而是"无止境"。</p>
+        <p style="margin:4px 0">B 错 —— "答得太短"是初号机派的"毛病"(简单直接,不分步),不是自省派的问题。自省派反而容易"答得过长",因为改太多次会啰嗦。</p>
+        <p style="margin:4px 0"><strong>C 对</strong> —— 自省派的坑是"改太多次" —— 没有"够好"的线,会陷入无限循环。工程上要用"质量分阈值"来兜底:LLM 给自己打分,达到阈值就停,达不到再改。这是 ReflectionAgent 落地时最容易踩的坑。</p>
+        <p style="margin:4px 0">D 错 —— "不肯自省"是自省派的反面 —— 既然叫"自省派",核心动作就是自省,不存在"不肯自省"的问题。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q7</span>
+        <span style="font-size:13px;color:var(--text-muted)">考统筹派</span>
+      </div>
+      <p class="quiz-q">柳敬亭统筹派的核心是?</p>
+      <ul class="quiz-options">
+        <li>A. 一句话答完</li>
+        <li>B. 边想边做</li>
+        <li>C. 先拆 3-5 步,再一步步走</li>
+        <li>D. 多派并行</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 先拆 3-5 步,再一步步走</strong></p>
+        <p style="margin:4px 0">A 错 —— "一句话答完"是初号机派(SimpleAgent)的做法,简单问题不分步。统筹派恰恰相反,先把大任务拆成几步,再一步步走。</p>
+        <p style="margin:4px 0">B 错 —— "边想边做"是推理派(ReActAgent)的核心,推理派每一步都要先想再做。统筹派是先想完(画出全图)再走。</p>
+        <p style="margin:4px 0"><strong>C 对</strong> —— "先拆 3-5 步,再一步步走" —— PlanAndSolveAgent 的精髓。复杂任务(如:查天气 + 查交通 + 查民俗 + 总结建议)必须先拆,否则 LLM 容易"顾此失彼"。</p>
+        <p style="margin:4px 0">D 错 —— "多派并行"是异步执行器(AsyncExecutor)的特性,属于万器归一的第四规,不是统筹派的核心。统筹派是"串行拆解",不是"并行执行"。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q8</span>
+        <span style="font-size:13px;color:var(--text-muted)">考万器归一</span>
+      </div>
+      <p class="quiz-q">万器归一的"四规"是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 大、小、方、圆</li>
+        <li>B. 进、出、开、关</li>
+        <li>C. 统一接口、总簿登记、可串联、可并行</li>
+        <li>D. 早、中、晚、夜</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 统一接口、总簿登记、可串联、可并行</strong></p>
+        <p style="margin:4px 0">A 错 —— "大、小、方、圆"是形容物品的术语,不是万器归一的规矩。</p>
+        <p style="margin:4px 0">B 错 —— "进、出、开、关"是门/阀门的操作术语,不是机件的接入规矩。</p>
+        <p style="margin:4px 0"><strong>C 对</strong> —— 四规是 "统一接口 / 总簿登记 / 可串联 / 可并行"。分别对应 BaseTool(基类)/ Registry(注册表)/ ToolChain(工具链)/ AsyncExecutor(异步执行)。这是工具系统的"四件套",把 100 种工具统一为 1 套接入方式。</p>
+        <p style="margin:4px 0">D 错 —— "早、中、晚、夜"是时辰,不是规矩。万器归一跟时辰无关。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q9</span>
+        <span style="font-size:13px;color:var(--text-muted)">考太子金句</span>
+      </div>
+      <p class="quiz-q">太子金句"自造机器,不是为了争洋货的脸面,是为了 ——"</p>
+      <ul class="quiz-options">
+        <li>A. 显示大齐国力</li>
+        <li>B. 让洋货卖不出去</li>
+        <li>C. 大齐人最明白大齐的山水人情</li>
+        <li>D. 让梁王下不来台</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 大齐人最明白大齐的山水人情</strong></p>
+        <p style="margin:4px 0">A 错 —— "显示国力"是面子工程,太子反复强调"自造不是为了排外"。如果为了面子,就违背了太子"洋货该用还用"的本意。</p>
+        <p style="margin:4px 0">B 错 —— "让洋货卖不出去"是贸易战思维,不是太子的初衷。太子明确说"洋货该用还用,我们不是排外"。</p>
+        <p style="margin:4px 0"><strong>C 对</strong> —— "大齐人最明白大齐的山水人情" —— 这是太子金句的核心。自造不是为了排外,是因为"这片土地上的事,这片土地上的人最明白"。对应工程上的"教学友好型"设计原则:框架要贴合使用者的真实场景,而不是让使用者去迁就框架。</p>
+        <p style="margin:4px 0">D 错 —— "让梁王下不来台"是朝堂政治,不是技术/工程层面的金句。太子金句是讲道理的,不是讲权谋的。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q10</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四派适用场景</span>
+      </div>
+      <p class="quiz-q">用户问"今天天气如何",该用哪派?</p>
+      <ul class="quiz-options">
+        <li>A. 钟子期初号机派 —— 一琴一弦,直接答</li>
+        <li>B. 王阳明推理派 —— 思而后行,行而复思</li>
+        <li>C. 韩愈自省派 —— 三省吾身,改到满意</li>
+        <li>D. 柳敬亭统筹派 —— 先拆后做</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 钟子期初号机派</strong></p>
+        <p style="margin:4px 0"><strong>A 对</strong> —— 简单问答(查天气)不必上"推理派"(杀鸡用牛刀),不必"自省派"(改到满意还不放手),更不必"统筹派"(根本没几步可拆)。用初号机派最直接,速度也最快。太子说:"选错了琴,反而误事"。</p>
+        <p style="margin:4px 0">B 错 —— 推理派适合"需要查外部"的场景(如查档案、查订单),简单查天气不需要"查"这一步。</p>
+        <p style="margin:4px 0">C 错 —— 自省派适合"对输出质量要求高"的场景(如写代码、写报告)。简单天气回答不需要反复改。</p>
+        <p style="margin:4px 0">D 错 —— 统筹派适合"复杂多步任务"(如查天气+查交通+查民俗+总结建议)。单独查天气是 1 步,根本不用拆。</p>
+      </details>
+    </div>
+
+  </div></div>
+</section>
+
+</main>
+
+<!-- ========== Footer ========== -->
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text-secondary)">WellInsight</strong> · 学习材料 · 第07章 v2.0 · 2026-06-25
+  </div>
+  <div>
+    原文:<a class="footer-link" href="https://raw.githubusercontent.com/datawhalechina/hello-agents/main/docs/chapter7/Chapter7-Building-Your-Agent-Framework.md" target="_blank">datawhalechina/hello-agents · Chapter 7</a>
+  </div>
+</footer>
+
+</div><!-- /.container -->
+
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+</body>
+</html>

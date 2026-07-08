@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第08章 · 记忆与检索 · WellInsight 学习材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2EDE6;--bg-card:#FAF7F2;--bg-elevated:#FFFCF7;--bg-deep:#E8DFD3;--text-primary:#3D3833;--text-secondary:#6B6157;--text-muted:#998E81;--accent-sage:#8B9D83;--accent-sage-soft:#D8E2D2;--accent-sage-faint:#ECF1E8;--accent-terracotta:#C49B8E;--accent-terracotta-soft:#E6D2C8;--accent-blue:#8A9AA8;--accent-blue-soft:#C8D2DA;--accent-amber:#C9A878;--accent-amber-soft:#E8D7B7;--accent-mauve:#A89098;--accent-mauve-soft:#DCCCD0;--border:#D9D2C7;--border-light:#E8E0D3;--shadow:0 2px 8px rgba(61,56,51,.06), 0 1px 2px rgba(61,56,51,.04);--shadow-lg:0 8px 24px rgba(61,56,51,.10), 0 2px 6px rgba(61,56,51,.05);}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.78;font-size:16px;font-weight:400;-webkit-font-smoothing:antialiased;letter-spacing:.01em;}
+.container{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+.sticky-toc{position:fixed;top:24px;right:24px;width:240px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);font-size:13px;z-index:50;max-height:calc(100vh - 48px);overflow-y:auto;}
+.sticky-toc-title{font-weight:600;color:var(--text-secondary);margin-bottom:8px;font-size:12px;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+.sticky-toc ol{list-style:none;counter-reset:toc;padding:0}
+.sticky-toc li{counter-increment:toc;margin:4px 0}
+.sticky-toc a{color:var(--text-secondary);text-decoration:none;display:block;padding:4px 0 4px 8px;margin-left:6px;border-left:2px solid transparent;font-size:12.5px;font-weight:500;transition:all .2s;}
+.sticky-toc a:hover{color:var(--accent-sage);border-left-color:var(--accent-sage)}
+.sticky-toc a::before{content:counter(toc) ".";color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px;margin-right:4px}
+.hero{background:linear-gradient(135deg,#FAF7F2 0%,#F2EDE6 100%);border:1px solid var(--border);border-radius:12px;padding:48px 40px 40px;margin-bottom:48px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent-sage) 0%,var(--accent-terracotta) 33%,var(--accent-blue) 66%,var(--accent-amber) 100%);}
+.hero-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text-muted);margin-bottom:16px;font-weight:500;letter-spacing:.5px;}
+.hero-meta-dot{width:4px;height:4px;background:var(--text-muted);border-radius:50%}
+.hero h1{font-size:46px;font-weight:700;line-height:1.15;color:var(--text-primary);margin-bottom:10px;letter-spacing:-1px;}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);margin-bottom:22px;font-weight:500;}
+.hero-fable{display:inline-block;padding:2px 10px;margin-right:4px;background:var(--accent-sage-soft);color:var(--accent-sage);border-radius:12px;font-size:14px;font-weight:600;letter-spacing:.5px;}
+.hero-desc{font-size:14.5px;color:var(--text-secondary);margin-bottom:24px;line-height:1.7;font-weight:400;}
+.hero-source{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);background:var(--bg-card);padding:6px 12px;border-radius:20px;border:1px solid var(--border-light);font-weight:500;}
+section{margin-bottom:56px;scroll-margin-top:80px}
+.chapter-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--accent-sage);background:var(--accent-sage-soft);padding:4px 12px;border-radius:12px;margin-bottom:14px;letter-spacing:1px;}
+h2{font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:14px;letter-spacing:-.3px;display:flex;align-items:baseline;gap:12px;line-height:1.3;}
+h2 .num{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--accent-terracotta);font-weight:500}
+h2-hook{display:block;font-size:15px;font-weight:500;color:var(--text-secondary);margin-top:8px;margin-bottom:24px;padding:12px 16px;background:var(--bg-card);border-left:3px solid var(--accent-amber);border-radius:0 6px 6px 0;font-style:italic;}
+h3{font-size:19px;font-weight:600;color:var(--text-primary);margin:24px 0 10px;padding-left:14px;border-left:3px solid var(--accent-amber);letter-spacing:-.2px;}
+h4{font-size:16px;font-weight:600;color:var(--accent-sage);margin:20px 0 10px}
+p{margin-bottom:14px;color:var(--text-primary);text-align:left;font-weight:400}
+strong{color:var(--text-primary);font-weight:600}
+em{color:var(--text-secondary);font-style:normal;font-weight:600}
+.lead{font-size:17px;color:var(--text-secondary);padding:18px 22px;background:var(--bg-card);border-left:3px solid var(--accent-terracotta);border-radius:0 6px 6px 0;margin-bottom:28px;font-weight:500;line-height:1.85;}
+.callout{background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:18px 22px;margin:20px 0;box-shadow:var(--shadow);}
+.callout-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--accent-sage);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.pullquote{background:linear-gradient(135deg,var(--accent-amber-soft) 0%,var(--bg-card) 100%);border:1px solid var(--accent-amber-soft);border-radius:8px;padding:22px 26px;margin:24px 0;font-size:16.5px;font-weight:500;color:var(--text-primary);position:relative;}
+.pullquote::before{content:"\201C";position:absolute;top:-6px;left:16px;font-size:48px;color:var(--accent-amber);font-family:Georgia,serif;line-height:1;font-weight:700;}
+.stats-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0 8px}
+.stat-cell{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:18px 16px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--accent-terracotta);line-height:1.1;margin-bottom:4px}
+.stat-label{font-size:13px;color:var(--text-secondary);font-weight:500;line-height:1.45}
+.stat-cell.victory{border-top:3px solid var(--accent-sage)}
+.stat-cell.defeat{border-top:3px solid var(--accent-mauve)}
+.stat-num.green{color:var(--accent-sage)}
+.stat-num.red{color:var(--accent-mauve)}
+.doctors-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0 8px}
+.doctor-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;transition:transform .2s;}
+.doctor-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.doctor-card.role-1{border-top:3px solid var(--accent-sage)}
+.doctor-card.role-2{border-top:3px solid var(--accent-terracotta)}
+.doctor-card.role-3{border-top:3px solid var(--accent-blue)}
+.doctor-card.role-4{border-top:3px solid var(--accent-amber)}
+.doctor-name{font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:2px;display:flex;align-items:center;gap:8px;letter-spacing:-.2px;}
+.doctor-age{font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:10px}
+.doctor-quote{font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:12px;line-height:1.6;padding-bottom:12px;border-bottom:1px dashed var(--border-light)}
+.doctor-behaviors{list-style:none;padding:0;margin:0;font-size:12.5px;color:var(--text-secondary);line-height:1.7}
+.doctor-behaviors li{padding:3px 0 3px 14px;position:relative}
+.doctor-behaviors li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--accent-amber)}
+.annotation{background:linear-gradient(135deg,var(--accent-sage-faint) 0%,var(--bg-card) 100%);border:1px solid var(--accent-sage-soft);border-left:3px solid var(--accent-sage);border-radius:0 8px 8px 0;padding:18px 22px;margin:32px 0 8px;position:relative;}
+.annotation-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--accent-sage-soft);}
+.annotation-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;letter-spacing:1.5px;}
+.annotation-hint{font-size:12px;color:var(--text-muted);font-weight:500;font-style:italic}
+.annotation dl{display:grid;grid-template-columns:minmax(140px,max-content) 1fr;gap:8px 18px;margin:0}
+.annotation dt{font-weight:600;color:var(--text-primary);font-size:13px;line-height:1.65}
+.annotation dd{margin:0;color:var(--text-secondary);font-size:13px;line-height:1.65}
+.annotation dd .who{color:var(--accent-terracotta);font-weight:700;margin-right:4px}
+.annotation dd .what{color:var(--text-secondary)}
+.dialog{background:var(--bg-deep);border-radius:6px;padding:14px 18px;margin:14px 0;font-size:14.5px;color:var(--text-primary);border-left:3px solid var(--accent-amber);}
+.dialog-speaker{font-weight:700;color:var(--accent-terracotta)}
+.table-wrap{margin:20px 0;background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:var(--bg-deep)}
+th{padding:12px 16px;text-align:left;font-weight:600;color:var(--text-primary);font-size:13px;letter-spacing:.3px;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border-light);color:var(--text-secondary);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(232,223,211,.3)}
+.coverage{background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:32px 0}
+.coverage-title{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px;padding-bottom:12px;border-bottom:2px dashed var(--border)}
+.quiz-list{display:flex;flex-direction:column;gap:14px;margin:18px 0}
+.quiz-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);border-left:4px solid var(--accent-sage)}
+.quiz-card-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.quiz-num{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent-sage);background:var(--accent-sage-soft);padding:2px 8px;border-radius:6px}
+.quiz-q{margin:0 0 8px;font-size:14.5px;color:var(--text-primary);font-weight:500;line-height:1.7}
+.quiz-options{list-style:none;padding:0;margin:0 0 6px;display:flex;flex-direction:column;gap:3px}
+.quiz-options li{padding:5px 10px;font-size:13.5px;color:var(--text-secondary);line-height:1.6;border-radius:5px;background:var(--bg-card);border:1px solid var(--border-light)}
+.quiz-answer{margin-top:10px;background:var(--bg-card);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text-secondary);border:1px dashed var(--border)}
+.quiz-answer summary{cursor:pointer;font-weight:600;color:var(--accent-sage);font-size:13px;padding:2px 0;list-style:none}
+.quiz-answer summary::before{content:"▶ "}
+.quiz-answer[open] summary{margin-bottom:6px}
+.summary-box{background:linear-gradient(135deg,var(--accent-sage-soft) 0%,var(--bg-card) 50%,var(--accent-amber-soft) 100%);border:1px solid var(--accent-sage);border-radius:12px;padding:32px 36px;margin:40px 0;position:relative;}
+.summary-box-title{font-size:13px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.summary-text{font-size:18px;color:var(--text-primary);line-height:1.85;font-weight:500}
+.footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);font-size:12.5px;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-weight:500}
+.footer-link{color:var(--accent-sage);text-decoration:none;font-weight:600}
+.back-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);transition:all .2s;z-index:40}
+.icon{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+code{background:var(--bg-deep);padding:2px 7px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent-terracotta);font-weight:500}
+@media (max-width:1100px){.sticky-toc{display:none}}
+@media (max-width:768px){.container{padding:24px 16px 60px}.hero{padding:32px 20px}.hero h1{font-size:32px}h2{font-size:22px}.doctors-grid,.stats-card{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="sticky-toc" aria-label="目录">
+  <div class="sticky-toc-title">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    目录
+  </div>
+  <ol>
+    <li><a href="#ch0">开篇 · 巧手机成了"金鱼"</a></li>
+    <li><a href="#ch1">第一幕 · 翰林掌院奏本"金鱼"</a></li>
+    <li><a href="#ch2">第二幕 · 文献阁挂牌,记簿与查档</a></li>
+    <li><a href="#ch3">第三幕 · 吕坤造记簿四柜</a></li>
+    <li><a href="#ch4">第四幕 · 苏望造查档机</a></li>
+    <li><a href="#ch5">第五幕 · 新税法实战 + 梁王再反转</a></li>
+    <li><a href="#finale">终章 · 文献阁匾,记则不忘查则知新</a></li>
+    <li><a href="#summary">一句话总结</a></li>
+    <li><a href="#coverage">概念地图</a></li>
+    <li><a href="#think">太子五条心得</a></li>
+    <li><a href="#quiz">自测十问</a></li>
+  </ol>
+</nav>
+
+<div class="container">
+
+<header class="hero">
+  <div class="hero-meta">
+    <span>WellInsight 学习材料</span>
+    <span class="hero-meta-dot"></span>
+    <span>来源教材 · 第08章 · 寓言版</span>
+    <span class="hero-meta-dot"></span>
+    <span>2026-06-25 · v2</span>
+  </div>
+  <h1>第08章 · 记忆与检索</h1>
+  <p class="hero-subtitle"><span class="hero-fable">文献阁记簿</span> · 19 岁太子装"记簿"与"查档" · 给灵机一本随时可翻的字典</p>
+  <p class="hero-desc">建议读法:先看故事,<strong>不要查名词</strong>;每章末尾有"本节专业名词对照",可倒回去对比。</p>
+  <span class="hero-source">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    原文 · datawhalechina/hello-agents · 第08章
+  </span>
+</header>
+
+<main id="content">
+
+<section id="ch0">
+  <span class="chapter-tag">开篇 · 景和九年六月</span>
+  <h2><span class="num">00</span>巧手机成了"金鱼" —— 问过的还要再问</h2>
+  <span class="h2-hook">"工部侍郎问巧手机:'上回我说过我姓什么吗?'巧手机答:'抱歉,我不知道。'—— 侍郎怒:'金鱼都记得三秒前的事!'"</span>
+
+  <p class="lead">景和九年六月。十九岁的太子刚在翰林院办完"四库全书"编修的差事,回到钦天监算法房,正准备歇几日,小李匆匆迎上来:"殿下,翰林院掌院学士方守诚,带了一群编修堵在算法房门口 —— 说巧手机成了'金鱼',再不修,翰林院要上奏弹劾。"</p>
+
+  <p>太子赶到门口。方守诚一见太子,拱手便拜:"殿下,巧手机不记事!昨儿问过张编修的姓名,今儿又问;昨儿说过他学 Python,今儿又问。这是'金鱼机',不是'巧手机'!"</p>
+
+  <p>旁边的户部侍郎接话:"臣这边更麻烦 —— 巧手机答的还是三年前的旧税法。朝廷今年新颁了《景和九年税法三十条》,巧手机一问三不知。这巧手机不是'金鱼',是'死鱼'。"</p>
+
+  <p>方守诚递上联名奏本:"殿下,翰林院三十六位编修联名 —— 恳请算法房三月内,给巧手机加<strong>记簿</strong>与<strong>查档</strong>两件机件。记簿让它'记得住',查档让它'知新事'。否则巧手机在翰林院就是摆设。"</p>
+
+  <p>太子接了奏本,沉吟片刻。算法房的钦天监一号巧手机跑了半年,确实只记得"当次会话"的事,会话一断就忘光 —— 灵机天生就是这样:它脑是临时的,会话一断,前事全忘;它读的也是旧书,朝廷新策它没读过。</p>
+
+  <p>太子对小李说:"<strong>灵机记性是临时的,纸上的记性是永久的 —— 我们得给灵机外挂一本字典,让它在'临时脑'之外,有本随时可翻的字典</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">对照开篇的两个症状</span>
+    </div>
+    <dl>
+      <dt>金鱼机 · 不记事</dt>
+      <dd><span class="who">方守诚的奏本</span><span class="what">—— 灵机的"临时脑"特性:每次新会话从零开始,之前的对话全忘光。需要外挂"记簿"系统(Memory)解决。</span></dd>
+      <dt>死鱼 · 不知新事</dt>
+      <dd><span class="who">户部侍郎的吐槽</span><span class="what">—— 灵机"内典不全":训练数据有截止日期,新政策/新事件它不知道。需要外挂"查档"系统(RAG,检索增强生成)解决。</span></dd>
+      <dt>灵机 · 临时脑</dt>
+      <dd><span class="who">太子的比喻</span><span class="what">—— 灵机自带的上下文窗口(context window):会话内能记住,会话外就忘。外挂字典 = 给它一本"上下文之外"的参考书。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch1">
+  <span class="chapter-tag">第一幕 · 立项之争</span>
+  <h2><span class="num">01</span>梁王再登场:"灵机自带记性,何必外挂?"</h2>
+  <span class="h2-hook">"上回梁王反对自造,被太子说服,这回他又来反对'外挂记簿'。同一个人,反对两次 —— 但这次,他说得有几分道理。"</span>
+
+  <p class="lead">六月十九日早朝。方守诚刚把联名奏本呈上,梁王就出列了 —— 他自第07章"崇洋派反转"后任"对外联络大臣",对算法房的事务一直很上心。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">梁王:</span>"殿下,方掌院说的'金鱼'和'死鱼',臣都懂。但臣有一问 —— 灵机本就'通脑',天生带记性,何必再外挂一层'记簿'?再挂一层,反应不慢半拍?再说,纸张能存多少?灵机通脑里的'内典'还能随时调用,纸张岂不是'死典'?"
+  </div>
+
+  <p>这话有道理,朝堂上几位老臣点头。方守诚脸色微变。太子示意梁王说完,然后慢慢开口。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">太子:</span>"<strong>梁王叔问得好。灵机的'内典',是会话内临时翻的;纸上的'外典',是会话外永久存的。一本字典 —— 不在内典里塞,也不在内典里找,而是内典不够时再翻外典。'挂一层'不是不信内典,是给内典备一本外典</strong>。查档机也一样:灵机不知道新事,不是因为它笨,而是因为它只读了旧书 —— 我们给它一本新书(档案库),它就能答新事。"
+  </div>
+
+  <p>梁王沉吟片刻,退了一步:"殿下这话,臣还要再想。"</p>
+
+  <h3>文献阁挂牌 · 三条铁规</h3>
+  <p>六月二十日,太子在翰林院后院挂"文献阁"匾,与算法房联合办公。三条铁规贴在正堂:</p>
+  <ul>
+    <li><strong>记簿</strong> —— 让巧手机"记得住"(上次说过的话不再问)—— 三个月内拿出第一版</li>
+    <li><strong>查档</strong> —— 让巧手机"知新事"(能查最新档案/文献)—— 三个月内跑通端到端</li>
+    <li><strong>万器归一</strong> —— 沿用第07章机件规范,新机件按统一接口接入</li>
+  </ul>
+
+  <p>太子在匾旁另立一段话:"<strong>记则不忘,查则知新 —— 给灵机外挂一本字典,不是不信它,是让它在'临时脑'之外,有本随时可翻的字典</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">梁王的质疑与太子的回应</span>
+    </div>
+    <dl>
+      <dt>通脑 · 内典</dt>
+      <dd><span class="who">梁王的比喻</span><span class="what">—— 灵机自带的"上下文窗口"(context window):会话内能记,但有长度限制,会话外就忘。</span></dd>
+      <dt>外典 · 字典</dt>
+      <dd><span class="who">太子的回应</span><span class="what">—— "外挂记忆"(external memory / RAG):会话外的永久存储,需要时再去翻。</span></dd>
+      <dt>会话内 vs 会话外</dt>
+      <dd><span class="who">太子金句</span><span class="what">—— 内典不够时再翻外典。这是 RAG 的核心思想:不把所有信息塞进灵机上下文,而是按需检索最相关的几段。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch2">
+  <span class="chapter-tag">第二幕 · 文献阁开局</span>
+  <h2><span class="num">02</span>文献阁挂牌,吕坤记簿 + 苏望查档,两位匠人入驻</h2>
+  <span class="h2-hook">"记簿是'自己记自己',查档是'借别人的记忆' —— 一内一外,合起来才是完整的记忆。"</span>
+
+  <p class="lead">六月二十一日。太子召见两位主笔匠人:翰林院编修吕坤(四十出头,管典籍二十年),国子监祭酒苏望(三十五岁,精研历代典籍索引)。两人领命入阁,太子当面给图纸,三月为期。</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num green">4</div>
+      <div class="stat-label">件记簿机件(案头纸/历事簿/通典/图音阁)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num green">3</div>
+      <div class="stat-label">档查档机型(通义坊/本地坊/简化坊)</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num red">90</div>
+      <div class="stat-label">日为期,三月期满交付</div>
+    </div>
+  </div>
+
+  <h3>节点 1 · 吕坤主记簿 · 依《尚书》"五际"立规</h3>
+  <p>吕坤的方案很独特 —— 他不直接造机,他先翻《尚书》,从"五际"(貌、言、视、听、思)里找到记忆的五步循环:</p>
+  <ul>
+    <li><strong>写</strong> —— 把听到的话变成可存的字(像把口语写成典籍)</li>
+    <li><strong>收</strong> —— 写入对应分柜(像把奏折分类归档)</li>
+    <li><strong>翻</strong> —— 用的时候翻出来(像官员调阅档案)</li>
+    <li><strong>固</strong> —— 短期变长期(像把临时奏折升为正式典籍)</li>
+    <li><strong>忘</strong> —— 没用的自动清理(像定期销毁旧档)</li>
+  </ul>
+
+  <h3>节点 2 · 苏望主查档 · 借"语义指纹"找档案</h3>
+  <p>苏望的方案更妙。他不直接让灵机"读"所有档案(太多了装不下),他给每段档案盖一个"语义指纹"—— 一段 200 字的档案,用几十个数字代表它的"意思"。</p>
+
+  <p>用户问灵机"景和九年盐税新规如何?",灵机先到档案库中,按"语义指纹"找"意思最近"的 5 段档案,然后把这 5 段塞进"纸条"里,再作答。</p>
+
+  <p>苏望说:"<strong>这就像翰林院的'索引卡' —— 不必通读万卷,只要看几行索引,就知道哪本书哪一页讲这事</strong>。"</p>
+
+  <p>太子点头:"这便是'查档'二字的本意 —— 不是把档案塞进灵机脑里,是按语义把档案找出来给灵机看。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">记簿四柜 + 查档三层</span>
+    </div>
+    <dl>
+      <dt>《尚书》"五际"</dt>
+      <dd><span class="who">吕坤的设计依据</span><span class="what">—— 记忆形成五步循环:编码(encoding)/ 存储(storage)/ 检索(retrieval)/ 巩固(consolidation)/ 遗忘(forgetting)。</span></dd>
+      <dt>语义指纹</dt>
+      <dd><span class="who">苏望的比喻</span><span class="what">—— 灵机"指纹"向量:把一段文字转成一串数字(几十到几百维),数字之间的距离代表"意思的相似度"。</span></dd>
+      <dt>索引卡</dt>
+      <dd><span class="who">苏望的类比</span><span class="what">—— 查档机的核心机制:不必把全部档案塞给灵机,而是用指纹找出最相关的几段,作为上下文喂给灵机。</span></dd>
+      <dt>语义指纹近 vs 远</dt>
+      <dd><span class="who">查档原理</span><span class="what">—— "指纹相似度检索"(vector similarity search):两段文字的指纹距离越近,意思越相近。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch3">
+  <span class="chapter-tag">第三幕 · 记簿四柜</span>
+  <h2><span class="num">03</span>吕坤造记簿:案头纸、历事簿、通典、图音阁</h2>
+  <span class="h2-hook">"记簿不是一本大账 —— 而是一柜四屉:案头纸放临时事,历事簿放做过的事,通典放知道的事,图音阁放看过听过的事。"</span>
+
+  <p class="lead">六月底。吕坤依《尚书》"貌言视听思",把记簿分为四大分柜,每柜有自己的"评分规矩"(决定什么事值得记、什么时候清理)。</p>
+
+  <div class="doctors-grid">
+    <div class="doctor-card role-1">
+      <div class="doctor-name">案头纸</div>
+      <div class="doctor-age">临时记事柜</div>
+      <div class="doctor-quote">"放在案头的纸,会前用,会后清。"</div>
+      <ul class="doctor-behaviors">
+        <li>容量有限(默认 50 张)</li>
+        <li>会话结束自动清空</li>
+        <li>评分规矩:用没用过 + 时间新不新</li>
+        <li>适合:本会话上下文</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-2">
+      <div class="doctor-name">历事簿</div>
+      <div class="doctor-age">历事柜</div>
+      <div class="doctor-quote">"按时间排,记的是'我做过什么'。"</div>
+      <ul class="doctor-behaviors">
+        <li>长期存储(可回顾)</li>
+        <li>按时间或主题索引</li>
+        <li>评分规矩:时间新近(权重 0.2)+ 重要性</li>
+        <li>适合:"上次我教你什么"</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-3">
+      <div class="doctor-name">通典</div>
+      <div class="doctor-age">抽象知识柜</div>
+      <div class="doctor-quote">"存抽象知识、用户偏好、长期规则。"</div>
+      <ul class="doctor-behaviors">
+        <li>高持久性、高重要性</li>
+        <li>可用知识图谱关联</li>
+        <li>评分规矩:图谱关联度(权重 0.3)</li>
+        <li>适合:"用户是 Python 开发者"</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-4">
+      <div class="doctor-name">图音阁</div>
+      <div class="doctor-age">图音素材柜</div>
+      <div class="doctor-quote">"存图、音等多模态素材。"</div>
+      <ul class="doctor-behaviors">
+        <li>支持图片、音频</li>
+        <li>支持跨模态检索</li>
+        <li>评分规矩:重要性 + 存储空间</li>
+        <li>适合:产品图、会议录音</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>节点 3 · 记簿的"五际"循环跑通</h3>
+  <p>七月初五。吕坤的助手张小山用《景和九年六月·户部税务奏折》做测试 —— 把奏折拆成 12 段话,分别存进四柜:</p>
+  <ol>
+    <li><strong>写</strong>:把每段话写进机器能识别的格式(去口语化、保留关键词)</li>
+    <li><strong>收</strong>:用户偏好("张编修喜用图解")→ 通典;会议录音 → 图音阁;今日待办 → 案头纸;上月奏折 → 历事簿</li>
+    <li><strong>翻</strong>:用户问"我上月问过什么?",历事簿翻出对应条目</li>
+    <li><strong>固</strong>:案头纸里"用户 Python 偏好"被翻了 5 次 → 自动固化进通典</li>
+    <li><strong>忘</strong>:案头纸超过 50 张 → 自动清掉最旧的</li>
+  </ol>
+
+  <p>吕坤验收,满意点头:"<strong>记簿不是'永久存所有事' —— 是'该记的记,该忘的忘,该固的固,该翻的翻</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">四柜记忆 + 五际循环</span>
+    </div>
+    <dl>
+      <dt>案头纸 · 临时记事</dt>
+      <dd><span class="who">对应工作记忆</span><span class="what">—— Working Memory:临时存储当前会话上下文,容量有限(50 条),会话结束自动清理。灵机自带的上下文窗口就是工作记忆。</span></dd>
+      <dt>历事簿 · 历事</dt>
+      <dd><span class="who">对应情景记忆</span><span class="what">—— Episodic Memory:按时间序列存储"我做过的事":每个具体交互事件,带时间戳,可回顾。</span></dd>
+      <dt>通典 · 抽象知识</dt>
+      <dd><span class="who">对应语义记忆</span><span class="what">—— Semantic Memory:抽象知识、用户偏好、长期规则。可用知识图谱关联存储。</span></dd>
+      <dt>图音阁 · 图音素材</dt>
+      <dd><span class="who">对应感知记忆</span><span class="what">—— Perceptual Memory:多模态素材:图片、音频。支持跨模态检索(用文字找图片)。</span></dd>
+      <dt>五际循环</dt>
+      <dd><span class="who">《尚书》设计依据</span><span class="what">—— 记忆形成五步:编码(encoding)/ 存储(storage)/ 检索(retrieval)/ 巩固(consolidation)/ 遗忘(forgetting)。记簿机件完整实现这五步。</span></dd>
+      <dt>权重 0.2 / 0.3</dt>
+      <dd><span class="who">评分规矩</span><span class="what">—— "时间新近权重"和"图谱关联权重":历事簿更看时间(0.2),通典更看知识关联(0.3)。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch4">
+  <span class="chapter-tag">第四幕 · 查档机</span>
+  <h2><span class="num">04</span>苏望造查档机:用"语义指纹"找最相关的 5 段</h2>
+  <span class="h2-hook">"不必通读万卷 —— 只要看几行索引,就知道哪本书哪一页讲这事。"</span>
+
+  <p class="lead">七月中。吕坤的记簿跑通后,苏望接手上"查档机"。他把查档机拆成四步流水线 —— 切段、盖指纹、建索引、检索作答。</p>
+
+  <h3>节点 4 · 三档"语义指纹"坊</h3>
+  <p>苏望测试了三种"语义指纹"铸造方式,各有取舍:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>档位</th><th>朝代比喻</th><th>铸造方式</th><th>优</th><th>劣</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>通义坊</td><td>云端铸造</td><td>外包给通义大匠</td><td>快、准、稳</td><td>要钱、要联网</td></td>
+        <tr><td>本地坊</td><td>自办铸造</td><td>自办铸造间</td><td>不联网、私密</td><td>装大件、占内存</td></td>
+        <tr><td>简化坊</td><td>字面对比</td><td>字面对比法</td><td>零成本、零依赖</td><td>"语义"理解浅</td></td>
+      </tbody>
+    </table>
+  </div>
+
+  <p>太子定下规矩:"<strong>朝廷部用'通义坊';地方衙门用'本地坊';边远小县连'本地坊'都装不下,用'简化坊'</strong>。三档并存,看预算看场景。"</p>
+
+  <h3>节点 5 · 查档机的完整流水线</h3>
+  <p>苏望把查档机拆成四步流水线:</p>
+  <ol>
+    <li><strong>切段</strong> —— 把档案库切成约 200 字的小段(每段太长会失精,太短会断意)</li>
+    <li><strong>盖指纹</strong> —— 每段用语义指纹坊生成几十个数字的"指纹"</li>
+    <li><strong>建索引</strong> —— 把指纹存进指纹库,支持快速"近邻查找"</li>
+    <li><strong>检索作答</strong> —— 用户问句也生成指纹 → 在指纹库中找"指纹最近"的 5 段 → 塞进灵机"纸条"里 → 灵机答</li>
+  </ol>
+
+  <p>苏望现场演示:把《景和九年税法三十条》全文切了 87 段,盖好指纹,建好索引。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">苏望:</span>"殿下,可以试了。问它任何税法问题,它先查档再答。"
+  </div>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">三档坊 + 四步流水线</span>
+    </div>
+    <dl>
+      <dt>通义坊 · 云端铸造</dt>
+      <dd><span class="who">对应云端服务</span><span class="what">—— DashScope Embedding:云端指纹服务(通义千问的 text-embedding-v3),精度高,要付费要联网。</span></dd>
+      <dt>本地坊 · 自办铸造</dt>
+      <dd><span class="who">对应本地模型</span><span class="what">—— Local Transformer Embedding:本地指纹模型(句子向量转换),不联网,数据私密,但要装大模型。</span></dd>
+      <dt>简化坊 · 字面对比</dt>
+      <dd><span class="who">对应字面匹配</span><span class="what">—— TF-IDF:轻量级方案,其实只是字面匹配,不能理解同义词/近义句。但零成本零依赖,适合边远地区。</span></dd>
+      <dt>切段</dt>
+      <dd><span class="who">第一步</span><span class="what">—— 文档切片(Document Chunking):把长文档切成小段,通常 200-500 字/段。</span></dd>
+      <dt>盖指纹 · 建索引</dt>
+      <dd><span class="who">第二三步</span><span class="what">—— 指纹生成 + 指纹库存储:每段文字转成指纹,存进指纹库(向量数据库,如 Qdrant),支持相似度检索。</span></dd>
+      <dt>近邻查找 · Top-K</dt>
+      <dd><span class="who">第四步</span><span class="what">—— 用用户问句的指纹去指纹库中找最近的 K 个段落(通常 K=5),作为上下文喂给灵机。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch5">
+  <span class="chapter-tag">第五幕 · 实战与反转</span>
+  <h2><span class="num">05</span>新税法实战 + 梁王第三次反转</h2>
+  <span class="h2-hook">"问巧手机'景和九年盐税新规',它答得比户部侍郎还熟 —— 梁王看了,长叹一声。"</span>
+
+  <p class="lead">六月廿三日早朝,翰林院掌院方守诚亲测文献阁的查档机。他当堂问巧手机:"<strong>景和九年盐税新规,商人入城要做哪些登记?</strong>"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num green">87</div>
+      <div class="stat-label">段档案入库(30 条税法切分)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num green">5</div>
+      <div class="stat-label">段被检索出来塞进纸条</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num red">3</div>
+      <div class="stat-label">次反转:梁王再服</div>
+    </div>
+  </div>
+
+  <p>巧手机"想"了半晌,吐答:</p>
+
+  <div class="callout">
+    <p style="margin:0"><strong>盐商入城新规:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">① 持盐引(旧三年一换,新一年一换);② 入城先至户部报税司登记("<strong>盐商登记簿</strong>"新格式);③ 货物过秤,在城门口由户部监秤官与盐商当面核签;④ 城内停留不超过三日,三日后续住须再申报一次。</p>
+    <p style="margin:6px 0 0;font-size:13px;color:var(--text-muted)">—— 据《景和九年税法三十条》第 7、12、19 条。</p>
+  </div>
+
+  <p>方守诚看答案,愣住了。旁边的户部侍郎低声说:"这比我背得还熟。"</p>
+
+  <h3>梁王再登场 · 三反转</h3>
+  <p>消息传到梁王府。梁王不信 —— 上回反对自造被说服,这回反对外挂记簿又被说服,如今新税法实战演示,他非要亲眼看。</p>
+
+  <p>六月廿五日,梁王亲临文献阁。苏望当场演示,把巧手机问了三个刁钻问题:</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">梁王:</span>"问它:'景和九年盐商欠税如何处罚?'"
+  </div>
+
+  <p>巧手机答:"<strong>欠税者,初犯罚银十两,再犯罚银五十两并扣押货物,三犯以上取消盐引资格三年</strong>。—— 据《景和九年税法三十条》第 24 条。"</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">梁王:</span>"再问:'景和九年,北方边境盐商入关,跟内地有何不同?'"
+  </div>
+
+  <p>巧手机答:"<strong>北方边境盐商需额外持'边盐引',由户部与兵部联合签发;入关后第一站须至当地守备衙门报备,核签后方可入城</strong>。—— 据《景和九年税法三十条》第 7 条及兵部《边境商律》第三条。"</p>
+
+  <p>梁王沉默了半晌,长叹一声:"<strong>上回本王反对自造,被殿下说服;这回本王反对外挂记簿,又被殿下说服 —— 殿下这两课,本王都服</strong>。"</p>
+
+  <p>梁王主动请缨:"臣愿任'文献阁对外联络大臣',把这套记簿与查档,推给周边诸国。北方戎国、南方越国,都用得上。" 太子大喜:"梁王叔肯来,大齐之幸也。"</p>
+
+  <h3>太子金句 · 记簿三戒</h3>
+  <p>太子在文献阁匾旁贴上"记簿三戒":</p>
+  <ul>
+    <li><strong>戒忘本</strong> —— 巧手机不必记住所有事,但<strong>用户姓名、偏好、长期指令</strong>必记</li>
+    <li><strong>戒乱存</strong> —— 不能什么都往记簿里塞,垃圾进垃圾出</li>
+    <li><strong>戒不固</strong> —— 该固化为长期的事不固,下次还得重新教</li>
+  </ul>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">实战 + 三戒</span>
+    </div>
+    <dl>
+      <dt>边盐引 · 守备衙门</dt>
+      <dd><span class="who">灵机查档答出</span><span class="what">—— 查档机的"跨文档检索":不同档案库(户部 / 兵部)的内容同时被检索,合并成完整答案。</span></dd>
+      <dt>三反转 · 梁王</dt>
+      <dd><span class="who">第07/08章反派</span><span class="what">—— 第07章"自造不是复刻"反转 → 第08章"外挂字典不是不信内典"反转 → 第08章"主动对外推广"。连续三反转。</span></dd>
+      <dt>记簿三戒</dt>
+      <dd><span class="who">太子立的规矩</span><span class="what">—— 记簿机件设计的三大原则:① 必记关键信息 ② 不存垃圾 ③ 短期记忆及时固化为长期。</span></dd>
+      <dt>文献阁对外联络大臣</dt>
+      <dd><span class="who">梁王新职位</span><span class="what">—— "开源推广":把自造框架推广给其他用户/国家,反向促进框架迭代。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="finale">
+  <span class="chapter-tag">终章 · 景和九年七月</span>
+  <h2><span class="num">06</span>三月期满,文献阁匾"记则不忘,查则知新"</h2>
+
+  <p class="lead">景和九年七月。三月期满,文献阁正式挂牌。太子题匾四字:"<strong>记则不忘,查则知新</strong>"。</p>
+
+  <p>这天早朝,方守诚、吕坤、苏望、梁王同堂。太子当众演示:把一张户部新送来的《景和九年秋粮调度令》当场入库(切段、盖指纹、建索引),然后问巧手机:"秋粮调度令中,受灾县如何减免赋税?" —— 巧手机从刚入库的 23 段档案中精准找出 5 段,答得丝毫不差。</p>
+
+  <p>方守诚带头鼓掌。翰林院编修们从此不再说巧手机是"金鱼"或"死鱼"。</p>
+
+  <div class="pullquote">
+    "通脑灵机的脑,是临时的脑;纸上的字典,是永久的字典。<br><br>
+    给灵机外挂一本字典,不是不信它,是让它在'临时脑'之外,还有一本随时可翻的字典 —— <br><br>
+    <strong>懂了原理者,方能驭灵机;只会用它者,必被灵机所限。</strong>"
+    <footer style="margin-top:14px;font-size:13px;color:var(--text-muted)">—— 太子,景和九年七月,19 岁,文献阁挂牌三月</footer>
+  </div>
+
+  <h3>跨章承接 · 下一章预告</h3>
+  <ul>
+    <li><strong>第09章 · 上下文工程</strong> —— 灵机的"临时脑"有限,如何精心排版"纸条"内容,让有限空间里读到最有用的信息?</li>
+    <li><strong>第10章 · MCP 协议</strong> —— 不同人家的巧手机如何互相配合?基于第07章工具系统,扩展"机件对机件"的说话规矩。</li>
+  </ul>
+</section>
+
+<section id="summary">
+  <div class="summary-box">
+    <div class="summary-box-title">一句话总结</div>
+    <p class="summary-text">第08章讲的是:<strong>巧手机成了"金鱼"和"死鱼" —— 翰林院掌院联名奏本,十九岁太子在翰林院下设文献阁,造出"记簿"四柜(案头纸/历事簿/通典/图音阁)与"查档机"三档坊(通义/本地/简化),三月为期,记则不忘,查则知新</strong>。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px">太子金句:"<strong>给灵机外挂一本字典,不是不信它,是让它在'临时脑'之外,还有一本随时可翻的字典</strong>"。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px;color:var(--text-muted)">反派(梁王)三反转:第07章反对自造 → 第08章上半场反对外挂 → 第08章下半场主动对外推广。母题连续 3 连击复用。</p>
+  </div>
+</section>
+
+<section id="coverage">
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" style="color:var(--accent-sage)"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      概念地图 · 25 个名词索引
+    </div>
+
+    <h4 style="margin:0 0 12px">📜 记簿四柜 · 四种"记忆分柜"</h4>
+    <div class="doctors-grid">
+      <div class="doctor-card role-1">
+        <div class="doctor-name">案头纸</div>
+        <div class="doctor-quote">"临时记事,会话结束自动清理。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应工作记忆</li>
+          <li>默认 50 张,会话结束自动清</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-2">
+        <div class="doctor-name">历事簿</div>
+        <div class="doctor-quote">"按时间排序的'我做过的事'。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应情景记忆</li>
+          <li>时间新近权重 0.2</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-3">
+        <div class="doctor-name">通典</div>
+        <div class="doctor-quote">"存抽象知识、用户偏好、长期规则。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应语义记忆</li>
+          <li>图谱关联权重 0.3</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-4">
+        <div class="doctor-name">图音阁</div>
+        <div class="doctor-quote">"存图、音等多模态素材。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应感知记忆</li>
+          <li>支持跨模态检索</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4 style="margin:24px 0 12px">📖 查档机 · 三档"语义指纹坊"</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>档位</th><th>朝代比喻</th><th>铸造方式</th><th>适用场景</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>通义坊</td><td>云端铸造</td><td>外包给通义大匠</td><td>朝廷各部</td></tr>
+          <tr><td>本地坊</td><td>自办铸造</td><td>自办铸造间</td><td>地方衙门</td></tr>
+          <tr><td>简化坊</td><td>字面对比</td><td>字面对比法</td><td>边远小县</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin:24px 0 12px">📜 五际循环 · 记忆形成五步</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>步骤</th><th>朝代叙事</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>写</td><td>把口语写成典籍</td></tr>
+          <tr><td>收</td><td>把奏折分类归档</td></tr>
+          <tr><td>翻</td><td>官员调阅档案</td></tr>
+          <tr><td>固</td><td>临时奏折升为正式典籍</td></tr>
+          <tr><td>忘</td><td>定期销毁旧档</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin:24px 0 12px">🔧 查档机四步流水线</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>步骤</th><th>动作</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1. 切段</td><td>把档案切成 200 字小段</td></tr>
+          <tr><td>2. 盖指纹</td><td>每段生成几十个数字</td></tr>
+          <tr><td>3. 建索引</td><td>指纹存进指纹库</td></tr>
+          <tr><td>4. 检索作答</td><td>找最近 5 段塞进纸条</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="think">
+  <span class="chapter-tag">太子的五条心得</span>
+  <h2><span class="num">心</span>十九岁太子的五条心得(白话版)</h2>
+  <span class="h2-hook">"故事听完了,太子想跟你掏心窝子说几句 —— 都是大白话,不必查名词。"</span>
+
+  <h3>心得一 · 金鱼的毛病不是笨,是没记性</h3>
+  <p>灵机天生不记事 —— 不是它笨,是它每次新会话都从零开始。<strong>给灵机外挂一本字典,它就从"金鱼"变回"锦鲤"</strong>。</p>
+
+  <h3>心得二 · 死鱼的毛病不是笨,是没读过新书</h3>
+  <p>灵机不知道新税法 —— 不是它不愿学,是它读的是去年出版的书。<strong>给灵机外挂一个新书库(查档),它就能答新事</strong>。</p>
+
+  <h3>心得三 · 记簿不是记所有事,是记该记的</h3>
+  <p>不能什么都往记簿里塞 —— 垃圾进垃圾出。记簿只记"<strong>下次还用得上</strong>"的事(用户姓名、偏好、长期指令),其余的自动忘。</p>
+
+  <h3>心得四 · 临时脑 + 永久字典,合起来才是完整的记忆</h3>
+  <p>灵机的"内典"是临时脑(会话内能记),外挂字典是永久字典(会话外能查)。<strong>两者配合,才是"既记得快,又记得久"</strong>。</p>
+
+  <h3>心得五 · 给字典不是不信内典,是给它备一本外典</h3>
+  <p>梁王反对"外挂记簿",认为灵机自带记性够了 —— 这话有道理,但只对一半。<strong>灵机的内典够用时,用内典;不够时,翻外典</strong>。这是王阳明"知行合一"的现代版:内典是知,外典是行,合起来才是真知行。</p>
+
+  <div class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">这五条心得对应到记簿机件上就是</span>
+    </div>
+    <dl>
+      <dt>心得一</dt><dd>→ 记簿机件解决"无状态"问题:临时脑 + 永久脑 = 让灵机有连续性</dd>
+      <dt>心得二</dt><dd>→ 查档机件解决"知识截止"问题:外挂档案库 = 让灵机知新事</dd>
+      <dt>心得三</dt><dd>→ 评分规矩 + 自动清理 = 自动决定"该记什么,该忘什么"</dd>
+      <dt>心得四</dt><dd>→ 上下文窗口 + 查档机件 = "临时脑 + 永久字典"的工程实现</dd>
+      <dt>心得五</dt><dd>→ "知行合一"的现代工程实践:内典够用用内典,不够翻外典</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="quiz">
+  <span class="chapter-tag">自测十问</span>
+  <h2><span class="num">测</span>读完了?来试试这十问</h2>
+  <span class="h2-hook">"题目和选项直接展开看,答案藏在每题底部的小箭头里 —— 自己先想,再看答案。"</span>
+
+  <div class="quiz-list">
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q1</span>
+        <span style="font-size:13px;color:var(--text-muted)">考开篇两大症状</span>
+      </div>
+      <p class="quiz-q">巧手机被骂"金鱼"和"死鱼",分别对应哪两个症状?</p>
+      <ul class="quiz-options">
+        <li>A. 反应慢 / 答得短</li>
+        <li>B. 不记事(临时脑) / 不知新事(内典不全)</li>
+        <li>C. 字写错 / 算错数</li>
+        <li>D. 太贵 / 太耗电</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 不记事 / 不知新事</strong></p>
+        <p style="margin:4px 0">A 错 —— "反应慢/答得短"是性能问题,不是记忆问题。性能问题靠提速,不是靠记簿。</p>
+        <p style="margin:4px 0"><strong>B 对</strong> —— "金鱼"=不记事(灵机临时脑,会话外全忘);"死鱼"=不知新事(灵机读的是旧书,朝廷新策它不知道)。这两个正是第08章要解决的两大问题。</p>
+        <p style="margin:4px 0">C 错 —— "字写错/算错数"是灵机"信口开河"问题,跟记簿无关。</p>
+        <p style="margin:4px 0">D 错 —— "太贵/太耗电"是工程成本问题,跟金鱼死鱼无关。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q2</span>
+        <span style="font-size:13px;color:var(--text-muted)">考记簿四柜</span>
+      </div>
+      <p class="quiz-q">"通典"对应哪种记忆类型?</p>
+      <ul class="quiz-options">
+        <li>A. 工作记忆</li>
+        <li>B. 情景记忆</li>
+        <li>C. 语义记忆</li>
+        <li>D. 感知记忆</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 语义记忆</strong></p>
+        <p style="margin:4px 0">A 错 —— 工作记忆是"案头纸"(临时记事,会话结束清空),不是通典。</p>
+        <p style="margin:4px 0">B 错 —— 情景记忆是"历事簿"(按时间排的"我做过的事"),不是通典。</p>
+        <p style="margin:4px 0"><strong>C 对</strong> —— "通典"存的是抽象知识、用户偏好、长期规则,这正是语义记忆的定义 —— 持久、可关联、抽象。</p>
+        <p style="margin:4px 0">D 错 —— 感知记忆是"图音阁"(图/音等多模态素材),不是通典。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q3</span>
+        <span style="font-size:13px;color:var(--text-muted)">考五际循环</span>
+      </div>
+      <p class="quiz-q">吕坤依《尚书》"五际"设计的记忆循环,正确顺序是?</p>
+      <ul class="quiz-options">
+        <li>A. 收 → 写 → 翻 → 固 → 忘</li>
+        <li>B. 写 → 收 → 翻 → 固 → 忘</li>
+        <li>C. 翻 → 收 → 写 → 忘 → 固</li>
+        <li>D. 固 → 忘 → 写 → 收 → 翻</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 写 → 收 → 翻 → 固 → 忘</strong></p>
+        <p style="margin:4px 0">A 错 —— "收"放在"写"之前,意味着没写就先收,这是不可能的(要先有可存的形式才能收)。</p>
+        <p style="margin:4px 0"><strong>B 对</strong> —— 写(把话变成可存的字)→ 收(写入分柜)→ 翻(用时翻出来)→ 固(短期变长期)→ 忘(没用的清掉)。这是认知科学里的标准记忆五步循环。</p>
+        <p style="margin:4px 0">C 错 —— "翻"放在"收"之前,意味着没收就先翻,这是时间倒流。</p>
+        <p style="margin:4px 0">D 错 —— "固"和"忘"放最前面,逻辑上也讲不通 —— 还没记忆就先巩固/遗忘?</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q4</span>
+        <span style="font-size:13px;color:var(--text-muted)">考查档机原理</span>
+      </div>
+      <p class="quiz-q">查档机的核心是?</p>
+      <ul class="quiz-options">
+        <li>A. 把所有档案塞进灵机脑里</li>
+        <li>B. 用语义指纹找出最相关的几段,塞进纸条里</li>
+        <li>C. 重新训练灵机</li>
+        <li>D. 让灵机自己读万卷</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 用语义指纹找出最相关的几段,塞进纸条里</strong></p>
+        <p style="margin:4px 0">A 错 —— "把所有档案塞进灵机脑里"是临时脑撑爆的做法,现实中根本不可能(档案库动辄几十万字,灵机纸条只有几千字)。</p>
+        <p style="margin:4px 0"><strong>B 对</strong> —— 这是查档机的核心:不把所有档案塞给灵机,而是用指纹找最相关的 5 段,作为上下文喂给灵机。这是"苏望索引卡"的现代版。</p>
+        <p style="margin:4px 0">C 错 —— "重新训练灵机"成本极高(数百万钱粮 + 数周时间),不现实。查档机是更便宜的替代方案。</p>
+        <p style="margin:4px 0">D 错 —— "让灵机自己读万卷"既慢又贵,且灵机的临时脑有限,根本读不完。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q5</span>
+        <span style="font-size:13px;color:var(--text-muted)">考三档语义指纹坊</span>
+      </div>
+      <p class="quiz-q">三个"语义指纹坊",哪个最便宜但"语义"理解最浅?</p>
+      <ul class="quiz-options">
+        <li>A. 简化坊(字面对比法)</li>
+        <li>B. 通义坊(云端铸造)</li>
+        <li>C. 本地坊(自办铸造)</li>
+        <li>D. 三档都一样</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 简化坊(字面对比法)</strong></p>
+        <p style="margin:4px 0"><strong>A 对</strong> —— 字面对比法其实只是字面匹配,不能理解同义词/近义句。比如问"汽车",它可能找不到"轿车""车辆"的文档,因为字面不同。但零成本零依赖,适合边远小县。</p>
+        <p style="margin:4px 0">B 错 —— 通义坊是云端服务,精度高,但要钱要联网,不是最便宜。</p>
+        <p style="margin:4px 0">C 错 —— 本地坊不联网,但要装大模型,占内存,成本也不低。</p>
+        <p style="margin:4px 0">D 错 —— 三档精度/成本差别很大,不能"都一样"。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q6</span>
+        <span style="font-size:13px;color:var(--text-muted)">考评分规矩</span>
+      </div>
+      <p class="quiz-q">为什么"历事簿"(情景记忆)更看重"时间新近","通典"(语义记忆)更看重"图谱关联"?</p>
+      <ul class="quiz-options">
+        <li>A. 因为前者数据多,后者数据少</li>
+        <li>B. 因为前者时效重要,后者关联重要</li>
+        <li>C. 因为情景记忆本质是"我最近做了什么",语义记忆本质是"我知道什么"</li>
+        <li>D. 没有原因,随机选的</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 情景记忆本质是"我最近做了什么",语义记忆本质是"我知道什么"</strong></p>
+        <p style="margin:4px 0">A 错 —— 数据量大小跟评分规矩无关。</p>
+        <p style="margin:4px 0">B 错 —— "时效/关联"是结果,不是原因。为什么历事簿看时效?因为历事簿的本质是"事件",事件有先后,新的事件更重要。</p>
+        <p style="margin:4px 0"><strong>C 对</strong> —— 历事簿存的是"我做过的事件",事件有"先后",新的事件在"我最近做了什么"语境下更重要,所以看时间新近。通典存的是"知识",知识有"关联",知识越与其他知识关联,说明它越"核心",所以看图谱关联度。这是两个记忆类型的本质区别。</p>
+        <p style="margin:4px 0">D 错 —— 评分规矩是有设计的,不是随机的。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q7</span>
+        <span style="font-size:13px;color:var(--text-muted)">考太子金句</span>
+      </div>
+      <p class="quiz-q">太子金句"给灵机外挂一本字典,不是不信它,是 ——"</p>
+      <ul class="quiz-options">
+        <li>A. 让它省力</li>
+        <li>B. 让它省钱</li>
+        <li>C. 让它在"临时脑"之外,还有一本随时可翻的字典</li>
+        <li>D. 让它跑得快</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 临时脑 + 永久字典</strong></p>
+        <p style="margin:4px 0">A 错 —— "让它省力"不是外挂字典的真正理由。外挂字典反而增加了一次检索,不能省力。</p>
+        <p style="margin:4px 0">B 错 —— "让它省钱"也不对 —— 外挂字典要付存储/检索成本,不是省钱。</p>
+        <p style="margin:4px 0"><strong>C 对</strong> —— 太子的核心比喻:灵机自带"临时脑"(会话内能用),外挂字典是"永久字典"(会话外也能查)。两者配合,临时脑够用就用临时脑,不够用就翻永久字典。</p>
+        <p style="margin:4px 0">D 错 —— "让它跑得快"也不对 —— 外挂字典要检索,反而更慢。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q8</span>
+        <span style="font-size:13px;color:var(--text-muted)">考记簿三戒</span>
+      </div>
+      <p class="quiz-q">太子立的"记簿三戒",不包括下列哪一条?</p>
+      <ul class="quiz-options">
+        <li>A. 戒忘本</li>
+        <li>B. 戒乱存</li>
+        <li>C. 戒多问</li>
+        <li>D. 戒不固</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · "戒多问"不在三戒之列</strong></p>
+        <p style="margin:4px 0">A 对(在三戒中) —— "戒忘本":用户姓名/偏好/长期指令必记。</p>
+        <p style="margin:4px 0">B 对(在三戒中) —— "戒乱存":不能什么都往记簿里塞。</p>
+        <p style="margin:4px 0"><strong>C 错(不在三戒中)</strong> —— "戒多问"不是三戒之一。多问是灵机的功能,不是记簿的设计原则。三戒是忘本/乱存/不固,不是问得多不多。</p>
+        <p style="margin:4px 0">D 对(在三戒中) —— "戒不固":该固化的不固化,下次还得重新教。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q9</span>
+        <span style="font-size:13px;color:var(--text-muted)">考反派母题</span>
+      </div>
+      <p class="quiz-q">梁王在本章中反对的是什么?后来为什么反转?</p>
+      <ul class="quiz-options">
+        <li>A. 反对自造 → 因为看见本土灵机比洋货好</li>
+        <li>B. 反对外挂记簿 → 因为看见查档机演示后,理解了"内典+外典"的配合</li>
+        <li>C. 反对梁王当大臣 → 因为皇上不让</li>
+        <li>D. 反对翰林院 → 因为换了官</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 反对外挂记簿 → 看见演示后反转</strong></p>
+        <p style="margin:4px 0">A 错 —— "反对自造"是第07章的事,不是第08章。第07章梁王反对"用洋货即可",被本土灵机演示说服后转"对外联络大臣"。</p>
+        <p style="margin:4px 0"><strong>B 对</strong> —— 第08章梁王的新反对点是"灵机自带记性,何必外挂"。但他亲眼看了新税法问答演示后,理解太子"内典+外典"的配合,主动请缨任"文献阁对外联络大臣",把记簿/查档推给周边国家。母题 3 连击复用。</p>
+        <p style="margin:4px 0">C 错 —— "反对梁王当大臣"不是本章情节。</p>
+        <p style="margin:4px 0">D 错 —— "反对翰林院"也不是本章情节。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q10</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四步流水线</span>
+      </div>
+      <p class="quiz-q">查档机的四步流水线,正确顺序是?</p>
+      <ul class="quiz-options">
+        <li>A. 建索引 → 切段 → 盖指纹 → 检索作答</li>
+        <li>B. 切段 → 盖指纹 → 建索引 → 检索作答</li>
+        <li>C. 盖指纹 → 切段 → 检索作答 → 建索引</li>
+        <li>D. 检索作答 → 切段 → 盖指纹 → 建索引</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 切段 → 盖指纹 → 建索引 → 检索作答</strong></p>
+        <p style="margin:4px 0">A 错 —— "建索引"放在"切段"之前,意味着还没切段就先建索引,这是不可能的。</p>
+        <p style="margin:4px 0"><strong>B 对</strong> —— 先把长档案切成小段,再给每段生成指纹,再把指纹存进指纹库(建索引),最后用问句去检索(检索作答)。这是查档机件的标准流水线。</p>
+        <p style="margin:4px 0">C 错 —— "盖指纹"放在"切段"之前,意味着还没切段就先盖指纹,这是不可能的(指纹盖在段上)。</p>
+        <p style="margin:4px 0">D 错 —— "检索作答"放在最前面,但检索之前必须有索引 —— 时间倒流。</p>
+      </details>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text-secondary)">WellInsight</strong> · 学习材料 · 第08章 v2.0 · 2026-06-25
+  </div>
+  <div>
+    原文:<a class="footer-link" href="https://raw.githubusercontent.com/datawhalechina/hello-agents/main/docs/chapter8/Chapter8-Memory-and-Retrieval.md" target="_blank">datawhalechina/hello-agents · Chapter 8</a>
+  </div>
+</footer>
+
+</div>
+
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin:round"><path d="M18 15l6-6-6-6"/></svg>
+</button>
+
+</body>
+</html>

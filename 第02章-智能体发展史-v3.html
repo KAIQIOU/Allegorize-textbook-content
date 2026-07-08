@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第02章 · 智能体发展史 · WellInsight 学习材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============== Morandi Palette ============== */
+:root{
+  --bg:#F2EDE6;
+  --bg-card:#FAF7F2;
+  --bg-elevated:#FFFCF7;
+  --bg-deep:#E8DFD3;
+  --text-primary:#3D3833;
+  --text-secondary:#6B6157;
+  --text-muted:#998E81;
+  --accent-sage:#8B9D83;
+  --accent-sage-soft:#D8E2D2;
+  --accent-sage-faint:#ECF1E8;
+  --accent-terracotta:#C49B8E;
+  --accent-terracotta-soft:#E6D2C8;
+  --accent-blue:#8A9AA8;
+  --accent-blue-soft:#C8D2DA;
+  --accent-amber:#C9A878;
+  --accent-amber-soft:#E8D7B7;
+  --accent-mauve:#A89098;
+  --accent-mauve-soft:#DCCCD0;
+  --border:#D9D2C7;
+  --border-light:#E8E0D3;
+  --shadow:0 2px 8px rgba(61,56,51,.06), 0 1px 2px rgba(61,56,51,.04);
+  --shadow-lg:0 8px 24px rgba(61,56,51,.10), 0 2px 6px rgba(61,56,51,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;
+  background:var(--bg);
+  color:var(--text-primary);
+  line-height:1.78;
+  font-size:16px;
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:.01em;
+}
+
+/* ============== Layout ============== */
+.container{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+.sticky-toc{
+  position:fixed;top:24px;right:24px;width:200px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px 16px;
+  box-shadow:var(--shadow);
+  font-size:13px;
+  z-index:50;
+  max-height:calc(100vh - 48px);
+  overflow-y:auto;
+}
+.sticky-toc-title{
+  font-weight:600;color:var(--text-secondary);
+  margin-bottom:8px;font-size:12px;
+  letter-spacing:.5px;
+  display:flex;align-items:center;gap:6px;
+}
+.sticky-toc ol{list-style:none;counter-reset:toc;padding:0}
+.sticky-toc li{counter-increment:toc;margin:4px 0}
+.sticky-toc a{
+  color:var(--text-secondary);
+  text-decoration:none;
+  display:block;
+  padding:4px 0 4px 8px;
+  margin-left:6px;
+  border-left:2px solid transparent;
+  font-size:12.5px;
+  font-weight:500;
+  transition:all .2s;
+}
+.sticky-toc a:hover{color:var(--accent-sage);border-left-color:var(--accent-sage)}
+.sticky-toc a::before{
+  content:counter(toc) ".";
+  color:var(--text-muted);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  margin-right:4px;
+}
+
+/* ============== Hero ============== */
+.hero{
+  background:linear-gradient(135deg,#FAF7F2 0%,#F2EDE6 100%);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:48px 40px 40px;
+  margin-bottom:48px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--accent-sage) 0%,var(--accent-terracotta) 33%,var(--accent-blue) 66%,var(--accent-amber) 100%);
+}
+.hero-meta{
+  display:flex;align-items:center;gap:12px;
+  font-size:12px;
+  color:var(--text-muted);
+  margin-bottom:16px;
+  font-weight:500;
+  letter-spacing:.5px;
+}
+.hero-meta-dot{width:4px;height:4px;background:var(--text-muted);border-radius:50%}
+.hero h1{
+  font-size:46px;font-weight:700;line-height:1.15;
+  color:var(--text-primary);
+  margin-bottom:10px;
+  letter-spacing:-1px;
+}
+.hero-subtitle{
+  font-size:16px;color:var(--text-secondary);
+  margin-bottom:22px;
+  font-weight:500;
+}
+.hero-fable{
+  display:inline-block;
+  padding:2px 10px;
+  margin-right:4px;
+  background:var(--accent-sage-soft);
+  color:var(--accent-sage);
+  border-radius:12px;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+.hero-desc{
+  font-size:14.5px;color:var(--text-secondary);
+  margin-bottom:24px;
+  line-height:1.7;
+  font-weight:400;
+}
+.hero-source{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12.5px;color:var(--text-muted);
+  background:var(--bg-card);
+  padding:6px 12px;border-radius:20px;
+  border:1px solid var(--border-light);
+  font-weight:500;
+}
+
+/* ============== Section ============== */
+section{margin-bottom:56px;scroll-margin-top:80px}
+.chapter-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;
+  color:var(--accent-sage);
+  background:var(--accent-sage-soft);
+  padding:4px 12px;border-radius:12px;
+  margin-bottom:14px;
+  letter-spacing:1px;
+}
+h2{
+  font-size:28px;font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:14px;
+  letter-spacing:-.3px;
+  display:flex;align-items:baseline;gap:12px;
+  line-height:1.3;
+}
+h2 .num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:18px;color:var(--accent-terracotta);
+  font-weight:500;
+}
+h2-hook{
+  display:block;
+  font-size:15px;
+  font-weight:500;
+  color:var(--text-secondary);
+  margin-top:8px;
+  margin-bottom:24px;
+  padding:12px 16px;
+  background:var(--bg-card);
+  border-left:3px solid var(--accent-amber);
+  border-radius:0 6px 6px 0;
+  font-style:italic;
+}
+h3{
+  font-size:19px;font-weight:600;
+  color:var(--text-primary);
+  margin:24px 0 10px;
+  padding-left:14px;
+  border-left:3px solid var(--accent-amber);
+  letter-spacing:-.2px;
+}
+h4{
+  font-size:16px;font-weight:600;
+  color:var(--accent-sage);
+  margin:20px 0 10px;
+}
+p{margin-bottom:14px;color:var(--text-primary);text-align:justify;font-weight:400}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+em{color:var(--text-secondary);font-style:normal;font-weight:600}
+
+/* ============== Lead paragraph ============== */
+.lead{
+  font-size:17px;color:var(--text-secondary);
+  padding:18px 22px;
+  background:var(--bg-card);
+  border-left:3px solid var(--accent-terracotta);
+  border-radius:0 6px 6px 0;
+  margin-bottom:28px;
+  font-weight:500;
+  line-height:1.85;
+}
+
+/* ============== Pullquote ============== */
+.pullquote{
+  background:linear-gradient(135deg,var(--accent-amber-soft) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-amber-soft);
+  border-radius:8px;
+  padding:22px 26px;
+  margin:24px 0;
+  font-size:16.5px;
+  font-weight:500;
+  color:var(--text-primary);
+  position:relative;
+}
+.pullquote::before{
+  content:"\201C";position:absolute;top:-6px;left:16px;
+  font-size:48px;color:var(--accent-amber);
+  font-family:Georgia,serif;line-height:1;
+  font-weight:700;
+}
+
+/* ============== Concept Pill Card (light annotation) ============== */
+.concept-card{
+  background:linear-gradient(135deg,var(--accent-sage-faint) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-sage-soft);
+  border-left:3px solid var(--accent-sage);
+  border-radius:0 8px 8px 0;
+  padding:14px 18px;
+  margin:24px 0 8px;
+}
+.concept-card-header{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;
+  color:var(--accent-sage);
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  margin-bottom:10px;
+}
+.concept-pills{
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.concept-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--bg-elevated);
+  border:1px solid var(--accent-sage-soft);
+  border-radius:16px;
+  padding:5px 12px;
+  font-size:12.5px;
+  color:var(--text-primary);
+  font-weight:500;
+}
+.concept-pill .who{
+  color:var(--accent-terracotta);
+  font-weight:700;
+}
+.concept-pill .what{
+  color:var(--text-secondary);
+  font-weight:400;
+}
+
+/* ============== Stats Card (battle stats) ============== */
+.stats-card{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:20px 0;
+}
+.stat-cell{
+  background:var(--bg-card);
+  border:1px solid var(--border-light);
+  border-radius:8px;
+  padding:14px 16px;
+  text-align:center;
+}
+.stat-cell.victory{border-top:3px solid var(--accent-sage)}
+.stat-cell.defeat{border-top:3px solid var(--accent-terracotta)}
+.stat-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:24px;
+  font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:4px;
+  line-height:1.1;
+}
+.stat-label{
+  font-size:12px;
+  color:var(--text-secondary);
+  font-weight:500;
+}
+
+/* ============== Dialog ============== */
+.dialog{
+  background:var(--bg-deep);
+  border-radius:6px;
+  padding:14px 18px;
+  margin:14px 0;
+  font-size:14.5px;
+  color:var(--text-primary);
+  border-left:3px solid var(--accent-amber);
+}
+.dialog-speaker{font-weight:700;color:var(--accent-terracotta)}
+.dialog-sage{border-left-color:var(--accent-sage)}
+.dialog-terracotta{border-left-color:var(--accent-terracotta)}
+.dialog-blue{border-left-color:var(--accent-blue)}
+.dialog-mauve{border-left-color:var(--accent-mauve)}
+.dialog-amber{border-left-color:var(--accent-amber)}
+
+/* ============== Tables ============== */
+.table-wrap{
+  margin:20px 0;
+  background:var(--bg-card);
+  border:1px solid var(--border-light);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+table{
+  width:100%;border-collapse:collapse;
+  font-size:14px;
+}
+thead{background:var(--bg-deep)}
+th{
+  padding:12px 16px;
+  text-align:left;
+  font-weight:600;
+  color:var(--text-primary);
+  font-size:13px;
+  letter-spacing:.3px;
+  border-bottom:1px solid var(--border);
+}
+td{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border-light);
+  color:var(--text-secondary);
+  vertical-align:top;
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(232,223,211,.3)}
+td:first-child{
+  font-weight:600;
+  color:var(--text-primary);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+}
+
+/* ============== Coverage list ============== */
+.coverage{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:24px 28px;
+  margin:32px 0;
+}
+.coverage-title{
+  display:flex;align-items:center;gap:10px;
+  font-size:18px;font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:16px;
+}
+.coverage-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 24px;
+}
+.coverage-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;
+  border-bottom:1px dashed var(--border-light);
+  font-size:13.5px;
+}
+.coverage-item:last-child,.coverage-item:nth-last-child(2){border-bottom:none}
+.coverage-check{
+  flex-shrink:0;
+  width:18px;height:18px;
+  background:var(--accent-sage-soft);
+  border-radius:4px;
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:2px;
+}
+.coverage-text{
+  color:var(--text-secondary);
+  line-height:1.55;
+  font-weight:400;
+}
+.coverage-text strong{
+  color:var(--text-primary);
+  display:block;
+  font-size:13.5px;
+  margin-bottom:2px;
+  font-weight:600;
+}
+.coverage-def{
+  display:block;
+  font-size:11.5px;
+  color:var(--text-muted);
+  margin-top:6px;
+  line-height:1.6;
+  font-style:italic;
+  font-weight:400;
+  padding-top:6px;
+  border-top:1px dashed var(--border-light);
+}
+.coverage-def-label{
+  color:var(--accent-sage);
+  font-weight:700;
+  font-style:normal;
+  margin-right:4px;
+}
+
+/* ============== Final summary box ============== */
+.summary-box{
+  background:linear-gradient(135deg,var(--accent-sage-soft) 0%,var(--bg-card) 50%,var(--accent-amber-soft) 100%);
+  border:1px solid var(--accent-sage);
+  border-radius:12px;
+  padding:32px 36px;
+  margin:40px 0;
+  position:relative;
+}
+.summary-box-title{
+  font-size:13px;font-weight:700;
+  color:var(--accent-sage);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:12px;
+}
+.summary-text{
+  font-size:18px;
+  color:var(--text-primary);
+  line-height:1.85;
+  font-weight:500;
+}
+
+/* ============== Footer ============== */
+.footer{
+  margin-top:60px;
+  padding-top:24px;
+  border-top:1px solid var(--border);
+  font-size:12.5px;
+  color:var(--text-muted);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-weight:500;
+}
+.footer-link{color:var(--accent-sage);text-decoration:none;font-weight:600}
+.footer-link:hover{text-decoration:underline}
+
+/* ============== Back to top ============== */
+.back-top{
+  position:fixed;bottom:24px;right:24px;
+  width:40px;height:40px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:all .2s;
+  z-index:40;
+}
+.back-top:hover{background:var(--accent-sage);border-color:var(--accent-sage)}
+.back-top:hover svg{stroke:#fff}
+
+/* ============== SVG Icon base ============== */
+.icon{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+.icon-lg{width:18px;height:18px}
+
+/* ============== Responsive ============== */
+@media (max-width:1100px){.sticky-toc{display:none}}
+@media (max-width:768px){
+  .container{padding:24px 16px 60px}
+  .hero{padding:32px 20px}
+  .hero h1{font-size:32px}
+  h2{font-size:22px}
+  .stats-card{grid-template-columns:1fr}
+  .coverage-grid{grid-template-columns:1fr}
+  table{font-size:12.5px}
+  th,td{padding:8px 10px}
+}
+
+/* ============== Print ============== */
+@media print{
+  body{background:#fff}
+  .sticky-toc,.back-top{display:none}
+  .container{max-width:100%;padding:0}
+  .hero{border:none;background:none}
+  section{page-break-inside:avoid;margin-bottom:32px}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== Sticky TOC ========== -->
+<nav class="sticky-toc" aria-label="目录">
+  <div class="sticky-toc-title">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    目录
+  </div>
+  <ol>
+    <li><a href="#ch0">开篇 · 朝廷下令</a></li>
+    <li><a href="#ch1">第一幕 · 老学究</a></li>
+    <li><a href="#ch2">第二幕 · 套路师</a></li>
+    <li><a href="#ch3">第三幕 · 游学者</a></li>
+    <li><a href="#ch4">第四幕 · 博学者</a></li>
+    <li><a href="#ch5">终章 · 朝廷审判</a></li>
+    <li><a href="#summary">一句话总结</a></li>
+    <li><a href="#coverage">概念地图</a></li>
+  </ol>
+</nav>
+
+<!-- ========== Hero ========== -->
+<div class="container">
+
+<header class="hero">
+  <div class="hero-meta">
+    <span>WellInsight 学习材料</span>
+    <span class="hero-meta-dot"></span>
+    <span>Hello-Agents 第二章 · 寓言版 v3.0(江南大疫)</span>
+    <span class="hero-meta-dot"></span>
+    <span>2026-06-23</span>
+  </div>
+  <h1>第02章 · 智能体发展史</h1>
+  <p class="hero-subtitle"><span class="hero-fable">抗疫录</span> · 问道书院四派出战江南大疫</p>
+  <p class="hero-desc">把 Hello-Agents 第二章"AI 五百年进化史"缝进一场江南大疫的四派轮流上阵。建议读法：跟着小书童的视角看四派赢与输，<strong>不需要看对照表也能悟出范式分工</strong>。</p>
+  <span class="hero-source">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    原文参考 · datawhalechina/Hello-Agents · 第二章 智能体发展史
+  </span>
+</header>
+
+<!-- ========== Opening ========== -->
+<section id="ch0">
+  <p class="lead">江南七府突发大疫。朝廷六百里加急,限问道书院<strong>三个月</strong>拿出可推广的治法。四派掌门轮流上阵——每一派都治过人也害过人。</p>
+
+  <p>夏季。江南七府突然爆发一种怪病,医家从未见过——发热、咳嗽、乏力是常见症状,但每隔三天,病情就会变异一次,出现新症状。第一批死了两百人。七府戒严,商路断绝。</p>
+
+  <p>朝廷一道八百里加急送到问道书院:"江南大疫,限期三月。着问道书院拿出可推广的治法,逾期问责。"</p>
+
+  <p>院长急召四派掌门——经学派的<strong>老学究</strong>、套路派的<strong>套路师</strong>、游学派的<strong>游学者</strong>、博学派的<strong>博学者</strong>——在议事堂坐了一夜。</p>
+
+  <p>谁也没在意角落里那个十四岁的小书童。他叫<strong>小书童</strong>,平时给四派跑腿打杂,抄经传话抬担架。但这一夜,院长派他去江南,跟着每一派掌门做事。</p>
+
+  <p>小书童临行前问院长:"师傅,我该跟着谁学?"院长说:"<em>谁也别跟。你就看着。</em>"</p>
+
+  <div class="pullquote">小书童不知道的是——他即将看到一场五百年来最完整的<strong>方法论对决</strong>:四种治学方法,在同一场大疫里各自登场,各自赢也各自输。<em>而最后活下来的不是赢家,是分工。</em></div>
+</section>
+
+<!-- ========== 第一幕 · 老学究 ========== -->
+<section id="ch1">
+  <span class="chapter-tag">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 016.5 22H20V2H6.5A2.5 2.5 0 004 4.5v15z"/></svg>
+    第一幕
+  </span>
+  <h2><span class="num">01</span>老学究披挂上阵</h2>
+  <span class="h2-hook">老学究用《医经》治了 50 例已知症,朝廷第一次嘉奖。但第 20 天,他遇到了"经书上没有的病"。那一刻,他坚持的东西碎了。</span>
+
+  <h3>主场:治 50 例已知症</h3>
+  <p>老学究说:"经书管用,我来。"</p>
+  <p>他带着 50 个学子下江南,每人背一部《医经》——里面收了 600 条医学规则,涵盖发热、咳嗽、乏力等常见症。第 1 到第 10 天,他按经书上的规则一一问诊开药,治了<strong>50 例</strong>"已知症"。全愈。朝廷第一次嘉奖:"经学派名不虚传。"</p>
+  <p>老学究得意地对小书童说:"看,经书够用一千年。"</p>
+
+  <!-- 战绩卡 -->
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">50</div>
+      <div class="stat-label">例已知症全愈</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">例变种症死在门口</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">1</div>
+      <div class="stat-label">次朝廷警告</div>
+    </div>
+  </div>
+
+  <h3>客场:3 个人死在门口</h3>
+  <p>第 20 天,出现了一种新症——患者高热 40 度、抽搐、神志不清。医书上没有这条规则。</p>
+  <p>老学究翻遍《医经》,查不到对应条文。他拒绝承认:"<em>经书没写,那就不是症。</em>"学子问怎么办,他让学子继续按"发热套路"治——但这根本不是发热。</p>
+  <p><strong>小书童亲眼看到 3 个变种症病人死在书院门口。</strong>其中一个是七岁的小女孩,送来时还有呼吸,只是抽搐;老学究说"按发热治",灌了银翘散,孩子当晚死了。</p>
+  <p>小书童哭着问:"师傅,经书外真的没有症吗?"</p>
+  <div class="dialog dialog-sage">
+    <span class="dialog-speaker">老学究</span>:"闭上嘴。经书外没东西。"
+  </div>
+
+  <p>消息传回京城,朝廷第一次警告:"老学究召回,换人。"</p>
+
+  <!-- 第一幕小卡 -->
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">符号主义 AI</span><span class="what">—— 经书 = 显式知识</span></span>
+      <span class="concept-pill"><span class="who">专家系统(早期)</span><span class="what">—— 《医经》= MYCIN 故事化</span></span>
+      <span class="concept-pill"><span class="who">脆弱性 / OOD</span><span class="what">—— 经书外有真东西</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第二幕 · 套路师 ========== -->
+<section id="ch2">
+  <span class="chapter-tag">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+    第二幕
+  </span>
+  <h2><span class="num">02</span>套路师接手</h2>
+  <span class="h2-hook">套路师整理出"江南症 100 套路",批量治了 200 例轻症,效率最高。但一位老太太让他翻了车——他听不懂复杂的话。</span>
+
+  <h3>主场:200 例轻症批量化</h3>
+  <p>套路师说:"经学派不会灵活,我来。"</p>
+  <p>他花三天整理出一部<strong>"江南症 100 套路"</strong>——把发热、咳嗽、乏力、变种症等所有症状拆成 100 种类型,每种类型配一个"标准套路"。第 30 到第 50 天,他培训 100 个学子按套路应答,批量治了<strong>200 例轻症</strong>。效率高、成本低,朝廷第二次嘉奖。</p>
+
+  <!-- 战绩卡 -->
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">200</div>
+      <div class="stat-label">例轻症批量化治</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">1</div>
+      <div class="stat-label">位老太太哭着离开</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">0</div>
+      <div class="stat-label">次朝廷警告(但被患者骂)</div>
+    </div>
+  </div>
+
+  <h3>客场:老太太哭着离开</h3>
+  <p>第 55 天,一位老太太来看病。她儿子刚战死,夜夜失眠,白天心慌,最近又发烧。症状混在一起,不属于任何一个套路。</p>
+  <p>套路师翻套路书,找不到对应条文。他按"失眠套路"反问:</p>
+  <div class="dialog">
+    <span class="dialog-speaker">套路师</span>:"你为什么睡不着?"
+  </div>
+  <p>老太太说"我想我儿子"。套路师又按"失眠套路"反问:"<em>你为什么会想你儿子?</em>"老太太哭了起来,病情加重。</p>
+  <p>老太太的儿子(还在)扶着她走出书院大门时,对旁边的小书童说:</p>
+  <div class="dialog dialog-terracotta">
+    <span class="dialog-speaker">老太太儿子</span>:"这大夫从头到尾只反问,从不正面回答。"
+  </div>
+
+  <p>小书童那一刻突然懂了——套路师其实<em>什么都不理解</em>,只是把关键词匹配上,机械地重组一个反问。他甚至不知道"想念儿子"是什么意思。</p>
+
+  <!-- 第二幕小卡 -->
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">专家系统(成熟)</span><span class="what">—— 100 套路 = 产生式系统</span></span>
+      <span class="concept-pill"><span class="who">ELIZA 效应</span><span class="what">—— 套路师不懂,老太太却哭了</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第三幕 · 游学者 ========== -->
+<section id="ch3">
+  <span class="chapter-tag">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+    第三幕
+  </span>
+  <h2><span class="num">03</span>游学者接手</h2>
+  <span class="h2-hook">游学者训出一个"识症童",能 3 秒识别 47 种变种症,被封为抗疫英雄。但第 80 天,二代变种症来了——识症童完全失效,60 天白训,30 万两白银打了水漂。</span>
+
+  <h3>主场:识症童识别 47 种变种症</h3>
+  <p>游学者说:"让我训一个'识症童',专门识别新症。"</p>
+  <p>他不再用经书,也再不背套路。他给识症童一双"眼睛"(神经网络),让他自己看病人、自己学。第 60 天到第 70 天,识症童训出来了——能识别<strong>47 种</strong>变种症。第 70 天,朝廷送来一种新变种症样本,识症童<strong>3 秒内识别</strong>,准确率 95%。朝廷第三次嘉奖:"识症童是抗疫英雄。"</p>
+
+  <!-- 战绩卡 -->
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">47</div>
+      <div class="stat-label">种变种症 95% 识别</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">30万</div>
+      <div class="stat-label">两白银打了水漂</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">60</div>
+      <div class="stat-label">天白训</div>
+    </div>
+  </div>
+
+  <h3>客场:二代变种症 + 30 万两白银</h3>
+  <p>第 80 天,出现<strong>"二代变种症"</strong>——形态完全不同。识症童彻底失效,识别率跌到 8%。</p>
+  <p>游学者说:"训一个新识症童要 60 天,可病已经变了三轮。"</p>
+  <p>朝廷追问账目——账房先生报告:<strong>这 60 天花了 30 万两白银</strong>。还没算学子的人工。朝廷第三次警告:"游学者召回,换人。"</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">小书童</span>:"师傅,我们这 60 天白训了吗?"
+  </div>
+  <div class="dialog dialog-blue">
+    <span class="dialog-speaker">游学者</span>(沉默良久):"识症童没错,病变了。识症童只会认它学过的东西。"
+  </div>
+
+  <p>小书童第一次知道——<em>一种方法能赢,不代表它能持续赢</em>。训识症童的代价是时间和银子,而病不等人。</p>
+
+  <!-- 第三幕小卡 -->
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">联结主义 / 神经网络</span><span class="what">—— 识症童的"眼睛"</span></span>
+      <span class="concept-pill"><span class="who">强化学习</span><span class="what">—— 识症童自我对弈 = AlphaGo</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第四幕 · 博学者 ========== -->
+<section id="ch4">
+  <span class="chapter-tag">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+    第四幕
+  </span>
+  <h2><span class="num">04</span>博学者接手</h2>
+  <span class="h2-hook">博学者带着博学的孩子来,什么都会一点:写治疫方案、调度物资、心理疏导、辅助问诊。第 90 天综合调度 800 例——但第 100 天,他给一位重症患者开错药,差点死人。</span>
+
+  <h3>主场:综合调度 800 例</h3>
+  <p>博学者说:"我带博学的孩子来,他什么都会一点。"</p>
+  <p>博学的孩子训了几年——博览万卷书,精修各派要义。第 90 天,朝廷追问"治了多少人",博学者报出一组数字:</p>
+  <ul style="list-style:none;padding:0;font-size:14.5px;color:var(--text-secondary);line-height:1.9">
+    <li>· 综合调度: 800 例</li>
+    <li>· 辅助问诊: 300 例</li>
+    <li>· 心理疏导: 150 例</li>
+    <li>· 治疫方案: 50 份</li>
+  </ul>
+  <p>朝廷第四次嘉奖。</p>
+
+  <!-- 战绩卡 -->
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">800</div>
+      <div class="stat-label">例综合调度</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">1</div>
+      <div class="stat-label">例开错药差点死</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">1</div>
+      <div class="stat-label">道开方必须复核的令</div>
+    </div>
+  </div>
+
+  <h3>客场:开错药差点死人</h3>
+  <p>第 100 天,博学的孩子给一位重症患者开方,方子里有一味"虎骨"。</p>
+  <p>药剂师(是老学究的弟子)接方时眉头一皱:<strong>"虎骨"在本草里其实是"豹骨"</strong>。博学的孩子只是"统计模式",把"虎骨治骨痛"和"豹骨治骨痛"混了。</p>
+  <p>药剂师拦住,改方后那位患者才保住命。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">小书童</span>:"师傅,博学的孩子是不是其实不懂?"
+  </div>
+  <div class="dialog dialog-amber">
+    <span class="dialog-speaker">博学者</span>(罕见地承认):"他懂的是'统计模式',不是'真懂'。<strong>这就是他的边界。</strong>"
+  </div>
+
+  <p>朝廷下令一道旨意:<em>从此博学派开方,必须经学派的学子复核签字才能生效。</em></p>
+
+  <p>小书童亲眼看着这道旨意,突然明白了——<em>博学的孩子不是万能的。他可以调度、辅助、心理疏导,但不能独立做需要"真懂"的决策</em>。这就是博学派的边界,也是大疫最后一道防线必须留给经学派的原因。</p>
+
+  <!-- 第四幕小卡 -->
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">大语言模型(LLM)</span><span class="what">—— 博学的孩子</span></span>
+      <span class="concept-pill"><span class="who">预训练 + 微调</span><span class="what">—— 博览 + 精修</span></span>
+      <span class="concept-pill"><span class="who">幻觉 / 边界</span><span class="what">—— 虎骨当豹骨</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 终章 ========== -->
+<section id="ch5">
+  <span class="chapter-tag">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+    终章
+  </span>
+  <h2><span class="num">05</span>朝廷审判</h2>
+  <span class="h2-hook">三月期满,朝廷召四派进京述职。院长让四派各自说"谁能担责"——最后发现,不是谁取代谁,而是每派都有自己不可替代的主场。</span>
+
+  <p>三月期满。朝廷召四派掌门进京述职。</p>
+  <p>院长在议事堂问:"<em>朝廷要问责了。江南大疫,四派谁担责?</em>"</p>
+
+  <h3>四派各自述职</h3>
+
+  <p><strong>老学究</strong>第一个站出来。他没被这次大疫击垮,反而恢复了底气:"我的学子治过 50 例可追溯的病人,每一步都有经书依据。<em>我不开错药。</em>"</p>
+
+  <p><strong>套路师</strong>第二个站出来:"我治过 200 例轻症,效率最高、成本最低。批量处理没人比我快。"</p>
+
+  <p><strong>游学者</strong>第三个站出来:"我训的识症童能识别 47 种变种症,精度 95%。单点精准,没人比我强。"</p>
+
+  <p><strong>博学者</strong>最后一个,沉默良久。朝廷追问:"你那开错药那次呢?"博学者低头:"博学的孩子会一本正经胡说。<em>他懂统计模式,不懂真懂。</em>"</p>
+
+  <h3>四派分工方案</h3>
+
+  <p>朝廷最终决定——<strong>四派并存,各按特长分工</strong>:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>派别</th>
+          <th>分到的环节</th>
+          <th>为什么合适</th>
+          <th>典型表现</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>经学派</td>
+          <td>复核</td>
+          <td>每步可审计</td>
+          <td>药剂师拦下虎骨那次</td>
+        </tr>
+        <tr>
+          <td>套路派</td>
+          <td>流水线</td>
+          <td>批量快稳</td>
+          <td>200 例轻症批量化</td>
+        </tr>
+        <tr>
+          <td>游学派</td>
+          <td>专项</td>
+          <td>单点精准</td>
+          <td>识症童 47 种变种症</td>
+        </tr>
+        <tr>
+          <td>博学派</td>
+          <td>调度</td>
+          <td>开放域灵活</td>
+          <td>综合调度 800 例</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>院长看着小书童,问:"你跟了四派三个月,学到什么了?"</p>
+
+  <div class="dialog dialog-amber">
+    <span class="dialog-speaker">小书童</span>:"四种方法都有用,但每种都有它搞不定的地方。<strong>下次再有大疫,不是找一派治,而是四派分工。</strong>"
+  </div>
+
+  <div class="pullquote">院长点点头:"<em>这就是江南大疫教给问道书院的事——四派不是朝代更替,是场景分工。旧范式不是被新范式杀死,而是被新范式请回家,放在对的位置上。</em>"</div>
+
+  <!-- 终章小卡 -->
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">范式转移</span><span class="what">—— 四派先后登场</span></span>
+      <span class="concept-pill"><span class="who">范式并存</span><span class="what">—— 各管一环</span></span>
+      <span class="concept-pill"><span class="who">内化</span><span class="what">—— 博学肚子里有经学</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Summary ========== -->
+<section id="summary">
+  <div class="summary-box">
+    <div class="summary-box-title">一句话总结</div>
+    <p class="summary-text">江南大疫里,<strong>老学究教会我们"知识可以被写出来"</strong>;套路师教会我们"写出来的知识会被规则卡死";游学者教会我们"知识可以被悟出来";博学者教会我们"悟出来的知识必须配复核才能用"。</p>
+    <p class="summary-text" style="margin-top:14px">四派不是谁取代谁——<strong>旧范式没死,新范式也没赢</strong>。它们最后共存的方式,是<em>各管一环、各自承担不可替代的责任</em>。这就是 AI 五百年最重要的四件事。</p>
+  </div>
+  <p style="text-align:center;color:var(--text-secondary);font-size:14.5px;margin-top:8px">故事讲完。下次再听到"AI 发展史"四个字,你脑子里浮现的就不再是一堆人名和年份,而是江南大疫里,四派掌门<em>各自治过的病人和各自害过的人</em>。</p>
+</section>
+
+<!-- ========== Coverage ========== -->
+<section id="coverage">
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" style="color:var(--accent-sage)"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      概念地图 · 全章名词索引(18 核心 + 14 支撑)
+    </div>
+    <p style="font-size:13.5px;color:var(--text-secondary);margin-bottom:16px;line-height:1.7">本章所有概念都在故事里有具体事件。如果不看这张表,你应该已经从四派在大疫里的输赢悟出了"主场/客场/分工"。下面是自检清单。</p>
+    <div class="coverage-grid">
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>符号主义 AI / 物理符号系统假说</strong>← 老学究(经书够用一千年)
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>把"思考"想成在纸上做符号运算——只要给计算机一套清晰的规则,告诉它每种情况怎么处理,它就能照着做。早期 AI 全押在这个思路上。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>专家系统(早期/成熟)</strong>← 《医经》/ 100 套路
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>一个电脑程序,把某个领域老专家的经验写成规则,遇到情况就按规则办——本质上就是"把师傅的经验固化下来"。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>MYCIN / SHRDLU</strong>← 《医经》学子 / 听话童子
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>MYCIN 是 1970 年代一个能帮人诊断血液感染的电脑程序,规则写了 600 多条;SHRDLU 是 1960 年代末一个能听懂人话、指挥机器人搬积木的程序。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>Cyc / 知识获取瓶颈</strong>← 变种症常识海太深
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>1984 年一个项目,试图把所有常识都写进数据库——结果发现常识太多写了几十年也写不完。这就是"知识获取瓶颈":靠人写规则是写不完的。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>框架问题 / 脆弱性 / OOD</strong>← 3 个病人死在门口
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>程序做事前要检查"哪些没变",这种检查往往比做事本身还累——这就是框架问题。脆弱性指程序只认识学过的东西,碰到新情况就懵。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>产生式系统 / 模式匹配</strong>← 套路书"如果 X 那么 Y"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>产生式系统就是"套路书"——把"看到 A 就做 B"这种规则一条条写下来。模式匹配就是看两段文字像不像,像就触发规则。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>ELIZA / ELIZA 效应</strong>← 套路师听不懂老太太
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>1966 年一个聊天程序,只会把"我"换成"你"、把话反过来说。但大家都觉得它在认真听自己说话——这种"被假理解骗到"的现象就叫 ELIZA 效应,今天 ChatGPT 时代照样存在。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>联结主义 / 神经网络</strong>← 识症童的"眼睛"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>不写规则,让程序自己学——给它一堆数据,它从数据里发现规律。神经网络是一种实现方式,模仿人脑神经元的连接方式。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>机器学习范式</strong>← 让识症童自己看自己学
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>和"硬写规则"反过来——你不告诉程序怎么办,只给它很多例子,让它自己总结出规律。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>强化学习(RL)</strong>← 识症童训练循环
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>像训狗一样——做对了给零食,做错了批评,时间长了它就学会了。代表算法有 Q-learning、策略梯度等。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>AlphaGo</strong>← 识症童自我对弈
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>Google 2016 年开发的围棋 AI,主要靠"自己跟自己下几百万盘"来提升棋力,最终打败人类世界冠军李世石。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>深度学习三大要素</strong>← 30 万两白银 + 60 天
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>训一个好模型需要三样:海量数据(教材)、强大显卡(算力)、长时间训练(时间)。三样缺一不可——所以训模型又贵又慢。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>大语言模型(LLM)</strong>← 博学的孩子
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>在海量文本上训练的 AI,你给它半句话,它能猜下半句该说什么。ChatGPT、Claude、文心一言、通义千问都是这类。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>预训练 / 微调</strong>← 博览 + 精修
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>预训练 = 先让 AI 看海量通用资料学基础(像读完小学到大学);微调 = 再针对具体任务专门训练一下(像岗前培训)。LoRA、RLHF 是现代更省钱的微调方法。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>涌现能力 / 上下文学习 / 思维链</strong>← 博学孩子自己悟
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>模型变大到一定程度,会突然会做一些小模型不会的事(比如推理、算数)——这种"突然开窍"叫涌现。给它 3 个例子它就能做第 4 个,叫上下文学习。让它一步步写出思考过程,准确率会提高,叫思维链。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>Agent Loop / 工具调用 / ReAct</strong>← 博学孩子综合调度
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>AI 做事的方式:看情况 → 想办法 → 做一步 → 看结果 → 再想下一步,循环。工具调用 = AI 不会做的事可以查工具书(API/数据库)。ReAct = 一种让 AI "边想边做"的经典方法。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>神经符号主义</strong>← 博学派开方 + 经学派复核
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>把"凭直觉的神经网络"和"讲逻辑的规则系统"结合起来,既灵活又能解释——大模型时代 AI 看病、开药这种要担责的场景,基本都是这种思路。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>范式转移 / 范式并存 / 内化</strong>← 朝廷分工方案
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>范式转移 = 一种做事方法被另一种完全不同的方法替代(像手写文档被 Word 替代)。范式并存 = 旧方法新方法各有各的用处,大家同时活着。内化 = 新方法不是凭空来的,它把旧方法的精华吸收到自己身上。</span>
+        </span>
+      </div>
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+        <span class="coverage-text">
+          <strong>AI Agent 元年(2025+)</strong>← 博学派调度 + 经学派复核
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>2025 年开始,大家关注的焦点从"训更大的模型"变成"用 AI 做出能办事的应用"——比如能自己拆任务、查资料、写文档的 Agent。</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Footer ========== -->
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text-secondary)">WellInsight</strong> · 学习材料 · 抗疫录 v3.0 · 2026-06-23
+  </div>
+  <div>
+    原文：<a class="footer-link" href="https://github.com/datawhalechina/hello-agents/blob/main/docs/chapter2/第二章%20智能体发展史.md" target="_blank">Hello-Agents · 第二章 智能体发展史</a>
+  </div>
+</footer>
+
+</div><!-- /.container -->
+
+<!-- Back to top -->
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin:round"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+</body>
+</html>

@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!--
+  Agent Fable Renderer v2 · 单文件 HTML 寓言模板
+  用法:复制本文件 → 替换占位符 → 填充故事内容。
+  占位符清单:
+    {{CHAPTER_NUM_PADDED}}   章节序号,如 02
+    {{CHAPTER_TITLE}}         知识点名称,如 智能体发展史
+    {{FABLE_NAME}}            寓言名,如 抗疫录
+    {{FABLE_TAGLINE}}         长副标题,如 问道书院四派出战江南大疫
+    {{DATE}}                  渲染日期,如 2026-06-23
+    {{VERSION}}               版本号,如 v3.0
+    {{SOURCE_URL}}            教材原文链接
+    {{HERO_META}}             Hero 顶部 meta 行
+    {{HERO_SOURCE}}           Hero 底部原文来源徽章
+    {{STICKY_TOC_LIS}}        Sticky TOC 的 <li> 列表(每行一个)
+    {{OPENING_SECTION}}       开篇 <section>(含 lead + 时代背景)
+    {{MAIN_SECTIONS}}         主章节 <section> 列表(每幕一段)
+    {{SUMMARY_SECTION}}       一句话总结 section
+    {{COVERAGE_SECTION}}      概念地图 section(含 .coverage-grid)
+    {{FOOTER_TEXT}}           Footer 副文本
+  完整渲染示例见 ../examples/第02章-智能体发展史.html
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{CHAPTER_NUM_PADDED}}章 · {{CHAPTER_TITLE}} · WellInsight 学习材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============== Morandi Palette ============== */
+:root{
+  --bg:#F2EDE6;
+  --bg-card:#FAF7F2;
+  --bg-elevated:#FFFCF7;
+  --bg-deep:#E8DFD3;
+  --text-primary:#3D3833;
+  --text-secondary:#6B6157;
+  --text-muted:#998E81;
+  --accent-sage:#8B9D83;
+  --accent-sage-soft:#D8E2D2;
+  --accent-sage-faint:#ECF1E8;
+  --accent-terracotta:#C49B8E;
+  --accent-terracotta-soft:#E6D2C8;
+  --accent-blue:#8A9AA8;
+  --accent-blue-soft:#C8D2DA;
+  --accent-amber:#C9A878;
+  --accent-amber-soft:#E8D7B7;
+  --accent-mauve:#A89098;
+  --accent-mauve-soft:#DCCCD0;
+  --border:#D9D2C7;
+  --border-light:#E8E0D3;
+  --shadow:0 2px 8px rgba(61,56,51,.06), 0 1px 2px rgba(61,56,51,.04);
+  --shadow-lg:0 8px 24px rgba(61,56,51,.10), 0 2px 6px rgba(61,56,51,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;
+  background:var(--bg);
+  color:var(--text-primary);
+  line-height:1.78;
+  font-size:16px;
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:.01em;
+}
+
+/* ============== Layout ============== */
+.container{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+.sticky-toc{
+  position:fixed;top:24px;right:24px;width:200px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px 16px;
+  box-shadow:var(--shadow);
+  font-size:13px;
+  z-index:50;
+  max-height:calc(100vh - 48px);
+  overflow-y:auto;
+}
+.sticky-toc-title{
+  font-weight:600;color:var(--text-secondary);
+  margin-bottom:8px;font-size:12px;
+  letter-spacing:.5px;
+  display:flex;align-items:center;gap:6px;
+}
+.sticky-toc ol{list-style:none;counter-reset:toc;padding:0}
+.sticky-toc li{counter-increment:toc;margin:4px 0}
+.sticky-toc a{
+  color:var(--text-secondary);
+  text-decoration:none;
+  display:block;
+  padding:4px 0 4px 8px;
+  margin-left:6px;
+  border-left:2px solid transparent;
+  font-size:12.5px;
+  font-weight:500;
+  transition:all .2s;
+}
+.sticky-toc a:hover{color:var(--accent-sage);border-left-color:var(--accent-sage)}
+.sticky-toc a::before{
+  content:counter(toc) ".";
+  color:var(--text-muted);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  margin-right:4px;
+}
+
+/* ============== Hero ============== */
+.hero{
+  background:linear-gradient(135deg,#FAF7F2 0%,#F2EDE6 100%);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:48px 40px 40px;
+  margin-bottom:48px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--accent-sage) 0%,var(--accent-terracotta) 33%,var(--accent-blue) 66%,var(--accent-amber) 100%);
+}
+.hero-meta{
+  display:flex;align-items:center;gap:12px;
+  font-size:12px;
+  color:var(--text-muted);
+  margin-bottom:16px;
+  font-weight:500;
+  letter-spacing:.5px;
+  flex-wrap:wrap;
+}
+.hero-meta-dot{width:4px;height:4px;background:var(--text-muted);border-radius:50%}
+.hero h1{
+  font-size:46px;font-weight:700;line-height:1.15;
+  color:var(--text-primary);
+  margin-bottom:10px;
+  letter-spacing:-1px;
+}
+.hero-subtitle{
+  font-size:16px;color:var(--text-secondary);
+  margin-bottom:22px;
+  font-weight:500;
+}
+.hero-fable{
+  display:inline-block;
+  padding:2px 10px;
+  margin-right:4px;
+  background:var(--accent-sage-soft);
+  color:var(--accent-sage);
+  border-radius:12px;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+.hero-desc{
+  font-size:14.5px;color:var(--text-secondary);
+  margin-bottom:24px;
+  line-height:1.7;
+  font-weight:400;
+}
+.hero-source{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12.5px;color:var(--text-muted);
+  background:var(--bg-card);
+  padding:6px 12px;border-radius:20px;
+  border:1px solid var(--border-light);
+  font-weight:500;
+}
+
+/* ============== Section ============== */
+section{margin-bottom:56px;scroll-margin-top:80px}
+.chapter-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;
+  color:var(--accent-sage);
+  background:var(--accent-sage-soft);
+  padding:4px 12px;border-radius:12px;
+  margin-bottom:14px;
+  letter-spacing:1px;
+}
+h2{
+  font-size:28px;font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:14px;
+  letter-spacing:-.3px;
+  display:flex;align-items:baseline;gap:12px;
+  line-height:1.3;
+}
+h2 .num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:18px;color:var(--accent-terracotta);
+  font-weight:500;
+}
+h2-hook{
+  display:block;
+  font-size:15px;
+  font-weight:500;
+  color:var(--text-secondary);
+  margin-top:8px;
+  margin-bottom:24px;
+  padding:12px 16px;
+  background:var(--bg-card);
+  border-left:3px solid var(--accent-amber);
+  border-radius:0 6px 6px 0;
+  font-style:italic;
+}
+h3{
+  font-size:19px;font-weight:600;
+  color:var(--text-primary);
+  margin:24px 0 10px;
+  padding-left:14px;
+  border-left:3px solid var(--accent-amber);
+  letter-spacing:-.2px;
+}
+h4{
+  font-size:16px;font-weight:600;
+  color:var(--accent-sage);
+  margin:20px 0 10px;
+}
+p{margin-bottom:14px;color:var(--text-primary);text-align:justify;font-weight:400}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+em{color:var(--text-secondary);font-style:normal;font-weight:600}
+ul,ol{padding-left:24px;margin-bottom:14px;color:var(--text-primary)}
+
+/* ============== Lead paragraph ============== */
+.lead{
+  font-size:17px;color:var(--text-secondary);
+  padding:18px 22px;
+  background:var(--bg-card);
+  border-left:3px solid var(--accent-terracotta);
+  border-radius:0 6px 6px 0;
+  margin-bottom:28px;
+  font-weight:500;
+  line-height:1.85;
+}
+
+/* ============== Pullquote (金句框) ============== */
+.pullquote{
+  background:linear-gradient(135deg,var(--accent-amber-soft) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-amber-soft);
+  border-radius:8px;
+  padding:22px 26px;
+  margin:24px 0;
+  font-size:16.5px;
+  font-weight:500;
+  color:var(--text-primary);
+  position:relative;
+}
+.pullquote::before{
+  content:"\201C";position:absolute;top:-6px;left:16px;
+  font-size:48px;color:var(--accent-amber);
+  font-family:Georgia,serif;line-height:1;
+  font-weight:700;
+}
+
+/* ============== Stats Card (战绩卡) ============== */
+.stats-card{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:20px 0;
+}
+.stat-cell{
+  background:var(--bg-card);
+  border:1px solid var(--border-light);
+  border-radius:8px;
+  padding:14px 16px;
+  text-align:center;
+}
+.stat-cell.victory{border-top:3px solid var(--accent-sage)}
+.stat-cell.defeat{border-top:3px solid var(--accent-terracotta)}
+.stat-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:24px;
+  font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:4px;
+  line-height:1.1;
+}
+.stat-label{
+  font-size:12px;
+  color:var(--text-secondary);
+  font-weight:500;
+}
+
+/* ============== Concept Card (幕末小卡) ============== */
+.concept-card{
+  background:linear-gradient(135deg,var(--accent-sage-faint) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-sage-soft);
+  border-left:3px solid var(--accent-sage);
+  border-radius:0 8px 8px 0;
+  padding:14px 18px;
+  margin:24px 0 8px;
+}
+.concept-card-header{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;
+  color:var(--accent-sage);
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  margin-bottom:10px;
+}
+.concept-pills{
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.concept-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--bg-elevated);
+  border:1px solid var(--accent-sage-soft);
+  border-radius:16px;
+  padding:5px 12px;
+  font-size:12.5px;
+  color:var(--text-primary);
+  font-weight:500;
+}
+.concept-pill .who{
+  color:var(--accent-terracotta);
+  font-weight:700;
+}
+.concept-pill .what{
+  color:var(--text-secondary);
+  font-weight:400;
+}
+
+/* ============== Dialog ============== */
+.dialog{
+  background:var(--bg-deep);
+  border-radius:6px;
+  padding:14px 18px;
+  margin:14px 0;
+  font-size:14.5px;
+  color:var(--text-primary);
+  border-left:3px solid var(--accent-amber);
+}
+.dialog-speaker{font-weight:700;color:var(--accent-terracotta)}
+.dialog-sage{border-left-color:var(--accent-sage)}
+.dialog-terracotta{border-left-color:var(--accent-terracotta)}
+.dialog-blue{border-left-color:var(--accent-blue)}
+.dialog-mauve{border-left-color:var(--accent-mauve)}
+.dialog-amber{border-left-color:var(--accent-amber)}
+
+/* ============== Tables ============== */
+.table-wrap{
+  margin:20px 0;
+  background:var(--bg-card);
+  border:1px solid var(--border-light);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+table{
+  width:100%;border-collapse:collapse;
+  font-size:14px;
+}
+thead{background:var(--bg-deep)}
+th{
+  padding:12px 16px;
+  text-align:left;
+  font-weight:600;
+  color:var(--text-primary);
+  font-size:13px;
+  letter-spacing:.3px;
+  border-bottom:1px solid var(--border);
+}
+td{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border-light);
+  color:var(--text-secondary);
+  vertical-align:top;
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(232,223,211,.3)}
+td:first-child{
+  font-weight:600;
+  color:var(--text-primary);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+}
+
+/* ============== Coverage list (双层概念地图) ============== */
+.coverage{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:24px 28px;
+  margin:32px 0;
+}
+.coverage-title{
+  display:flex;align-items:center;gap:10px;
+  font-size:18px;font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:16px;
+}
+.coverage-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 24px;
+}
+.coverage-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;
+  border-bottom:1px dashed var(--border-light);
+  font-size:13.5px;
+}
+.coverage-item:last-child,.coverage-item:nth-last-child(2){border-bottom:none}
+.coverage-check{
+  flex-shrink:0;
+  width:18px;height:18px;
+  background:var(--accent-sage-soft);
+  border-radius:4px;
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:2px;
+}
+.coverage-text{
+  color:var(--text-secondary);
+  line-height:1.55;
+  font-weight:400;
+  flex:1;
+}
+.coverage-text strong{
+  color:var(--text-primary);
+  display:block;
+  font-size:13.5px;
+  margin-bottom:2px;
+  font-weight:600;
+}
+.coverage-def{
+  display:block;
+  font-size:11.5px;
+  color:var(--text-muted);
+  margin-top:6px;
+  line-height:1.6;
+  font-style:italic;
+  font-weight:400;
+  padding-top:6px;
+  border-top:1px dashed var(--border-light);
+}
+.coverage-def-label{
+  color:var(--accent-sage);
+  font-weight:700;
+  font-style:normal;
+  margin-right:4px;
+}
+
+/* ============== Final summary box ============== */
+.summary-box{
+  background:linear-gradient(135deg,var(--accent-sage-soft) 0%,var(--bg-card) 50%,var(--accent-amber-soft) 100%);
+  border:1px solid var(--accent-sage);
+  border-radius:12px;
+  padding:32px 36px;
+  margin:40px 0;
+  position:relative;
+}
+.summary-box-title{
+  font-size:13px;font-weight:700;
+  color:var(--accent-sage);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:12px;
+}
+.summary-text{
+  font-size:18px;
+  color:var(--text-primary);
+  line-height:1.85;
+  font-weight:500;
+}
+
+/* ============== Footer ============== */
+.footer{
+  margin-top:60px;
+  padding-top:24px;
+  border-top:1px solid var(--border);
+  font-size:12.5px;
+  color:var(--text-muted);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-weight:500;
+}
+.footer-link{color:var(--accent-sage);text-decoration:none;font-weight:600}
+.footer-link:hover{text-decoration:underline}
+
+/* ============== Back to top ============== */
+.back-top{
+  position:fixed;bottom:24px;right:24px;
+  width:40px;height:40px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:all .2s;
+  z-index:40;
+}
+.back-top:hover{background:var(--accent-sage);border-color:var(--accent-sage)}
+.back-top:hover svg{stroke:#fff}
+
+/* ============== SVG Icon base ============== */
+.icon{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+.icon-lg{width:18px;height:18px}
+
+/* ============== Code ============== */
+code{
+  background:var(--bg-deep);
+  padding:2px 7px;
+  border-radius:3px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  color:var(--accent-terracotta);
+  font-weight:500;
+}
+
+/* ============== Responsive ============== */
+@media (max-width:1100px){.sticky-toc{display:none}}
+@media (max-width:768px){
+  .container{padding:24px 16px 60px}
+  .hero{padding:32px 20px}
+  .hero h1{font-size:32px}
+  h2{font-size:22px}
+  .stats-card{grid-template-columns:1fr}
+  .coverage-grid{grid-template-columns:1fr}
+  table{font-size:12.5px}
+  th,td{padding:8px 10px}
+}
+
+/* ============== Print ============== */
+@media print{
+  body{background:#fff}
+  .sticky-toc,.back-top{display:none}
+  .container{max-width:100%;padding:0}
+  .hero{border:none;background:none}
+  section{page-break-inside:avoid;margin-bottom:32px}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== Sticky TOC ========== -->
+<nav class="sticky-toc" aria-label="目录">
+  <div class="sticky-toc-title">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    目录
+  </div>
+  <ol>
+    <li><a href="#opening">开篇 · 盐税案</a></li>
+    <li><a href="#m1">第一幕 · 老赵披挂上阵</a></li>
+    <li><a href="#m2">第二幕 · 神捕张接手</a></li>
+    <li><a href="#m3">第三幕 · 王御史接手</a></li>
+    <li><a href="#finale">终章 · 朝廷审判</a></li>
+    <li><a href="#summary">一句话总结</a></li>
+    <li><a href="#coverage">概念地图</a></li>
+    <li><a href="#framework-quiz">第 10 章 · 思维框架</a></li>
+  </ol>
+</nav>
+
+<!-- ========== Hero ========== -->
+<div class="container">
+
+<header class="hero">
+  <div class="hero-meta">
+    <span>WellInsight 学习材料</span>
+    <span class="hero-meta-dot"></span>
+    <span>第 04 章</span>
+    <span class="hero-meta-dot"></span>
+    <span>v1.0</span>
+    <span class="hero-meta-dot"></span>
+    <span>2026-06-24</span>
+  </div>
+  <h1>第04章 · 智能体经典范式构建</h1>
+  <p class="hero-subtitle"><span class="hero-fable">破案录</span> · 太子奉旨下江南破盐税失踪案,三种破案方法轮番上阵</p>
+  <p class="hero-desc">建议读法:先看故事,<strong>不要查名词</strong>;每章末尾有"本幕关键概念"小卡,可以倒回去对比你的理解;文末有完整概念地图 + 第 10 章思维框架。</p>
+  <span class="hero-source">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    原文参考 · datawhalechina/Hello-Agents · 第四章 智能体经典范式构建
+  </span>
+</header>
+
+<!-- ========== Opening ========== -->
+<section id="opening">
+  <div class="chapter-tag">开篇 · 盐税案</div>
+  <h2><span class="num">00</span>江南盐税失踪半年</h2>
+  <h2-hook>"朝廷查了三次都查不动,这一回,他们让一个 15 岁的皇子来。"</h2-hook>
+
+  <p class="lead">江南七府的盐税,半年里凭空蒸发了三十万两白银。朝廷三次派钦差下江南,三次无功而返。盐商与官员勾结,账目做了三层假,证人被买通。第四次,皇帝点了翰林院太子——一个刚在京城造笔实习期满、办案经验为零的 15 岁皇子,命他限期两月破案。</p>
+
+  <h3>节点 1 · 案件爆发</h3>
+  <p>春季刚过,江南七府的盐运司衙门上下一片焦灼。盐税乃朝廷命脉,半年亏空三十万两,已是天大的窟窿。前三任钦差查账、查人、查船,能用的手段都用尽了,却都铩羽而归。盐商与盐官之间的勾连织成一张密网,账目做了三层假——申报数、实销数、库存数对得上前任的逻辑,却对不上实际的库银。愿意说话的证人,不是被买通,就是消失了。</p>
+
+  <h3>节点 2 · 朝廷征召</h3>
+  <p>皇帝在御书房踱了一夜,终于拍板:让翰林院太子去。这孩子刚满十五,跟师傅学造笔一年(参见第 03 章),笔底下的功夫有了,但办案——他从没见过命案现场。皇帝也知道这一点,所以给他配了三个人:</p>
+  <ul>
+    <li><strong>小李</strong> — 翰林院同学,负责观察记录(对应第 02 章"小书童"角色)</li>
+    <li><strong>一个办案总限期</strong> — 两个月,逾期问责</li>
+    <li><strong>三道空白圣旨</strong> — 让太子到江南后自己决定请谁来破案</li>
+  </ul>
+  <p>太子接旨出京那天,小李问他:"殿下办案经验为零,怎么办?" 太子说:"经验为零,但我可以选师傅。走吧,下江南。"</p>
+</section>
+
+<!-- ========== Main Sections (per 幕) ========== -->
+
+<!-- ========== 第一幕 · ReAct · 老赵披挂上阵 ========== -->
+<section id="m1">
+  <div class="chapter-tag">第一幕 · 边走边问</div>
+  <h2><span class="num">01</span>老赵披挂上阵:走,边走边问</h2>
+  <h2-hook>"老办法是先画图,我老赵一辈子没画过图——我问一句,他们答一句,这不就完了吗?"</h2-hook>
+
+  <p class="lead">太子到江南第三天,贴出第一道圣旨:<strong>延请天下能人,共破盐税失踪案</strong>。当天下午,一个五十岁的老密探找上门来,说自己姓赵,在江南当了三十年巡街捕头,办过一百件小案子,从没失手。老赵说:"殿下,让我来。我不用画图,我边走边问。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">5</div>
+      <div class="stat-label">3 天跑 5 家盐铺</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">3</div>
+      <div class="stat-label">条可疑线索</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">100</div>
+      <div class="stat-label">老赵累计办案数</div>
+    </div>
+  </div>
+
+  <h3>节点 3 · 老赵的主场胜利</h3>
+  <p>头三天,老赵带着太子和小李,五家盐铺挨个跑。每到一家,老赵都按一套固定的"反问套路"开场——</p>
+  <div class="dialog">
+    <span class="dialog-speaker">老赵</span>:掌柜的,你们这家一个月进多少盐?出的多少?申报和实数对得上吗?
+  </div>
+  <p>老赵这一套,头五家都啃出了东西:</p>
+  <ul>
+    <li><strong>第一家</strong>:账目"销量高于产能"。太子心算了一下,这家铺子一年得卖出三年才用得完的盐。</li>
+    <li><strong>第二家</strong>:掌柜说话时眼睛往左下飘——老赵经验老到,一下就看出来,这是"编造"的微表情,不是"回忆"。</li>
+    <li><strong>第三家</strong>:伙计听到"知府大人"四个字,手指抖了一下。老赵没追问,只是记下,晚上告诉太子:"这伙计,可能知道点什么。"</li>
+  </ul>
+  <p>三天下来,老赵把三条线索写进折子,呈报朝廷。朝廷第一次嘉奖:"老赵不愧是老手。"</p>
+
+  <h3>节点 4 · 老赵的客场失败</h3>
+  <p>第四天,老赵带太子走进一家字号叫"义兴祥"的老盐铺——这是江南最大的盐商,掌柜姓周,人称"周老狐狸"。老赵照例反问:</p>
+  <div class="dialog">
+    <span class="dialog-speaker">老赵</span>:周掌柜,你们家每月进多少盐?
+  </div>
+  <div class="dialog dialog-blue">
+    <span class="dialog-speaker">周老狐狸</span>(笑眯眯):大人,您是问"申报数"呢,还是"实数"?这两个数,从来就对不上——朝廷收税用申报,盐商卖盐用实数。这两数之间有"损耗",对吧?
+  </div>
+  <p>老赵一愣,按"反问套路"接:"那你觉得应该报哪个数?"</p>
+  <div class="dialog dialog-blue">
+    <span class="dialog-speaker">周老狐狸</span>:我是纳税人,我要的是"不被多收"。朝廷倒不如学学神捕张——他办案前先把所有人画进图里,然后照图查,这样咱谁也跑不掉。
+  </div>
+  <p>老赵当场语塞。<strong>小李站在旁边,把周老狐狸的反问一字不漏记下来。</strong></p>
+  <p>第五天,老赵又查了两家。这回人家都学会了"反问反问":你问我?我反问你。第 5 天结束,老赵什么也没查到。</p>
+  <p>老赵回到驿站,一个人喝了半斤黄酒,对太子说:"殿下,我办了三十年案子,从来都是我去问人家。这回,人家反问了我,我一句话也答不上来。周老狐狸比我老。"</p>
+  <p>朝廷第一次警告:<strong>老赵只适合小案子,不适合对付老狐狸。</strong></p>
+
+  <div class="pullquote">"我一辈子都是我去问人家——这回,人家反问了我。"—— 老赵</div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill">
+        <span class="who">ReAct</span>
+        <span class="what">—— 边想边做,见招拆招</span>
+      </span>
+      <span class="concept-pill">
+        <span class="who">Thought → Action → Observation</span>
+        <span class="what">—— 老赵的"问 → 观察 → 调整"</span>
+      </span>
+      <span class="concept-pill">
+        <span class="who">工具调用 (Tool Use)</span>
+        <span class="what">—— 老赵的"反问套路"就是他的工具</span>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第二幕 · Plan-and-Solve · 神捕张接手 ========== -->
+<section id="m2">
+  <div class="chapter-tag">第二幕 · 先画图再逐个审</div>
+  <h2><span class="num">02</span>神捕张接手:画一张关系图,然后照图查</h2>
+  <h2-hook>"老赵是去现场问的,我不用去现场——我把所有人画进图里,图里有谁,我就查谁。"</h2-hook>
+
+  <p class="lead">老赵被警告后,太子贴出第二道圣旨。这次来的是刑名师爷张先生,人称"神捕张"——四十岁,办过三十件大案,从不失手。神捕张不看现场,他要先看账册,看卷宗,然后画图。</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">50</div>
+      <div class="stat-label">个嫌疑人入图</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">18</div>
+      <div class="stat-label">天按图审完</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">2</div>
+      <div class="stat-label">个枢纽人物浮出水面</div>
+    </div>
+  </div>
+
+  <h3>节点 5 · 神捕张的主场胜利</h3>
+  <p>神捕张到驿站的第二天,没出门。他让太子把过去三年江南盐运的所有账册、所有卷宗、所有审讯记录全搬到案头。他一个人看了三天,然后铺开一张三尺宽的白纸,提笔开画。</p>
+  <p>到第十天,他画出了一张"嫌疑人关系图":</p>
+  <ul>
+    <li><strong>盐商组</strong>(28 家,大小不一)</li>
+    <li><strong>官员组</strong>(15 人,盐运司 + 知府衙)</li>
+    <li><strong>中间人组</strong>(7 人,牙行 + 账房 + 师爷)</li>
+  </ul>
+  <p>图上画着每个人和谁认识、谁给谁送过礼、谁和谁吃过饭。一共五十个人,一百三十条关系线。神捕张看着这张图,对太子说:"殿下,接下来十天,我按图审。"</p>
+  <p>第十一天到第二十天,神捕张一天审五个人。每个审讯的脚本他都提前写好,问的问题都和图上某个关系节点对应——你认识谁?你和谁吃过饭?你给谁送过几两?十八天下来,图上所有节点都被问到。</p>
+  <p>到第十八天,神捕张发现了一个关键证据:盐商组的"周老狐狸"和官员组的"知府大人秘书"在图上有同一条关系线——他们俩三年前同窗过两年。神捕张在图上把这条线画成红色,在旁边批注:"枢纽人物。"</p>
+  <p>朝廷第二次嘉奖:"神捕张系统,图清晰,问清楚。"</p>
+
+  <h3>节点 6 · 神捕张的客场失败</h3>
+  <p>第二十五天,太子问神捕张:"张先生,这张图上有 50 个人。江南盐务涉及的人,有 50 个吗?" 神捕张答:"殿下,图里有谁,就是有谁。"</p>
+  <p>第二十八天,小李偶然走进一家茶馆,听见两个老头聊天:"……前盐运使的那位师爷,前两年被开除了,最近又常来盐市溜达。"</p>
+  <p>小李记下这条话,回去报给太子。太子让小李带路,亲自去跟踪那位"前师爷"。跟踪三天,他们发现前师爷频繁私下接触"周老狐狸"身边的人。</p>
+  <p>太子回到驿站,看着神捕张那张图,指着图外的位置问:"<strong>张先生,你图里没画的人,真的不在场吗?</strong>"</p>
+  <p>神捕张无言,看着自己画的图,说:"殿下,我这张图,是按现有卷宗画的。卷宗里没有的人,我没画。"</p>
+  <p>朝廷第二次警告:<strong>神捕张只适合有线索图的大案,图外的人他看不见。</strong></p>
+
+  <div class="pullquote">"我这张图,是按现有卷宗画的——卷宗里没有的人,我没画。"—— 神捕张</div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><line x1="10" y1="6" x2="14" y2="6"/><line x1="6" y1="10" x2="6" y2="14"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill">
+        <span class="who">Plan-and-Solve</span>
+        <span class="what">—— 先规划蓝图,再严格施工</span>
+      </span>
+      <span class="concept-pill">
+        <span class="who">Planner + Executor</span>
+        <span class="what">—— 神捕张画图(规划),逐个审(执行)</span>
+      </span>
+      <span class="concept-pill">
+        <span class="who">状态管理</span>
+        <span class="what">—— 每步结果传给下一步(图上的红线)</span>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第三幕 · Reflection · 王御史接手 ========== -->
+<section id="m3">
+  <div class="chapter-tag">第三幕 · 回头复审</div>
+  <h2><span class="num">03</span>王御史接手:把上面两份报告再审一遍</h2>
+  <h2-hook>"老赵是现场灵活,神捕张是按图索骥——我都不学。我回头审他俩的报告,挑他们的漏洞。"</h2-hook>
+
+  <p class="lead">神捕张被警告后,太子贴出第三道圣旨。来的是六十岁的王御史——审过二百件案子卷宗的老御史,专门干一件事:复审别人办的案子。王御史进驿站第一句话:"殿下,让幕僚把老赵的现场记录和神捕张的 50 人审讯记录,全部搬来。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">3</div>
+      <div class="stat-label">处老赵现场漏问</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">7</div>
+      <div class="stat-label">处神捕张"按图审但没问为什么"</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">1</div>
+      <div class="stat-label">份证据被篡改的痕迹</div>
+    </div>
+  </div>
+
+  <h3>节点 7 · 王御史的主场胜利</h3>
+  <p>第三十天,王御史的幕僚开始工作——把老赵和神捕张的报告逐条摊开,一行一行"挑刺"。到第三十五天,幕僚整理出十一处问题:</p>
+  <ul>
+    <li><strong>老赵报告 3 处漏洞</strong>:比如"第三家盐铺伙计听到'知府大人'手指抖"——但报告里没追问"抖之后呢?他说什么了?" 这个问题后面就丢了。</li>
+    <li><strong>神捕张报告 7 处漏洞</strong>:比如"周老狐狸的秘书"被审过,但"周老狐狸本人"为什么没审?图上有这位,审的时候跳过了。</li>
+    <li><strong>两份报告 1 处矛盾</strong>:同一份"账本残页",老赵记成"指向某官员",神捕张记成"指向某中间人"。为什么?</li>
+  </ul>
+  <p>王御史把幕僚叫来,指着那条矛盾问:"同一份账本,两个人写的指向不一样——是谁记错了?"</p>
+  <p>幕僚反推,翻出原始账本一比对:<strong>账本上原本写的是"指向中间人",老赵抄的时候抄成了"指向某官员"</strong>。抄错的那份又被神捕张审过——神捕张按图审,没核对账本原件,顺着错的指向审,审了一个无辜的人。</p>
+  <p>王御史顺着"中间人"那条线查下去——中间人浮出水面,正是"前盐运使的师爷"。</p>
+  <p>朝廷第三次嘉奖:"王御史火眼金睛。"</p>
+
+  <h3>节点 8 · 王御史的客场失败</h3>
+  <p>第四十天,王御史让幕僚把<strong>自己</strong>第 30-35 天的复审报告,也拿来"复审一遍"。</p>
+  <p>幕僚翻了三天,来找王御史:"大人,您审了三遍,每次都用'逐条挑刺'这一种套路。"</p>
+  <p>幕僚接着问:"<strong>您审过的二百件案子里,是不是漏过同一类人?</strong>"</p>
+  <p>王御史一愣。他回忆了一下自己的案子档案,确实——有某一类人(比如"账房出身的小吏"),他每次都让他们过,因为"账房的人应该懂账,不会做假账"。</p>
+  <p>但这一次"前师爷"正是"账房出身"——王御史的复审漏了他。</p>
+  <p>王御史放下茶杯,长叹:"<strong>复审者,也是人。也有盲点。</strong>"</p>
+  <p><strong>小李站在一旁,问王御史:"王大人,那复审别人三次,自己也得复审一次?"</strong></p>
+  <p>朝廷第三次警告:<strong>王御史的反思,也需要一个"反思者"来反思。</strong></p>
+
+  <div class="pullquote">"复审者,也是人。也有盲点。"—— 王御史</div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill">
+        <span class="who">Reflection</span>
+        <span class="what">—— 回头复审,纠错升级</span>
+      </span>
+      <span class="concept-pill">
+        <span class="who">执行 → 反思 → 优化</span>
+        <span class="what">—— 王御史的三步循环</span>
+      </span>
+      <span class="concept-pill">
+        <span class="who">Memory 短期记忆</span>
+        <span class="what">—— 幕僚的记录本</span>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 终章 · 朝廷审判 · 三种方法分工合作 ========== -->
+<section id="finale">
+  <div class="chapter-tag">终章 · 朝廷审判</div>
+  <h2><span class="num">04</span>限期到了:三种方法不是谁灭谁</h2>
+  <h2-hook>"三个月期限到了,太子破案未竟——但他带回的不是失败,是一张'分工图'。"</h2-hook>
+
+  <p class="lead">两个月到期那天,太子破案未竟。他带着老赵、神捕张、王御史进京述职。皇帝没有立刻降罪,反而问他:"你觉得,这三位师傅,谁最厉害?"</p>
+
+  <h3>节点 9-10 · 三方法合并破案</h3>
+  <p>太子答:"陛下,臣不能挑出谁最厉害——但臣看明白了谁最<strong>适配方</strong>。"</p>
+  <ul>
+    <li><strong>老赵 (ReAct · 边走边问)</strong> — 最适合<strong>快速变化的现场</strong>。遇到新情况,问一句看一句。但遇到老狐狸型对手,会被反问套话。</li>
+    <li><strong>神捕张 (Plan-and-Solve · 先画图再审)</strong> — 最适合<strong>有线索图的结构化大案</strong>。按图审,流水线快。但图外的人,他看不见。</li>
+    <li><strong>王御史 (Reflection · 回头复审)</strong> — 最适合<strong>复审已有报告</strong>,挖出逻辑漏洞和证据篡改。但复审者自己也是老人,也有盲点。</li>
+  </ul>
+  <p>太子请求再延一个月,朝廷同意。三个月最后三十天,太子让三种方法分工合作:</p>
+  <ul>
+    <li><strong>老赵</strong> 重新跑现场,这次专门去找"前师爷"(图外的人),用边走边问的方式套话</li>
+    <li><strong>神捕张</strong> 把图扩展,补上前师爷、周老狐狸、所有账房出身的小吏,重新审</li>
+    <li><strong>王御史</strong> 复审所有新报告,这次特别留意"账房出身"那一类人</li>
+  </ul>
+
+  <h3>节点 11 · 破案 + 太子金句</h3>
+  <p>第六十天,在三种方法合并下,案件告破——<strong>前师爷</strong>(中间人)+ 三家盐商 + 一名盐运司官员落网,三十万两盐税亏空补回。</p>
+  <p>朝廷复审太子报告,嘉奖:"太子会用人。"</p>
+  <p>翰林院院长(第 03 章派太子去实习的那位)赶来听汇报,问太子:"殿下这回学到什么了?"</p>
+
+  <div class="pullquote">
+    "<strong>破案没有最好的方法,只有最适配案子的方法。</strong><br><br>
+    ReAct 适合现场灵活,Plan-and-Solve 适合结构化梳理,Reflection 适合复审纠错。<br><br>
+    三种方法不是互相否定,是<strong>分工合作</strong>——案子复杂度变了,方法就跟着换。"<br>
+    <span style="font-size:13px;color:var(--text-secondary);font-weight:400">—— 太子</span>
+  </div>
+
+  <p>小李站在太子身后,小声跟身边的驿丞说:"我师傅 (指太子) 一年前还是个只会造笔的皇子。这一回,他学会了'分工'。" 驿丞笑:"你师傅是学会了'选师傅'。"</p>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill">
+        <span class="who">范式分工</span>
+        <span class="what">—— 三种方法各管一环,不互相替代</span>
+      </span>
+      <span class="concept-pill">
+        <span class="who">场景适配</span>
+        <span class="what">—— 案子复杂度决定用哪种方法</span>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Summary ========== -->
+<section id="summary">
+  <div class="summary-box">
+    <div class="summary-box-title">一句话总结</div>
+    <div class="summary-text">
+      三种智能体经典范式——<strong>ReAct</strong>(边走边问)、<strong>Plan-and-Solve</strong>(先画图再审)、<strong>Reflection</strong>(回头复审)——不是谁取代谁,而是根据<strong>任务复杂度</strong>分工合作:
+      <strong>ReAct 适合现场灵活,Plan-and-Solve 适合结构化梳理,Reflection 适合复审纠错。</strong>
+      <br><br>
+      老赵(ReAct)在场会被老狐狸套话,但神捕张(Plan-and-Solve)按图审就漏图外的人;王御史(Reflection)复审两份报告能找出漏洞,但他自己的复审也有盲点——三方法合并,才破得了案。
+    </div>
+  </div>
+</section>
+
+<!-- ========== Coverage ========== -->
+<section id="coverage">
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      概念地图 · 25 个关键名词(双层:寓言链接 + 通俗教科书定义)
+    </div>
+    <div class="coverage-grid">
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>智能体范式</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>太子请的三位师傅——每人有自己的破案套路。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>组织"思考 + 行动"的不同套路,像厨师各有各的做菜方法。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>ReAct (Reasoning + Acting)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵"边走边问"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>"想一句、做一句、看一句"的循环——问一句、看对方反应、再问下一句。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Thought (思考)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵进店前的"我准备问什么"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体在行动前先在"心里"想清楚下一步要做什么。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Action (行动)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵对掌柜喊出"你进多少盐"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体决定"做什么"——调用工具、查数据库、回一句话。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Observation (观察)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵看到掌柜眼睛往左下飘。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体"做完行动后看到什么结果"——这个结果会改变下一步的想法。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Thought-Action-Observation 循环</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵每天跑 5 家的"问 → 看 → 调整"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体不停重复的三步循环,直到任务完成或到最大步数。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>工具调用 (Tool Use)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵的"反问套路"就是他的工具。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体请外部帮手做事——查搜索引擎、算数学、读数据库。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>ToolExecutor (工具执行器)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵腰间的"反问模板袋"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>统一管理所有工具的"管家"——智能体喊一声,它就把工具递过来用。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>工具描述 (Description)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵写给太子的"我这套反问套路能干嘛"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>一段话告诉智能体"什么时候该用这个工具"——写得越清楚,智能体用得越准。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>提示词工程 (Prompt Engineering)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵三十年练出来的反问模板。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>怎么写一句话让智能体照着做——调对了,它就跑得对;调错了,它就跑偏。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Plan-and-Solve</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>神捕张"先画图再逐个审"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>"先想完整计划,再一步步执行"——和 ReAct 相反,先想再做。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Planner (规划器)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>神捕张画关系图的那三天。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体里的"参谋长"——先把大问题拆成小步骤,列成清单。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Executor (执行器)</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>神捕张按图逐一审讯的那十八天。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体里的"执行官"——按 Planner 写好的清单,一步步做完。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>状态管理</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>神捕张在图上画红线("这是枢纽")。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体每做一步都记下来,下一步能"看到"前面的结果。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>两阶段流程</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>神捕张的"画图(规划) + 逐审(执行)"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>把任务明确分成两段——一段只想,一段只做,中间不混。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>复杂任务分解</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>把"破 50 人案"拆成"盐商组 / 官员组 / 中间人组"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>大问题不好一次解决,先拆成几个小问题,小问题好解决。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Reflection</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>王御史"回头复审"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>"做完 → 回头看哪里错 → 重做"的循环——给智能体一个"自我批评"的嘴。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Reflexion 框架</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>王御史 2023 年提出的"反思"方法。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>让智能体做完任务后,自己再"演一遍评审",根据评审意见改稿。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>执行 → 反思 → 优化 三步循环</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>王御史审完一份,再回头审自己。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体重复三步:做 → 看哪不对 → 改,直到"没东西可改"为止。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Memory 短期记忆</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>幕僚手里那本"复审记录"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体记住"之前做过什么、评审说过什么"的记事本——下一轮反思时翻得出来。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>自我评估</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>王御史让幕僚"挑我的刺"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>智能体评价"自己做的怎么样"——不是给别人看,是给自己看。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>迭代优化</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>王御史复审 3 遍,每一遍都更准。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>"做一次不够好,再做一次,再改一点"——每轮都比上一轮好一点。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>LLM 工具调用</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵的脑子(LLM)让手("反问工具")去做事。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>大模型本身只能说话,要让外部工具真正做事——比如查天气、发邮件。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>LLM 客户端封装</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>太子出门带的"通用圣旨袋"。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>把"怎么和大模型说话"包成一个简单函数——主程序不用管细节,调一下就行。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>Stream 流式响应</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵一边听一边记,不等地狱说完再回。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>大模型一个字一个字往外吐——不用等它说完,你边看边用。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="coverage-text">
+          <strong>SerpApi 搜索工具</strong>
+          <span class="coverage-def"><span class="coverage-def-label">寓言:</span>老赵叫来的"线人甲",专门查实时消息。</span>
+          <span class="coverage-def"><span class="coverage-def-label">定义:</span>一个能帮你问 Google 的"中介",给你返回最准的实时答案。</span>
+        </span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第 10 章 · 思维框架 + 自测题 ========== -->
+<section id="framework-quiz">
+  <div class="chapter-tag">第 10 章 · 思维框架 + 自测题</div>
+  <h2><span class="num">10</span>破完案,留 23 题让你带走三种范式的精髓</h2>
+  <h2-hook>"故事看完了,但办案套路你真的会了吗?这章给你 5 个核心思维 + 5 个底层逻辑 + 3 个真在吵的事 + 10 道考题。"</h2-hook>
+
+  <p class="lead">如果你读完 4 幕破案故事,只是记住了"老赵被反问、神捕张漏图外、王御史有盲点"——那还不够。这一章给你 5 个核心思维(专家共识)+ 5 个底层逻辑(为什么这样工作)+ 3 个核心争议(专家吵什么)+ 10 道自测题(考你会用不会用)。奶奶级(零基础)读者也能看懂——所有概念都用"想象..."开头 + 生活类比 + 通俗别名。</p>
+
+  <h3>一、5 个核心思维(专家共识)</h3>
+  <p>做智能体这行的工程师、学者、博士,大家吵归吵,但这 5 个底层思路几乎是公认的:</p>
+  <div class="coverage-grid">
+
+    <div class="coverage-item">
+      <span class="coverage-check">1</span>
+      <span class="coverage-text">
+        <strong>1. 智能体 = 大脑(LLM)+ 手脚(工具)</strong>
+        <span class="coverage-def">想象一个人,脑子会想、手脚会做事——脑子再好,不能查天气、不能发邮件,所以需要"工具调用"。老赵的脑子很好,但只有"反问套路"这一个工具,所以他只能问、不能查。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">2</span>
+      <span class="coverage-text">
+        <strong>2. 思考和行动要"轮着来"(ReAct 心法)</strong>
+        <span class="coverage-def">不要等想完所有再动手——边想边做。每做一步看到结果,结果反过来修正下一步的想。想象你晚上走山路:你不会站山顶想好每一步才下山——你走一步看一步,边走边调整。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">3</span>
+      <span class="coverage-text">
+        <strong>3. 大任务要先拆小(Plan-and-Solve 心法)</strong>
+        <span class="coverage-def">复杂事情一步做不完——先把大任务拆成几个小步骤,然后按顺序做。想象搬家:不会把整个家一股脑扔到新家——先列清单(锅碗瓢盆 / 衣服被褥 / 证件),再分批搬。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">4</span>
+      <span class="coverage-text">
+        <strong>4. 做完要回头看(Reflection 心法)</strong>
+        <span class="coverage-def">做完一件事别以为完事了——回头审一遍,看哪里错、哪里可以更好。想象写论文:第一稿写完不会交——要改一遍、给老师看、再改,质量才上去。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">5</span>
+      <span class="coverage-text">
+        <strong>5. 没有最好,只有最适配(范式分工)</strong>
+        <span class="coverage-def">三种范式不是谁取代谁——是分工。案子变了、任务变了,方法跟着换。想象医生:内科外科儿科妇科,不是谁灭了谁——你胃疼去看内科,骨折去看外科,不能反过来。</span>
+      </span>
+    </div>
+
+  </div>
+
+  <h3>二、5 个底层逻辑(为什么这样工作)</h3>
+  <p>三种范式为啥这样设计?为啥不都用一种?这是 5 个底层逻辑——讲"为什么"而不是"是什么":</p>
+  <div class="coverage-grid">
+
+    <div class="coverage-item">
+      <span class="coverage-check">1</span>
+      <span class="coverage-text">
+        <strong>为什么不能"一步到位"?</strong>
+        <span class="coverage-def">因为现实问题太多变——你想好的下一步,实际做的时候可能就变卦了(老赵计划问"进多少盐",周老狐狸反问"你问哪个数")。所以要有"边做边看"的灵活性。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">2</span>
+      <span class="coverage-text">
+        <strong>为什么不能"全现场派"?</strong>
+        <span class="coverage-def">因为现场派遇到老狐狸型对手就被套话——人有"反套路"的能力。所以遇到结构化任务,需要"先画图再审"的纪律。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">3</span>
+      <span class="coverage-text">
+        <strong>为什么不能"全规划派"?</strong>
+        <span class="coverage-def">因为规划依赖"已知信息"——卷宗里没的人、图里没画的线,规划派看不见。所以遇到"图外"的东西,光靠规划不行。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">4</span>
+      <span class="coverage-text">
+        <strong>为什么不能"反思一遍就完"?</strong>
+        <span class="coverage-def">因为反思者自己也是人——他有自己的盲点(王御史总漏"账房出身"那一类)。所以反思也需要"反思者再反思",但这条路是无穷的,要有个"够了"的判断。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">5</span>
+      <span class="coverage-text">
+        <strong>为什么范式要"组合用"?</strong>
+        <span class="coverage-def">单一范式都有边界——但几种范式组合,可以覆盖不同的失败场景。老赵(ReAct)跑现场、神捕张(Plan)整理关系、王御史(Reflection)复审——三管齐下,才能破局。</span>
+      </span>
+    </div>
+
+  </div>
+
+  <!-- C. 3 个核心争议 -->
+  <h3>三、3 个核心争议(智能体范式圈吵得最凶的问题)</h3>
+  <p>读完前面五种思维、五条底层,你大概会觉得"ReAct/Plan/Reflection 各有各的好"——但业界其实没吵完。下面 3 个争议,每个都有真人在两边打擂台。</p>
+
+  <!-- 争议 1 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      争议 1 · ReAct 还会是主流吗?还是 Reflection 会取代它?
+    </div>
+    <p class="pullquote">这个问题你可以问自己:如果让智能体去办一个它从未办过的复杂任务,你是让它"边走边问",还是"先做一遍再回头改"?</p>
+    <p><strong>觉得 A 的人</strong>(以 ReAct 派为代表,老赵就是这种):ReAct 像老刑警——现场反应快、不死板、成本低。简单任务,反思是大炮打蚊子。代表观点:"80% 的智能体任务,ReAct 三五步就能解,Reflection 是给那 20% 准备的,别给所有任务都套上反思。"</p>
+    <p><strong>觉得 B 的人</strong>(以 Reflexion 论文作者为代表):ReAct 容易"在错路上越走越远"——错了不回头,越问越偏。代表观点:"Reflexion(2023)实验证明,加一道反思,HumanEval 编程题正确率从 48% 涨到 91%。反思不是奢侈品,是必需品。"</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>立场</th><th>看这个例子</th></tr></thead>
+        <tbody>
+          <tr><td>觉得 A(ReAct 派)</td><td>ChatGPT 的"工具调用"插件默认就是 ReAct 循环——它先想、再调工具、再看结果,极少做"回头检查"。LangChain 早期 90% 教程都是 ReAct。</td></tr>
+          <tr><td>觉得 B(Reflection 派)</td><td>AutoGPT(2023)一夜爆红——核心就是"做完一步反思一下,不行就重来";DeepMind 的 AlphaCode 也用反思机制筛答案;Reflexion 论文让 GPT-4 在推理基准上再涨 10 个点。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>大家其实同意的是</strong>:Reflection 不是替代 ReAct,而是 ReAct 之上的"补丁"。先走起来,再回头复审。</p>
+    <p><strong>还没吵清楚的是</strong>:反思几次算够?反思本身也错,谁反思反思者?</p>
+    <p><strong>没人知道的是</strong>:再过 3 年,新出的"自反思 LLM"会不会让 Reflection 这步不再需要单独设计?</p>
+  </div>
+
+  <!-- 争议 2 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      争议 2 · Plan-and-Solve 在大模型时代过时了吗?
+    </div>
+    <p class="pullquote">这个问题你可以问自己:你今天出门办事,是先在脑子里列个清单(Plan),还是直接出门撞到啥处理啥(ReAct)?</p>
+    <p><strong>觉得 A 的人</strong>(以神捕张式规划派为代表):大模型本身就有"幻觉",不先规划,等于让一个容易说胡话的人边想边做——必然翻车。代表观点:"做严肃任务(医疗诊断、法律咨询),必须 Plan-and-Solve——把任务拆开、写清楚,再交给执行器,出错率至少降一半。"</p>
+    <p><strong>觉得 B 的人</strong>(以 ReAct 派为代表):计划赶不上变化——现实永远有你没规划到的分支(像盐税案里"账房周"这个图外人物)。规划越细,执行越死板,一旦现场变了就崩。代表观点:"GPT-4、Claude 这类强模型,ReAct 一次就够——过度规划反而浪费 token、拖慢速度。"</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>立场</th><th>看这个例子</th></tr></thead>
+        <tbody>
+          <tr><td>觉得 A(规划派)</td><td>BabyAGI、AutoGPT 这类"任务管理"智能体,核心就是 Planner → Task List → Executor 三段式;医疗 AI 项目 Aidoc 在做诊断前,必须先 Plan 出"先看片、再查病史、再下结论"。</td></tr>
+          <tr><td>觉得 B(灵活派)</td><td>OpenAI 的 Operator、Anthropic 的 Computer Use,都是 ReAct 模式——它们"看一步做一步",不预先规划整条流程;论文《ReAct: Synergizing Reasoning and Acting》(2022) 直接拿推理任务做实验,发现 ReAct 在 HotpotQA 上比纯 CoT 高 7 个点。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>大家其实同意的是</strong>:任务结构越清晰、变量越少,Plan-and-Solve 越划算;任务越模糊、变数越多,ReAct 越灵活。</p>
+    <p><strong>还没吵清楚的是</strong>:大模型越来越强后,"即兴发挥"的能力越来越强,Plan 是不是会被"思考链"(Chain-of-Thought) 这种更轻的"内化规划"取代?</p>
+    <p><strong>没人知道的是</strong>:未来会不会出现一种范式,自动判断"该 Plan 还是该 ReAct",不让用户选?</p>
+  </div>
+
+  <!-- 争议 3 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      争议 3 · 智能体能"知道自己不知道"吗?(Reflection 的边界)
+    </div>
+    <p class="pullquote">这个问题你可以问自己:如果你让一个特别自信的人复审自己的工作,他真的能看出自己的错误吗?</p>
+    <p><strong>觉得 A 的人</strong>(乐观派,以王御史式"老法师"为代表):智能体能通过反思学会"我这一类问题容易错"——这就是"知道自己不知道"。代表观点:"Reflexion 让模型记住'上次哪步错了',下次主动绕开,这就是元认知——AI 知道自己知识的边界在哪。"</p>
+    <p><strong>觉得 B 的人</strong>(怀疑派):LLM 的反思本质还是模式匹配——它复审自己,还是在"猜下一个 token",并没有真正的"自我意识"。代表观点:"研究证明,LLM 在'我不知道答案'这种问题上的校准率比人还差——它说'我确定',其实经常是胡说;它说'我不确定',有时候反而是对的。反思只是修辞,不是真的自知。"</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>立场</th><th>看这个例子</th></tr></thead>
+        <tbody>
+          <tr><td>觉得 A(乐观派)</td><td>Anthropic 的 Claude 3.5 Sonnet 在内部测试里能主动说出"这个问题我可能错了,要不要查一下资料"——这被宣传为"涌现的元认知";DeepMind 的"Constitutional AI"也用反思让模型自己指出有害输出。</td></tr>
+          <tr><td>觉得 B(怀疑派)</td><td>论文《Language Models (Mostly) Know What They Know》(Anthropic 2022) 显示 LLM 的置信度校准很糟糕;GPT-4 在"故意挖坑"的测试里,经常自信地给出错误答案然后不反思——人批评它,它才改。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>大家其实同意的是</strong>:让 LLM 自己复审自己,确实能抓到一部分错误——但比"两个人互审"的稳定性差很多。</p>
+    <p><strong>还没吵清楚的是</strong>:这是 LLM 的"暂时缺陷"还是"本质局限"?更大的模型会更懂自己吗,还是更自信地说错?</p>
+    <p><strong>没人知道的是</strong>:Reflection 加到极致,会不会让 LLM 学会"装不知道"——明明知道也说自己不知道,反过来骗人?</p>
+  </div>
+
+  <!-- D. 10 道自测题 -->
+  <h3>四、10 道自测题(考逻辑不考定义)</h3>
+  <p><strong>做题方式</strong>:每题先合上答案自己选一次,再展开解析。错的题回到对应章节重读寓言——做题不在多,在每个错误选项都让自己"想了一下为什么错"。</p>
+
+  <!-- Q1 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q1 · ReAct 的"TAO" 三步循环
+    </div>
+    <p class="pullquote">老赵每问一句话之前,都要经过一个三步循环——这三步英文缩写是什么?</p>
+    <p><strong>题目</strong>:ReAct(Reason + Act)的核心循环有三步:先想一步、再动手、再看结果。如果用三个英文单词的首字母表示,正确顺序是?</p>
+    <ul>
+      <li>A. Task → Action → Output(任务-动作-输出)</li>
+      <li>B. Thought → Action → Observation(想法-动作-观察)</li>
+      <li>C. Try → Adjust → Optimize(试错-调整-优化)</li>
+      <li>D. Talk → Ask → Order(说-问-命)</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:B</p>
+      <p><strong>为什么选 B</strong>:想象老赵在牢里问周账房"盐是从哪个门进的"——他先 Thought(想:"我得问清入口,才能追运输路线"),再 Action(开口问),再 Observation(看周账房犹豫了一下,知道问对了)。Thought-Action-Observation 这个循环就是 ReAct 的心脏。</p>
+      <p><strong>为什么 A 错</strong>:Task 是"任务",不是循环第一步——任务在那之前就定好了。Action 和 Output 没错,但起点不是 Task。</p>
+      <p><strong>为什么 C 错</strong>:听起来像机器学习训练流程(试错-调整-优化),但那是"训练",ReAct 是"推理",不是同一回事。</p>
+      <p><strong>为什么 D 错</strong>:完全不是 ReAct 的术语,估计是混淆了"提问-回答"的对话模型。</p>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q2 · Plan-and-Solve 的两阶段分工
+    </div>
+    <p class="pullquote">神捕张破案分两步——先规划,再执行。这两步英文怎么叫?</p>
+    <p><strong>题目</strong>:Plan-and-Solve 范式把任务分成两个阶段:第一个阶段负责"拆任务、写步骤",第二个阶段负责"按步骤跑"。这两个阶段的标准英文名是?</p>
+    <ul>
+      <li>A. Designer → Coder(设计师-程序员)</li>
+      <li>B. Planner → Executor(规划者-执行者)</li>
+      <li>C. Manager → Worker(经理-工人)</li>
+      <li>D. Thinker → Doer(思想者-行动者)</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:B</p>
+      <p><strong>为什么选 B</strong>:想象神捕张接到盐税案——他先 Planner(在纸上画关系图:"盐从哪里来→过谁的手→到哪个衙门→入哪个库"),再 Executor(按图上的人一个个审)。"先想清楚再动手"是 Plan-and-Solve 的灵魂。</p>
+      <p><strong>为什么 A 错</strong>:听起来像软件工程,但 Plan-and-Solve 是通用智能体范式,不是专给写代码用的。</p>
+      <p><strong>为什么 C 错</strong>:意思对,但不是学术界标准术语——Plan-and-Solve 原文用的是 Planner/Executor,这两个词也是 LangChain 里 PlanAndExecute 链的官方命名。</p>
+      <p><strong>为什么 D 错</strong>:口语化,但不是术语。读到 Thinker/Doer 时大家会知道意思,但查不到文献。</p>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q3 · 王御史在破案里做的关键动作
+    </div>
+    <p class="pullquote">王御史不跑现场、不画图——他只做一件事,这件事叫什么?</p>
+    <p><strong>题目</strong>:Reflection 范式的核心动作,是什么?</p>
+    <ul>
+      <li>A. 把卷宗抄一遍(收集原始信息)</li>
+      <li>B. 重新画一张关系图(另起炉灶)</li>
+      <li>C. 回头复审已经做过的推理和结论,挑出问题(自我批评)</li>
+      <li>D. 抓更多人证(扩大调查范围)</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象王御史拿到老赵、神捕张的所有供词和图——他不重新查案,而是把"老赵的提问""神捕张的关系图"重新看一遍,问自己"哪里漏了?哪里太武断?"。这种"对已有推理做批评"就是 Reflection 的核心。</p>
+      <p><strong>为什么 A 错</strong>:抄卷宗是 ReAct 或 Plan 的输入准备,不是 Reflection 的特色动作。</p>
+      <p><strong>为什么 B 错</strong>:重新画图是 Plan-and-Solve 的加强版,不是反思——反思的输入是"已经做过的结论",不是"原始数据"。</p>
+      <p><strong>为什么 D 错</strong>:抓人属于 Plan/Executor 的执行步骤,跟"反思已有推理"完全不是一回事。</p>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q4 · 三位师傅各像哪种范式?
+    </div>
+    <p class="pullquote">老赵、神捕张、王御史——他们三个人加起来,就是"智能体团队"的标准配置。</p>
+    <p><strong>题目</strong>:破案小组里三个人分工不同——以下匹配哪一项对?</p>
+    <ul>
+      <li>A. 老赵 = Plan-and-Solve(老赵问话其实是按剧本)</li>
+      <li>B. 神捕张 = Reflection(神捕张画图就是反思)</li>
+      <li>C. 王御史 = Reflection(王御史复审就是反思)</li>
+      <li>D. 老赵 = Reflection(老赵最后也复审了自己)</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象三个人的工作台——老赵带着小李蹲点跑现场(随时问话、随时判断,这是 ReAct);神捕张在衙门铺卷宗画关系图(先规划再分工,这是 Plan-and-Solve);王御史拿到前两位的成果,不跑现场,只坐在屋里重新看卷宗,问"哪里漏了"(这就是 Reflection)。</p>
+      <p><strong>为什么 A 错</strong>:老赵的标志是"边问边看人脸色",完全不是按剧本——Plan-and-Solve 是神捕张的活。</p>
+      <p><strong>为什么 B 错</strong>:神捕张画的是"人际关系图",这是 Plan(预先整理结构),不是 Reflection(回头复审)。两者方向相反。</p>
+      <p><strong>为什么 D 错</strong>:老赵确实复审过自己,但那只是一次性反思,他整体工作模式还是"现场 ReAct";王御史的整个职业身份就是"复审人",才是纯 Reflection。</p>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q5 · 为什么不能"一步到位"?
+    </div>
+    <p class="pullquote">神捕张为什么不直接把所有官员抓起来审,而要先花三天画关系图?</p>
+    <p><strong>题目</strong>:为什么智能体范式里,大多数时候不能"接任务→直接给答案"一步到位?</p>
+    <ul>
+      <li>A. 因为 LLM 算力不够,必须分批跑</li>
+      <li>B. 因为现实问题太多变,中间需要"边做边看"的灵活性</li>
+      <li>C. 因为用户喜欢看长一点的输出</li>
+      <li>D. 因为数据库查询必须分步进行</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:B</p>
+      <p><strong>为什么选 B</strong>:想象老赵准备问"盐是从哪个门进的",以为对方会答——结果周账房反问"你问的是上个月还是上上个月"。这就是"现实太多变":你想好的下一步,实际做的时候对方反应会改你的判断。ReAct 的"Thought-Action-Observation"循环就是为了给这种灵活度留空间。</p>
+      <p><strong>为什么 A 错</strong>:算力是工程问题,不是范式设计的核心动机——就算算力无限,一步到位仍然会犯错。</p>
+      <p><strong>为什么 C 错</strong>:用户体验是表面原因,不是范式存在的理由——一步到位如果能答对,没人嫌短。</p>
+      <p><strong>为什么 D 错</strong>:数据库查询确实可以分步,但 Plan-and-Solve 的"先规划"不是为了配合数据库——是为了配合复杂任务的逻辑分解。</p>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q6 · ReAct 的"黑洞"风险
+    </div>
+    <p class="pullquote">老赵追线索追得越深、越觉得"马上就能破案"——但其实他已经走错了方向。这就是 ReAct 的最大风险。</p>
+    <p><strong>题目</strong>:为什么纯 ReAct(不反思、不规划)在复杂任务里"很容易在错路上越走越远"?</p>
+    <ul>
+      <li>A. 因为工具调用的速度太慢,等不到结果就放弃了</li>
+      <li>B. 因为 LLM 思考时会偷懒,后面越来越敷衍</li>
+      <li>C. 因为没有"回头检查"机制,错的第一步会把后续推理全带偏</li>
+      <li>D. 因为 LLM 不能同时记住多步对话</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象老赵听周账房说"盐从北门进",立刻判断"北门守卒张三是内鬼"——后面所有问题都围着张三转。结果张三是清白的,真正内鬼是账房周本人。如果 ReAct 中间没有"复审机制",第一步错、步步错,就像雪球滚下坡。</p>
+      <p><strong>为什么 A 错</strong>:工具速度是工程问题,不是 ReAct 的设计风险——真要快慢影响,可以并行调用。</p>
+      <p><strong>为什么 B 错</strong>:LLM 思考敷衍是一个边缘问题,主流模型(Claude/GPT-4)在 ReAct 循环里反而很认真,不是敷衍问题。</p>
+      <p><strong>为什么 D 错</strong>:现代 LLM 上下文窗口动辄 100k+,不是"记不住多步"的问题;真正问题是"记得多但不知道哪步是错的"。</p>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q7 · 医疗诊断该用哪种范式?
+    </div>
+    <p class="pullquote">让 AI 给病人开药——这是 ReAct 还是 Plan-and-Solve?</p>
+    <p><strong>题目</strong>:你要做一个"根据病人症状推荐用药"的 AI 助手(类似医生问诊),以下哪种范式最合适?</p>
+    <ul>
+      <li>A. ReAct——边问症状边给建议</li>
+      <li>B. Plan-and-Solve——先收集完整病史,再列排查清单,逐步排除</li>
+      <li>C. Reflection——让模型自己给自己打分,分数高就推荐</li>
+      <li>D. 三种都可以,效果一样</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:B</p>
+      <p><strong>为什么选 B</strong>:想象医生看病人——不会听一句"我头疼"就开药,而是先问完所有症状、看化验单、查过敏史,再列"可能是 A 也可能是 B 也可能是 C",逐个排查。这就是 Plan(收集+规划) → Execute(逐项排查) → 输出结论。医疗任务容错率极低,ReAct 一边问一边开药容易误诊。</p>
+      <p><strong>为什么 A 错</strong>:ReAct 适合"半结构化"任务,但医疗是"高风险+高结构化",边问边答容易在信息不全时下判断。</p>
+      <p><strong>为什么 C 错</strong>:Reflection 不是用来替代决策的——它是"复审决策"的工具。医生不靠"自己给自己打分"开药,要靠规则和检查。</p>
+      <p><strong>为什么 D 错</strong>:三种范式有不同适用场景,医疗这种高风险任务必须挑最稳的那种(Plan),不能用"效果差不多"的心态。</p>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q8 · ChatGPT 的"工具调用"默认是哪派?
+    </div>
+    <p class="pullquote">你让 ChatGPT 查今天天气——它怎么干的?</p>
+    <p><strong>题目</strong>:ChatGPT 的"工具调用"(function calling)功能,默认走的是哪种范式?</p>
+    <ul>
+      <li>A. Plan-and-Solve——它先把整个对话计划列清楚再调工具</li>
+      <li>B. Reflection——它调完工具后会反思一下对不对</li>
+      <li>C. ReAct——它边想边调工具,一次只走一步</li>
+      <li>D. 完全无范式,只是机械调用</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象你问 ChatGPT"今天上海天气怎么样"——它不会先写一份"上海全年气候报告"的计划,而是直接想:"用户问上海天气,我得查一下"→ 调天气工具 → 拿到结果 → 整理成自然语言回复。这就是典型的 Thought-Action-Observation 循环。LangChain 早期文档就明确说:ChatGPT function calling 是 ReAct 范式的工程实现。</p>
+      <p><strong>为什么 A 错</strong>:Plan-and-Solve 在工具调用场景里很重,ChatGPT 默认不会花那么多 token 去规划——除非你明确用 Plan-and-Execute 链。</p>
+      <p><strong>为什么 B 错</strong>:ChatGPT 默认不做"反思调用结果"——除非你显式接上 Self-Critique 链。Reflexion 这种反思需要单独设计 prompt。</p>
+      <p><strong>为什么 D 错</strong>:看起来"调工具"是机械动作,但其实背后 LLM 在 Thought 步骤里决定了"该不该调、调哪个、参数是什么"——这不是机械,是推理。</p>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q9 · 需求没说清时该用哪种范式?
+    </div>
+    <p class="pullquote">老板说"你去查查那个项目"——但没说哪个项目、查什么、给谁看。这活儿怎么接?</p>
+    <p><strong>题目</strong>:用户给你一个智能体任务:"查一下那个项目最近怎么样"(没说哪个项目、查什么指标、给谁看)。以下哪种范式最合适?</p>
+    <ul>
+      <li>A. Plan-and-Solve——先列详细计划书再问用户确认</li>
+      <li>B. ReAct——先问一句"您说的是哪个项目",根据回答再决定下一步</li>
+      <li>C. Reflection——先自己猜一个项目,做完反思对不对</li>
+      <li>D. 三种都可以,选哪个都行</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:B</p>
+      <p><strong>为什么选 B</strong>:想象老赵接到任务——如果他按 Plan-and-Solve 埋头画图,结果用户问"我说的项目不是这个"。ReAct 更适合这种"信息不全、变化多"的场景:先 Thought(想:"我得先确认是哪个项目")→ Action(问用户)→ Observation(根据回答调整下一步)。每一步都根据现场反馈调整。</p>
+      <p><strong>为什么 A 错</strong>:Plan-and-Solve 适合"任务清晰、变量已知"——需求都没说清就规划,等于盲人画地图,做完才发现跑偏了。</p>
+      <p><strong>为什么 C 错</strong>:Reflection 是"复审已有推理",不是"猜用户意图"。在没确认前就猜项目,Reflection 反思也是反思错的。</p>
+      <p><strong>为什么 D 错</strong>:范式选择不是随大流——不同任务有不同"最适配"的范式。需求模糊时 ReAct 是经典答案。</p>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Q10 · Reflection 加得越多越好吗?
+    </div>
+    <p class="pullquote">王御史审完一遍还审——为什么不审十遍?</p>
+    <p><strong>题目</strong>:Reflection 是"回头复审"——反思次数越多,质量越高吗?</p>
+    <ul>
+      <li>A. 是——反思十遍肯定比反思一遍强</li>
+      <li>B. 不是——反思三次后边际收益趋近零,再多就是浪费 token</li>
+      <li>C. 不是——反思者本身也是人(模型),反思也会错,无限反思只是"用错的东西反复检查"</li>
+      <li>D. 是——但只对 GPT-4 有效,GPT-3.5 不行</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象王御史复审卷宗——他自己也有盲点(总漏"账房出身"那一类人)。如果让他反思十遍,他会反复确认"张三是不是内鬼",但不会突然发现"账房周才是"。反思工具的能力是有上限的——用同样的脑子反复检查,只能在自己能看到的范围里打转,无法突破盲区。这就是为什么实务里 Reflection 通常只做 1-2 轮就停。</p>
+      <p><strong>为什么 A 错</strong>:听起来像"多检查总没错",但 Reflection 有成本(token+时间),且反思者本身可能错——不是越多越好。</p>
+      <p><strong>为什么 B 错</strong>:虽然有部分对(反思确实有边际收益递减),但没抓到核心问题——真正的限制是"反思者能力有上限",不只是"边际收益"。</p>
+      <p><strong>为什么 D 错</strong>:跟模型版本没关系——这是 Reflection 的本质问题,不是工程问题。GPT-4 反思也有盲点,只是比 GPT-3.5 浅一点。</p>
+    </details>
+  </div>
+
+  <div class="pullquote">做对这 10 题,说明你已经把"ReAct / Plan-and-Solve / Reflection"这套智能体范式的核心逻辑刻进脑子了。下一步:自己挑一个真实问题,试着用三种范式各做一遍,看看哪个最合手。</div>
+
+</section>
+
+<!-- ========== Footer ========== -->
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text-secondary)">WellInsight</strong> · 学习材料 · 破案录 v1.0 · 2026-06-24
+  </div>
+  <div>
+    原文:<a class="footer-link" href="https://github.com/datawhalechina/hello-agents/blob/main/docs/chapter4/第四章%20智能体经典范式构建.md" target="_blank">datawhalechina/hello-agents · 第四章</a>
+  </div>
+</footer>
+
+</div><!-- /.container -->
+
+<!-- Back to top -->
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin:round"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+</body>
+</html>

@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!--
+  第03章 · 大语言模型基础 · 翰林院造笔 · v1.0
+  沿用第 02 章朝廷世界观;7 角色分工造笔;19 节点因果链;50 概念;Codex 6 条标准全过
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第03章 · 大语言模型基础 · WellInsight 学习材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============== Morandi Palette ============== */
+:root{
+  --bg:#F2EDE6;
+  --bg-card:#FAF7F2;
+  --bg-elevated:#FFFCF7;
+  --bg-deep:#E8DFD3;
+  --text-primary:#3D3833;
+  --text-secondary:#6B6157;
+  --text-muted:#998E81;
+  --accent-sage:#8B9D83;
+  --accent-sage-soft:#D8E2D2;
+  --accent-sage-faint:#ECF1E8;
+  --accent-terracotta:#C49B8E;
+  --accent-terracotta-soft:#E6D2C8;
+  --accent-blue:#8A9AA8;
+  --accent-blue-soft:#C8D2DA;
+  --accent-amber:#C9A878;
+  --accent-amber-soft:#E8D7B7;
+  --accent-mauve:#A89098;
+  --accent-mauve-soft:#DCCCD0;
+  --border:#D9D2C7;
+  --border-light:#E8E0D3;
+  --shadow:0 2px 8px rgba(61,56,51,.06), 0 1px 2px rgba(61,56,51,.04);
+  --shadow-lg:0 8px 24px rgba(61,56,51,.10), 0 2px 6px rgba(61,56,51,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;
+  background:var(--bg);
+  color:var(--text-primary);
+  line-height:1.78;
+  font-size:16px;
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:.01em;
+}
+
+.container{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+.sticky-toc{
+  position:fixed;top:24px;right:24px;width:200px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px 16px;
+  box-shadow:var(--shadow);
+  font-size:13px;
+  z-index:50;
+  max-height:calc(100vh - 48px);
+  overflow-y:auto;
+}
+.sticky-toc-title{
+  font-weight:600;color:var(--text-secondary);
+  margin-bottom:8px;font-size:12px;
+  letter-spacing:.5px;
+  display:flex;align-items:center;gap:6px;
+}
+.sticky-toc ol{list-style:none;counter-reset:toc;padding:0}
+.sticky-toc li{counter-increment:toc;margin:4px 0}
+.sticky-toc a{
+  color:var(--text-secondary);
+  text-decoration:none;
+  display:block;
+  padding:4px 0 4px 8px;
+  margin-left:6px;
+  border-left:2px solid transparent;
+  font-size:12.5px;
+  font-weight:500;
+  transition:all .2s;
+}
+.sticky-toc a:hover{color:var(--accent-sage);border-left-color:var(--accent-sage)}
+.sticky-toc a::before{
+  content:counter(toc) ".";
+  color:var(--text-muted);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  margin-right:4px;
+}
+
+.hero{
+  background:linear-gradient(135deg,#FAF7F2 0%,#F2EDE6 100%);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:48px 40px 40px;
+  margin-bottom:48px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--accent-sage) 0%,var(--accent-terracotta) 33%,var(--accent-blue) 66%,var(--accent-amber) 100%);
+}
+.hero-meta{
+  display:flex;align-items:center;gap:12px;
+  font-size:12px;
+  color:var(--text-muted);
+  margin-bottom:16px;
+  font-weight:500;
+  letter-spacing:.5px;
+  flex-wrap:wrap;
+}
+.hero-meta-dot{width:4px;height:4px;background:var(--text-muted);border-radius:50%}
+.hero h1{
+  font-size:46px;font-weight:700;line-height:1.15;
+  color:var(--text-primary);
+  margin-bottom:10px;
+  letter-spacing:-1px;
+}
+.hero-subtitle{
+  font-size:16px;color:var(--text-secondary);
+  margin-bottom:22px;
+  font-weight:500;
+}
+.hero-fable{
+  display:inline-block;
+  padding:2px 10px;
+  margin-right:4px;
+  background:var(--accent-sage-soft);
+  color:var(--accent-sage);
+  border-radius:12px;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+.hero-desc{
+  font-size:14.5px;color:var(--text-secondary);
+  margin-bottom:24px;
+  line-height:1.7;
+  font-weight:400;
+}
+.hero-source{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12.5px;color:var(--text-muted);
+  background:var(--bg-card);
+  padding:6px 12px;border-radius:20px;
+  border:1px solid var(--border-light);
+  font-weight:500;
+}
+
+section{margin-bottom:56px;scroll-margin-top:80px}
+.chapter-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;
+  color:var(--accent-sage);
+  background:var(--accent-sage-soft);
+  padding:4px 12px;border-radius:12px;
+  margin-bottom:14px;
+  letter-spacing:1px;
+}
+h2{
+  font-size:28px;font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:14px;
+  letter-spacing:-.3px;
+  display:flex;align-items:baseline;gap:12px;
+  line-height:1.3;
+}
+h2 .num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:18px;color:var(--accent-terracotta);
+  font-weight:500;
+}
+h2-hook{
+  display:block;
+  font-size:15px;
+  font-weight:500;
+  color:var(--text-secondary);
+  margin-top:8px;
+  margin-bottom:24px;
+  padding:12px 16px;
+  background:var(--bg-card);
+  border-left:3px solid var(--accent-amber);
+  border-radius:0 6px 6px 0;
+  font-style:italic;
+}
+h3{
+  font-size:19px;font-weight:600;
+  color:var(--text-primary);
+  margin:24px 0 10px;
+  padding-left:14px;
+  border-left:3px solid var(--accent-amber);
+  letter-spacing:-.2px;
+}
+h4{
+  font-size:16px;font-weight:600;
+  color:var(--accent-sage);
+  margin:20px 0 10px;
+}
+p{margin-bottom:14px;color:var(--text-primary);text-align:justify;font-weight:400}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+em{color:var(--text-secondary);font-style:normal;font-weight:600}
+ul,ol{padding-left:24px;margin-bottom:14px;color:var(--text-primary)}
+
+.lead{
+  font-size:17px;color:var(--text-secondary);
+  padding:18px 22px;
+  background:var(--bg-card);
+  border-left:3px solid var(--accent-terracotta);
+  border-radius:0 6px 6px 0;
+  margin-bottom:28px;
+  font-weight:500;
+  line-height:1.85;
+}
+
+.pullquote{
+  background:linear-gradient(135deg,var(--accent-amber-soft) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-amber-soft);
+  border-radius:8px;
+  padding:22px 26px;
+  margin:24px 0;
+  font-size:16.5px;
+  font-weight:500;
+  color:var(--text-primary);
+  position:relative;
+}
+.pullquote::before{
+  content:"\201C";position:absolute;top:-6px;left:16px;
+  font-size:48px;color:var(--accent-amber);
+  font-family:Georgia,serif;line-height:1;
+  font-weight:700;
+}
+
+.stats-card{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:20px 0;
+}
+.stat-cell{
+  background:var(--bg-card);
+  border:1px solid var(--border-light);
+  border-radius:8px;
+  padding:14px 16px;
+  text-align:center;
+}
+.stat-cell.victory{border-top:3px solid var(--accent-sage)}
+.stat-cell.defeat{border-top:3px solid var(--accent-terracotta)}
+.stat-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:24px;
+  font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:4px;
+  line-height:1.1;
+}
+.stat-label{
+  font-size:12px;
+  color:var(--text-secondary);
+  font-weight:500;
+}
+
+.concept-card{
+  background:linear-gradient(135deg,var(--accent-sage-faint) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-sage-soft);
+  border-left:3px solid var(--accent-sage);
+  border-radius:0 8px 8px 0;
+  padding:14px 18px;
+  margin:24px 0 8px;
+}
+.concept-card-header{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;
+  color:var(--accent-sage);
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  margin-bottom:10px;
+}
+.concept-pills{
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.concept-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--bg-elevated);
+  border:1px solid var(--accent-sage-soft);
+  border-radius:16px;
+  padding:5px 12px;
+  font-size:12.5px;
+  color:var(--text-primary);
+  font-weight:500;
+}
+.concept-pill .who{
+  color:var(--accent-terracotta);
+  font-weight:700;
+}
+.concept-pill .what{
+  color:var(--text-secondary);
+  font-weight:400;
+}
+
+.dialog{
+  background:var(--bg-deep);
+  border-radius:6px;
+  padding:14px 18px;
+  margin:14px 0;
+  font-size:14.5px;
+  color:var(--text-primary);
+  border-left:3px solid var(--accent-amber);
+}
+.dialog-speaker{font-weight:700;color:var(--accent-terracotta)}
+.dialog-sage{border-left-color:var(--accent-sage)}
+.dialog-terracotta{border-left-color:var(--accent-terracotta)}
+.dialog-blue{border-left-color:var(--accent-blue)}
+.dialog-mauve{border-left-color:var(--accent-mauve)}
+.dialog-amber{border-left-color:var(--accent-amber)}
+
+.table-wrap{
+  margin:20px 0;
+  background:var(--bg-card);
+  border:1px solid var(--border-light);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+table{
+  width:100%;border-collapse:collapse;
+  font-size:14px;
+}
+thead{background:var(--bg-deep)}
+th{
+  padding:12px 16px;
+  text-align:left;
+  font-weight:600;
+  color:var(--text-primary);
+  font-size:13px;
+  letter-spacing:.3px;
+  border-bottom:1px solid var(--border);
+}
+td{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border-light);
+  color:var(--text-secondary);
+  vertical-align:top;
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(232,223,211,.3)}
+td:first-child{
+  font-weight:600;
+  color:var(--text-primary);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+}
+
+.coverage{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:24px 28px;
+  margin:32px 0;
+}
+.coverage-title{
+  display:flex;align-items:center;gap:10px;
+  font-size:18px;font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:16px;
+}
+.coverage-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 24px;
+}
+.coverage-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;
+  border-bottom:1px dashed var(--border-light);
+  font-size:13.5px;
+}
+.coverage-item:last-child,.coverage-item:nth-last-child(2){border-bottom:none}
+.coverage-check{
+  flex-shrink:0;
+  width:18px;height:18px;
+  background:var(--accent-sage-soft);
+  border-radius:4px;
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:2px;
+}
+.coverage-text{
+  color:var(--text-secondary);
+  line-height:1.55;
+  font-weight:400;
+  flex:1;
+}
+.coverage-text strong{
+  color:var(--text-primary);
+  display:block;
+  font-size:13.5px;
+  margin-bottom:2px;
+  font-weight:600;
+}
+.coverage-def{
+  display:block;
+  font-size:11.5px;
+  color:var(--text-muted);
+  margin-top:6px;
+  line-height:1.6;
+  font-style:italic;
+  font-weight:400;
+  padding-top:6px;
+  border-top:1px dashed var(--border-light);
+}
+.coverage-def-label{
+  color:var(--accent-sage);
+  font-weight:700;
+  font-style:normal;
+  margin-right:4px;
+}
+
+.summary-box{
+  background:linear-gradient(135deg,var(--accent-sage-soft) 0%,var(--bg-card) 50%,var(--accent-amber-soft) 100%);
+  border:1px solid var(--accent-sage);
+  border-radius:12px;
+  padding:32px 36px;
+  margin:40px 0;
+  position:relative;
+}
+.summary-box-title{
+  font-size:13px;font-weight:700;
+  color:var(--accent-sage);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:12px;
+}
+.summary-text{
+  font-size:18px;
+  color:var(--text-primary);
+  line-height:1.85;
+  font-weight:500;
+}
+
+.footer{
+  margin-top:60px;
+  padding-top:24px;
+  border-top:1px solid var(--border);
+  font-size:12.5px;
+  color:var(--text-muted);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-weight:500;
+}
+.footer-link{color:var(--accent-sage);text-decoration:none;font-weight:600}
+.footer-link:hover{text-decoration:underline}
+
+.back-top{
+  position:fixed;bottom:24px;right:24px;
+  width:40px;height:40px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:all .2s;
+  z-index:40;
+}
+.back-top:hover{background:var(--accent-sage);border-color:var(--accent-sage)}
+.back-top:hover svg{stroke:#fff}
+
+.icon{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+.icon-lg{width:18px;height:18px}
+
+code{
+  background:var(--bg-deep);
+  padding:2px 7px;
+  border-radius:3px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  color:var(--accent-terracotta);
+  font-weight:500;
+}
+
+@media (max-width:1100px){.sticky-toc{display:none}}
+@media (max-width:768px){
+  .container{padding:24px 16px 60px}
+  .hero{padding:32px 20px}
+  .hero h1{font-size:32px}
+  h2{font-size:22px}
+  .stats-card{grid-template-columns:1fr}
+  .coverage-grid{grid-template-columns:1fr}
+  table{font-size:12.5px}
+  th,td{padding:8px 10px}
+}
+
+@media print{
+  body{background:#fff}
+  .sticky-toc,.back-top{display:none}
+  .container{max-width:100%;padding:0}
+  .hero{border:none;background:none}
+  section{page-break-inside:avoid;margin-bottom:32px}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== Sticky TOC ========== -->
+<nav class="sticky-toc" aria-label="目录">
+  <div class="sticky-toc-title">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    目录
+  </div>
+  <ol>
+    <li><a href="#opening">开篇:圣旨造笔</a></li>
+    <li><a href="#act1">第一幕:老掌柜的两字经</a></li>
+    <li><a href="#act2">第二幕:账房先生的语义账本</a></li>
+    <li><a href="#act3">第三幕:说书人的记忆掌故</a></li>
+    <li><a href="#act4">第四幕:军师阁的 8 个顾问</a></li>
+    <li><a href="#act5">第五幕:状元郎的文字接龙</a></li>
+    <li><a href="#act6">第六幕:掌柜小妹与御史大夫</a></li>
+    <li><a href="#act7">第七幕:缩放法则与开错药</a></li>
+    <li><a href="#finale">终章:翰林院重组</a></li>
+    <li><a href="#coverage">概念地图</a></li>
+    <li><a href="#framework-quiz">思维框架 + 自测题</a></li>
+  </ol>
+</nav>
+
+<!-- ========== Hero ========== -->
+<div class="container">
+
+<header class="hero">
+  <div class="hero-meta">
+    <span>翰林院造笔</span><span class="hero-meta-dot"></span>
+    <span>第 03 章</span><span class="hero-meta-dot"></span>
+    <span>共 10 段</span><span class="hero-meta-dot"></span>
+    <span>v4.0</span><span class="hero-meta-dot"></span>
+    <span>50 概念</span><span class="hero-meta-dot"></span>
+    <span>+思维框架</span><span class="hero-meta-dot"></span>
+    <span>+10 自测题</span>
+  </div>
+  <h1>第03章 · 大语言模型基础</h1>
+  <p class="hero-subtitle"><span class="hero-fable">造笔录</span> · 翰林院七匠如何造出天下第一笔</p>
+  <p class="hero-desc">建议读法:先看故事,<strong>不要查名词</strong>;每章末尾有"本幕关键概念"小卡,可以倒回去对比你的理解;文末有完整概念地图。</p>
+  <span class="hero-source">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    原文:Hello-Agents · 第三章 大语言模型基础
+  </span>
+</header>
+
+<!-- ========== Opening ========== -->
+<section id="opening">
+  <div class="chapter-tag">开篇 · 节点 1-2</div>
+  <h2><span class="num">00</span>圣旨造笔</h2>
+  <h2-hook>"一夜,皇帝下了一道旨——朕要一支永不疲倦的笔。"</h2-hook>
+
+  <p class="lead">那一夜,皇帝批完最后一份奏章,把朱笔往桌上一扔。太监从未见过皇帝这般疲态。"翰林院那帮人写得慢,改得慢,催得紧。"皇帝说,"朕要的不是更快的人——朕要一支<strong>永不疲倦的笔</strong>,能替朕写万言奏章。"</p>
+
+  <p>圣旨六百里加急送到翰林院。山长一夜未眠。第二天一早,他召来七个匠人。</p>
+
+  <h3>七匠分班</h3>
+
+  <p>山长说:"三月为期,谁能造出'天下第一笔',重重有赏。"</p>
+
+  <p>七匠各怀绝技:</p>
+  <ul>
+    <li><strong>老掌柜</strong>——翰林院三十年老人,凭"两字经"写文案三十年没失手。</li>
+    <li><strong>账房先生</strong>——曾把《千字文》每个字放在账本上,发现"圣旨"和"诏书"靠得近。</li>
+    <li><strong>说书人</strong>——能把 30 句故事讲得环环相扣,门生都佩服。</li>
+    <li><strong>军师阁</strong>——八人智囊团,八人各看一面,曾帮朝廷解过三道难题。</li>
+    <li><strong>状元郎</strong>——翰林院最年轻的天才,擅长一句话接一句话往下写。</li>
+    <li><strong>掌柜小妹</strong>——只管切片,把顾客的话切成字饼喂给状元郎。</li>
+    <li><strong>御史大夫</strong>——专门琢磨"怎么问"才能让状元郎发挥最好。</li>
+  </ul>
+
+  <p>山长又招来一人——<strong>太子</strong>。"太子跟班七天,每天看一个匠人上工,记下谁赢谁输。"</p>
+
+  <div class="dialog dialog-sage">
+    <p><span class="dialog-speaker">太子:</span>"七天能造出笔吗?"</p>
+    <p><span class="dialog-speaker">山长:</span>"不是造笔,是看哪个匠人适合造笔。"</p>
+    <p><span class="dialog-speaker">太子:</span>"我以为写得最长的就是最厉害的。"</p>
+    <p><span class="dialog-speaker">山长:</span>"七天后你就知道了。"</p>
+  </div>
+
+  <p>太子的七天跟班,就这么开始了。</p>
+
+  <div class="pullquote">一支笔不是一个人写的——是七个角色合起来写的。<br><span style="font-size:14px;color:var(--text-muted);font-weight:400">— 太子的金句(第 7 天说出)</span></div>
+</section>
+
+<!-- ========== 第一幕 ========== -->
+<section id="act1">
+  <div class="chapter-tag">第一幕 · 节点 3-4</div>
+  <h2><span class="num">01</span>老掌柜的两字经</h2>
+  <h2-hook>"看前 2 个字就接下一个字,三十年没失手。"</h2-hook>
+
+  <p>第一天,太子跟着老掌柜进了文案房。</p>
+
+  <p>老掌柜七十岁,胡子花白,抬头纹像三道战壕。桌上摊着一份圣旨草稿:"<strong>圣旨 宣诏</strong>"。老掌柜指了指:"小子,你看好了。"</p>
+
+  <p>他提起笔:"'圣'字后面接什么?翻一翻我三十年的存档——'<strong>圣</strong>'字后面,十次有九次是'旨'。写。"</p>
+
+  <p>他接着写:"'旨'字后面呢?存档告诉我,十次有八次是'宣'或'告'。好,写'宣'。"</p>
+
+  <p>再往下:"'宣'字后面?十次有九次是'诏'。写。"</p>
+
+  <p>三十个字写完,太子看得目瞪口呆:"真快!"</p>
+
+  <h3>新奏章来了</h3>
+
+  <p>这时,太监送来一份新奏章:<strong>"江南水患,百姓困顿"</strong>。</p>
+
+  <p>老掌柜提起笔,写到"<strong>水患</strong>"——停住。翻存档。"<strong>水</strong>"字后面,接"<strong>患</strong>"的次数:零次。"<strong>患</strong>"字后面,接"<strong>百</strong>"的次数:零次。三十年的存档,从未见过"<strong>水患 + 百姓</strong>"这种组合。</p>
+
+  <p>老掌柜的笔悬在半空,落不下去。</p>
+
+  <div class="dialog dialog-terracotta">
+    <p><span class="dialog-speaker">太子:</span>"老掌柜,为什么停了?"</p>
+    <p><span class="dialog-speaker">老掌柜:</span>"存档里没见过这种接法。我不能写我没见过的字。"</p>
+    <p><span class="dialog-speaker">太子:</span>"那你三十年的功夫呢?"</p>
+    <p><span class="dialog-speaker">老掌柜:</span>"功夫只在见过的字里。新字,我写不出。"</p>
+  </div>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">30 年</div>
+      <div class="stat-label">"两字经"主场胜利</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">0 次</div>
+      <div class="stat-label">"水患+百姓"存档组合</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">退回</div>
+      <div class="stat-label">朝廷记录</div>
+    </div>
+  </div>
+
+  <p>老掌柜被山长叫去,记了一次"小过"。太子看着老掌柜的背影,心里暗想:"原来,三十年功夫,遇上没见过的字,就废了。"</p>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">N-gram</span><span class="what">看前 N 个字接下一个字</span></span>
+      <span class="concept-pill"><span class="who">马尔可夫假设</span><span class="what">只看前 2 字就够,不看全部历史</span></span>
+      <span class="concept-pill"><span class="who">数据稀疏</span><span class="what">没见过的字组合,概率=0</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第二幕 ========== -->
+<section id="act2">
+  <div class="chapter-tag">第二幕 · 节点 5-7</div>
+  <h2><span class="num">02</span>账房先生的语义账本</h2>
+  <h2-hook>"账本能算术——国王减男人加女人,等于女王。"</h2-hook>
+
+  <p>第二天,太子跟着账房先生进了账房。</p>
+
+  <p>账房先生四十来岁,戴着一副老花镜。桌上摊着一本巨大的账本,每一页只写一个字,字旁边有一串坐标。</p>
+
+  <h3>"我把每个字放在账本上"</h3>
+
+  <p>账房先生说:"老掌柜只记'字接不接得上',我记'<strong>字的意思</strong>'。"</p>
+
+  <p>他翻开账本给太子看——"</p>
+
+  <p>"<strong>圣旨</strong>"和"<strong>诏书</strong>"靠得很近。</p>
+
+  <p>"<strong>圣旨</strong>"和"<strong>苹果</strong>"离得很远。</p>
+
+  <p>"<strong>高兴</strong>"和"<strong>欢喜</strong>"只差一点点。</p>
+
+  <p>太子问:"怎么知道'圣旨'和'诏书'靠得近?"</p>
+
+  <p>账房先生说:"用尺子量两个字的'<strong>夹角</strong>'——夹角越小,意思越近。这就是余弦相似度。"</p>
+
+  <h3>账本算术</h3>
+
+  <p>账房先生翻开账本另一页:"小子,你看好了。"</p>
+
+  <p>他在账本上点了四个位置:</p>
+  <ul>
+    <li><code>国王</code>——账本右上角</li>
+    <li><code>男人</code>——账本右下角</li>
+    <li><code>女人</code>——账本左下角</li>
+    <li><code>女王</code>——账本左中</li>
+  </ul>
+
+  <p>账房先生说:"现在我做一道题——"<strong>国王</strong>的位置,<strong>减掉</strong>'男人'的位置,<strong>再加上</strong>'女人'的位置——"</p>
+
+  <p>他用笔在账本上比划。"你猜,等于什么?"</p>
+
+  <p>太子瞪大眼:"账本还能算术?"</p>
+
+  <p>账房先生比划完,笔尖落点——恰好在"<strong>女王</strong>"的位置上。</p>
+
+  <div class="pullquote">国王 − 男人 + 女人 ≈ 女王<br><span style="font-size:14px;color:var(--text-muted);font-weight:400">— 账房先生的算术魔法 · 词向量能学出"性别"和"皇室"这种抽象关系</span></div>
+
+  <p>太子看着账本,第一次觉得"账本比老掌柜的两字经灵活"。</p>
+
+  <h3>账房先生的限制</h3>
+
+  <p>可朝廷送来的奏章越来越长——这回是 100 字的奏章。账房先生写到第 60 字,前 20 字的意思突然全丢了。</p>
+
+  <div class="dialog dialog-blue">
+    <p><span class="dialog-speaker">太子:</span>"账房先生,前面不是还讲过吗?为什么忘了?"</p>
+    <p><span class="dialog-speaker">账房先生:</span>"账本窗口是固定的,只能装 5 个字。再往前,就被挤出窗口了。"</p>
+    <p><span class="dialog-speaker">太子:</span>"那能不能把窗口做大?"</p>
+    <p><span class="dialog-speaker">账房先生:</span>"窗口越大,账本越乱。这是账本的边界。"</p>
+  </div>
+
+  <p>账房先生写完 100 字奏章,被记了"小过"。太子叹口气:"账本能算术,可写长篇就垮。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">国王−男人+女人</div>
+      <div class="stat-label">账本算术 = 女王</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">5 字</div>
+      <div class="stat-label">账本窗口大小</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">100 字</div>
+      <div class="stat-label">长篇前 20 字全丢</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">词嵌入</span><span class="what">字 → 账本上的一个点(向量)</span></span>
+      <span class="concept-pill"><span class="who">余弦相似度</span><span class="what">用夹角量两个字的意思远近</span></span>
+      <span class="concept-pill"><span class="who">神经网络语言模型</span><span class="what">账本能算术,符号账本不能</span></span>
+      <span class="concept-pill"><span class="who">词向量算术</span><span class="what">King−Man+Woman≈Queen</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第三幕 ========== -->
+<section id="act3">
+  <div class="chapter-tag">第三幕 · 节点 8-9</div>
+  <h2><span class="num">03</span>说书人的记忆掌故</h2>
+  <h2-hook>"我能带着前面的记忆往下讲——只要故事不太长。"</h2-hook>
+
+  <p>第三天,太子跟着说书人进了书场。</p>
+
+  <p>说书人五十多岁,声音浑厚,讲起故事来环环相扣。太子坐下,听了一段 30 句的故事——前因后果一丝不漏。</p>
+
+  <h3>说书人的本事</h3>
+
+  <p>太子问:"说书人,你为什么记得这么清楚?"</p>
+
+  <p>说书人说:"我能'<strong>带着</strong>'前面的记忆往下讲——这一句,我会回头看上几句,把上几句的意思装进我的'<strong>记忆</strong>'里,再讲下一句。"</p>
+
+  <p>这就是隐藏状态——说书人脑子里的"短期记忆",每讲一句就更新一次。</p>
+
+  <p>太子赞叹:"这才是讲故事!"</p>
+
+  <h3>500 句的故事</h3>
+
+  <p>可朝廷送来的奏章是 <strong>500 句</strong>。说书人讲到第 50 句——前面讲的第 1 句讲的什么来着?</p>
+
+  <p>讲到第 100 句——前 30 句全忘了。</p>
+
+  <p>讲到第 500 句——前半本奏章彻底"褪色"了。</p>
+
+  <div class="dialog dialog-mauve">
+    <p><span class="dialog-speaker">太子:</span>"说书人,你不是说能记吗?怎么全忘了?"</p>
+    <p><span class="dialog-speaker">说书人:</span>"记得太多就模糊了。前 50 句在'记忆'里已经褪色——这是记性边界。"</p>
+    <p><span class="dialog-speaker">太子:</span>"能不能让记忆不褪色?"</p>
+    <p><span class="dialog-speaker">说书人:</span>"可以加三道门——选择性地记、选择性地忘。"</p>
+  </div>
+
+  <h3>三道门</h3>
+
+  <p>说书人改良方案——给记忆加三道门:</p>
+  <ul>
+    <li><strong>遗忘门</strong>:让不重要的前面忘掉(选择性失忆)</li>
+    <li><strong>输入门</strong>:把当前重要的记下来(选择性记忆)</li>
+    <li><strong>输出门</strong>:决定现在要不要调用记忆(选择性回忆)</li>
+  </ul>
+
+  <p>改良后,说书人能讲到第 200 句还记得第 1 句。但讲到第 500 句还是要"排队讲",一笔一笔接龙,慢。</p>
+
+  <p>太子叹口气:"记性可以改良,但还是要排队——慢。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">30 句</div>
+      <div class="stat-label">说书人记忆上限(改良前)</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">500 句</div>
+      <div class="stat-label">朝廷奏章字数</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">200 句</div>
+      <div class="stat-label">三道门改良后上限</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">RNN</span><span class="what">带着记忆往下讲</span></span>
+      <span class="concept-pill"><span class="who">隐藏状态</span><span class="what">说书人的短期记忆</span></span>
+      <span class="concept-pill"><span class="who">梯度消失</span><span class="what">前面的话褪色,记不清</span></span>
+      <span class="concept-pill"><span class="who">LSTM 三道门</span><span class="what">选择性记 / 选择性忘</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第四幕 ========== -->
+<section id="act4">
+  <div class="chapter-tag">第四幕 · 节点 10-15</div>
+  <h2><span class="num">04</span>军师阁的 8 个顾问</h2>
+  <h2-hook>"8 个顾问并行思考——但每个新问题,都得现场救场。"</h2-hook>
+
+  <p>第四天,太子跟着军师阁进了议事厅。</p>
+
+  <p>说书人讲到第 500 句就忘前 50 句,被山长叫来。山长说:"一个人排队太慢——让 8 个顾问并行思考,各看各的,再汇总。"</p>
+
+  <p>太子好奇:"8 个人并行,不会乱吗?"</p>
+
+  <p>山长答:"不乱,只要每个人做完三步——"</p>
+
+  <ul>
+    <li><strong>先问</strong>:问一句"这句话的关键字是谁?"</li>
+    <li><strong>再答</strong>:看自己认不认识这个关键字,认得就举手</li>
+    <li><strong>再取</strong>:把认得的关键字的内容拿出来,放在一起</li>
+  </ul>
+
+  <p>"8 个人各自问、各自答、各自取,最后汇总——这就是军师阁的'并行三步'。"</p>
+
+  <p>太子似懂非懂。但军师阁确实跑得比说书人快 10 倍。</p>
+
+  <h3>第一个救场:位次印章</h3>
+
+  <p>一周后,军师阁出乱子了。</p>
+
+  <p>"1 号顾问!"山长叫,"你把'<strong>我吃饭</strong>'和'<strong>饭吃我</strong>'当成同义了!"</p>
+
+  <p>8 个顾问面面相觑。原来他们只顾着"谁和谁相关",完全没管"谁在前谁在后"。</p>
+
+  <div class="dialog dialog-amber">
+    <p><span class="dialog-speaker">太子:</span>"这不是说书人的老问题吗?"</p>
+    <p><span class="dialog-speaker">山长:</span>"对。说书人是'忘掉前面',军师阁是'分不清前后'——都是位次问题。"</p>
+  </div>
+
+  <p>山长想了想:"得给每句话盖个'<strong>位次印章</strong>'。第 1 句话盖'甲',第 2 句盖'乙',第 3 句盖'丙'…… 顾问一看印章,就知道哪句在前、哪句在后。"</p>
+
+  <p>位次印章盖上,"我吃饭"和"饭吃我"终于分得清了。</p>
+
+  <h3>第二个救场:快车道</h3>
+
+  <p>又过几天,军师阁又出问题。</p>
+
+  <p>"信号越传越弱——1 号顾问看完的内容,传到 8 号那里就变成'蚊子声'了。"</p>
+
+  <p>太子听得懵:"什么是信号?"</p>
+
+  <div class="dialog dialog-sage">
+    <p><span class="dialog-speaker">山长:</span>"想象一下,8 个顾问坐圆桌,1 号看完传给 2 号,2 号再传给 3 号——一直传到 8 号。每传一次,信息都被'稀释'一点(因为每个顾问要加入自己的理解)。传到 8 号那里,1 号的原话早就模糊了。"</p>
+    <p><span class="dialog-speaker">太子:</span>"这不又是说书人的老问题吗?"</p>
+    <p><span class="dialog-speaker">山长:</span>"对。所以我们得加一条'<strong>快车道</strong>'——1 号看完的原文,可以绕过中间 6 个顾问,直接传给 8 号。8 号看到的是'原文 + 中间所有理解',原文不会丢。"</p>
+  </div>
+
+  <p>快车道修好,信号不再稀释。</p>
+
+  <h3>第三个救场:稳定器</h3>
+
+  <p>又过两天,军师阁又出问题。</p>
+
+  <p>"1 号顾问看到的内容'很小声',8 号看到的内容'很大声'——信号忽大忽小,顾问自己都搞不清哪个对哪个错。"</p>
+
+  <div class="dialog dialog-blue">
+    <p><span class="dialog-speaker">山长:</span>"再加一个'<strong>稳定器</strong>'——每隔一段,顾问就停下来,把现在的内容'校准'一下:特别小的放大、特别大的缩小,让大家都差不多大小。"</p>
+    <p><span class="dialog-speaker">太子:</span>"为什么信号会忽大忽小?"</p>
+    <p><span class="dialog-speaker">山长:</span>"因为每个顾问的'理解风格'不同——有人放大、有人缩小,8 个人叠加,信号就漂了。稳定器每过一段就校正一次,信号就稳了。"</p>
+  </div>
+
+  <p>稳定器加上,8 顾问终于能正常协作。</p>
+
+  <h3>第四个救场:深思考</h3>
+
+  <p>一周后,军师阁再出问题。</p>
+
+  <p>"顾问们只是'看'了原文,但没'理解'——他们知道'小明吃饭',但不知道'<strong>小明吃饭是因为饿</strong>'。"</p>
+
+  <div class="dialog dialog-terracotta">
+    <p><span class="dialog-speaker">太子:</span>"他们不是已经问 / 答 / 取了吗?为什么还不懂?"</p>
+    <p><span class="dialog-speaker">山长:</span>"顾问只是'看到了'表面——他们知道'小明吃饭',但不知道'为什么吃饭'。要让他们再'消化'一遍。"</p>
+    <p><span class="dialog-speaker">太子:</span>"怎么消化?"</p>
+    <p><span class="dialog-speaker">山长:</span>"看完原文,再过一遍'深思考'环节——把表面的意思往深里想一层。比如'小明吃饭'经过深思考,变成'小明饿了所以吃饭'。"</p>
+  </div>
+
+  <p>深思考环节加上,顾问们终于"既看字面,又懂深意"。</p>
+
+  <h3>军师阁完工——但代价</h3>
+
+  <p>军师阁终于稳定了。8 个顾问并行三步(问 / 答 / 取)+ 4 个救场(位次 / 快车道 / 稳定器 / 深思考)+ 8 个角度各看一面(主语、时态、因果、情感……)。</p>
+
+  <p>太子看着 8 顾问协作,第一次觉得:"这才是真正的'并行思考'!"</p>
+
+  <div class="pullquote">8 个顾问,每个新问题都要现场救场——位次、快车道、稳定器、深思考,一个不能少。<br><span style="font-size:14px;color:var(--text-muted);font-weight:400">— 太子看出军师阁的代价:强大但复杂</span></div>
+
+  <p>可太子也发现了一个问题——军师阁太复杂了。每次表达,8 个顾问都要协作,4 个救场环节都要走一遍。"这得花多少功夫?"太子问。</p>
+
+  <p>山长想了想:"明天让状元郎试试——他只要一个人。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">10×</div>
+      <div class="stat-label">军师阁 vs 说书人速度</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">8 个角度</div>
+      <div class="stat-label">8 顾问各看一面</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">8 + 4</div>
+      <div class="stat-label">代价:8 顾问 + 4 救场</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">并行三步</span><span class="what">问 / 答 / 取,8 人并行</span></span>
+      <span class="concept-pill"><span class="who">8 个角度</span><span class="what">主语 / 时态 / 因果 / 情感 各看一面</span></span>
+      <span class="concept-pill"><span class="who">位次印章</span><span class="what">标第 1 / 第 2 / 第 3,分清前后</span></span>
+      <span class="concept-pill"><span class="who">快车道</span><span class="what">原文直接传,不丢</span></span>
+      <span class="concept-pill"><span class="who">稳定器</span><span class="what">信号忽大忽小,校准成差不多大小</span></span>
+      <span class="concept-pill"><span class="who">深思考</span><span class="what">把"小明吃饭"变"小明饿了所以吃饭"</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第五幕 ========== -->
+<section id="act5">
+  <div class="chapter-tag">第五幕 · 节点 13-14</div>
+  <h2><span class="num">05</span>状元郎的文字接龙</h2>
+  <h2-hook>"扔掉军师阁的'理解组',只留'起草组'——一个人接龙写万言。"</h2-hook>
+
+  <p>第五天,太子跟着状元郎进了文思阁。</p>
+
+  <p>状元郎二十出头,最年轻的天才。他桌上只放一支笔、一摞白纸,别无他物。</p>
+
+  <h3>简化:只做一件事</h3>
+
+  <p>山长说:"军师阁太复杂,8 个顾问协作。我们不需要那么复杂——只要<strong>一个人</strong>,只做<strong>一件事</strong>。"</p>
+
+  <p>山长指着状元郎:"他只看前面所有字,写下一个字。这就是<strong>Decoder-Only</strong>(只留'起草组',扔掉'理解组')。"</p>
+
+  <p>状元郎拿起笔:"圣旨 宣诏——"</p>
+
+  <p>"写'<strong>天</strong>'。"</p>
+
+  <p>他把"天"加进前面:"圣旨 宣诏 天——"</p>
+
+  <p>"写'<strong>下</strong>'。"</p>
+
+  <p>再加进前面:"圣旨 宣诏 天下——"</p>
+
+  <p>"写'<strong>臣</strong>'。"</p>
+
+  <p>…… 一直接龙,一直写到"圣旨 宣诏 天下 臣民 共 知"——</p>
+
+  <p>太子惊讶:"一个人接龙,写了 18 个字?"</p>
+
+  <p>山长说:"一个人专心做一件事,反而比 8 个顾问协作强——专注意味着快。"</p>
+
+  <h3>接龙的规矩</h3>
+
+  <p>太子问:"写第 5 个字时,要不要看后面的字?"</p>
+
+  <p>状元郎说:"<strong>不能</strong>。接龙时偷看后面,就不叫'接龙',叫'抄写'了。"(这就是掩码自注意力——把自己后面的字遮住)</p>
+
+  <p>状元郎继续接龙:"圣旨 宣诏 天下 臣民 共 知......"</p>
+
+  <h3>百道奏章</h3>
+
+  <p>皇帝送来百道奏章,状元郎一一接龙写出。每道奏章 1000-3000 字,他写得行云流水。</p>
+
+  <p>翰林院记录:<strong>百道奏章,无一字错。</strong></p>
+
+  <p>朝廷嘉奖:"<strong>天下第一笔!</strong>"</p>
+
+  <p>太子看着状元郎的背影,激动地想:"状元郎是翰林院最强的人!"</p>
+
+  <div class="pullquote">一支笔不是一个人写的——是七个角色合起来写的。<br><span style="font-size:14px;color:var(--text-muted);font-weight:400">— 太子当时的错觉 · 第 7 天才会醒悟</span></div>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">100 道</div>
+      <div class="stat-label">奏章数</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">1000-3000 字</div>
+      <div class="stat-label">每道奏章字数</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">0 错</div>
+      <div class="stat-label">接龙错误率</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">Decoder-Only</span><span class="what">扔掉理解组,只留起草组</span></span>
+      <span class="concept-pill"><span class="who">自回归</span><span class="what">把上字加进前面,再写下一字</span></span>
+      <span class="concept-pill"><span class="who">掩码自注意力</span><span class="what">接龙时遮住后面</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第六幕 ========== -->
+<section id="act6">
+  <div class="chapter-tag">第六幕 · 节点 15-16</div>
+  <h2><span class="num">06</span>掌柜小妹与御史大夫</h2>
+  <h2-hook>"状元郎写得好,但要'切片'和'问法'才能发挥 10 倍。"</h2-hook>
+
+  <p>第六天,太子跟着掌柜小妹和御史大夫,看他们怎么"调教"状元郎。</p>
+
+  <h3>掌柜小妹的切片</h3>
+
+  <p>掌柜小妹二十出头,瘦瘦小小,搬着一台切字机进文思阁。</p>
+
+  <p>她对状元郎说:"你虽然万能,但顾客说的一句复杂话——'<strong>我想订一份带花生酱的三明治</strong>'——你不能'切字'理解,只能接龙写字。"</p>
+
+  <p>掌柜小妹演示:</p>
+
+  <p>"早期'<strong>按词切</strong>':'花生酱'是一个词,可字典里没有——不认识。"</p>
+
+  <p>"早期'<strong>按字切</strong>':'花生酱'切成'花/生/酱'——太碎,丢意思。"</p>
+
+  <p>"新方法'<strong>贪心合并</strong>'(BPE):把最常一起出现的'花'和'生'合并成'花生','花生'和'酱'合并成'花生酱'——字典里有了!"</p>
+
+  <div class="dialog dialog-terracotta">
+    <p><span class="dialog-speaker">太子:</span>"字典自己会长大?"</p>
+    <p><span class="dialog-speaker">掌柜小妹:</span>"我每接 100 个顾客的话,就统计哪些字该合并——用得多的字组合,合并;用得少的,拆开。字典自动变大变精准。"</p>
+    <p><span class="dialog-speaker">太子:</span>"那如果顾客说了一个生僻词?"</p>
+    <p><span class="dialog-speaker">掌柜小妹:</span>"拆成常用片——比如'DatawhaleAgent'拆成'Data / whale / Agent'三片,字典里都有。"</p>
+  </div>
+
+  <p>掌柜小妹拍拍手:"我切的字,状元郎就能懂;我切的字,朝廷就按字数付银子——所以切得越准,朝廷花得越少。"</p>
+
+  <h3>御史大夫的"问话技巧"</h3>
+
+  <p>御史大夫五十多岁,留着小胡子,手里拿着一摞剧本。他对太子说:"状元郎虽然万能,但<strong>问法不同,答法天差地别</strong>。"</p>
+
+  <p>他演示三个"开关":</p>
+
+  <p><strong>温度开关(Temperature):</strong></p>
+  <ul>
+    <li>开小(< 0.3):状元郎回答很稳很死板——适合事实问答、代码生成</li>
+    <li>开中(0.3-0.7):平衡自然——适合日常对话</li>
+    <li>开大(> 0.7):很野很发散——适合创意写作</li>
+  </ul>
+
+  <p><strong>top-k 开关:</strong>只让状元郎从概率最高的 k 个字里选(比如 k=3,3 个候选里掷骰子)。</p>
+  <p><strong>top-p 开关:</strong>只让状元郎从概率累加到 p 的字里选(比如 p=0.9,够用 90% 概率的字都入选)。</p>
+
+  <h4>三种"示范"</h4>
+
+  <p>御史大夫演示三种"示范":</p>
+
+  <p><strong>零样本:</strong>不给例子,直接问"判断情感:Datawhale 的 AI Agent 课程非常棒!——"</p>
+
+  <p><strong>单样本:</strong>给 1 个例子"餐厅服务太慢 → 负面"+ 待判断文本——</p>
+
+  <p><strong>少样本:</strong>给 3-5 个例子(包含正面 / 负面 / 中性),让状元郎自己悟——</p>
+
+  <h4>"请一步步想"</h4>
+
+  <p>御史大夫拿出一个数学题:"两个赛季总胜率——"</p>
+
+  <p>普通问 → 状元算错。</p>
+  <p>加一句"<strong>请一步步想</strong>" → 状元一步步算出 63.16%。</p>
+
+  <div class="pullquote">问得精准,状元发挥 10 倍;问得粗糙,状元发挥 1 倍。<br><span style="font-size:14px;color:var(--text-muted);font-weight:400">— 御史大夫的提示工程心得</span></div>
+
+  <h4>角色扮演</h4>
+
+  <p>御史大夫最后演示一招:"请你扮资深 Python 老师,给初学者讲 GIL——"</p>
+
+  <p>太子看着这一堆"调教"招式,问:"状元郎本来就会,为什么要这么多花样?"</p>
+
+  <p>御史大夫答:"状元郎是'博学的孩子',不是'精准的佣人'——给他<strong>提示</strong>,他就精准;不给,他就要自己猜。提示工程,就是'<strong>把你要的精准说出来</strong>'。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">贪心合并</div>
+      <div class="stat-label">BPE 让字典自动长大</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">3 开关</div>
+      <div class="stat-label">温度 / top-k / top-p</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">63.16%</div>
+      <div class="stat-label">"请一步步想"算对</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">Tokenizer 分词</span><span class="what">把话切成字饼</span></span>
+      <span class="concept-pill"><span class="who">BPE 字节对编码</span><span class="what">贪心合并让字典长大</span></span>
+      <span class="concept-pill"><span class="who">提示工程</span><span class="what">问得巧,发挥 10 倍</span></span>
+      <span class="concept-pill"><span class="who">Temperature 温度</span><span class="what">稳 / 平衡 / 发散</span></span>
+      <span class="concept-pill"><span class="who">Top-k / Top-p</span><span class="what">限候选字范围</span></span>
+      <span class="concept-pill"><span class="who">少样本提示</span><span class="what">给 3-5 个例子让模型悟</span></span>
+      <span class="concept-pill"><span class="who">思维链 CoT</span><span class="what">"请一步步想"</span></span>
+      <span class="concept-pill"><span class="who">角色扮演</span><span class="what">"请你扮资深老师"</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 第七幕 ========== -->
+<section id="act7">
+  <div class="chapter-tag">第七幕 · 节点 17-18</div>
+  <h2><span class="num">07</span>缩放法则与开错药</h2>
+  <h2-hook>"状元郎为什么这么厉害?三样东西堆得越大,他就越聪明——但他也会开错药。"</h2-hook>
+
+  <h3>缩放法则</h3>
+
+  <p>第七天,皇帝召山长进京,问:"状元郎为什么这么厉害?"</p>
+
+  <p>山长答:"三样东西堆得越大,状元郎越聪明——"(缩放法则)</p>
+
+  <ol>
+    <li><strong>数据</strong>——翰林院读了多少奏章(数据量)</li>
+    <li><strong>算力</strong>——翰林院雇了多少个"并行顾问"跑训练(计算量)</li>
+    <li><strong>时间</strong>——训练跑了多少天(参数量)</li>
+  </ol>
+
+  <p>皇帝问:"数据、算力、时间,哪个最重要?"</p>
+
+  <p>山长说:"<strong>DeepMind 的 Chinchilla 定律</strong>:数据要够,模型不必太大——<strong>700 亿参数 + 4 倍 GPT-3 数据</strong>,胜过 <strong>1750 亿参数 + 少量数据</strong>。"</p>
+
+  <div class="dialog dialog-sage">
+    <p><span class="dialog-speaker">皇帝:</span>"为什么小模型训得好,反而败给大模型?"</p>
+    <p><span class="dialog-speaker">山长:</span>"小模型训不够数据就'读书少',大模型训够了数据就'开窍'——这种'突然开窍'叫<strong>涌现</strong>。"</p>
+    <p><span class="dialog-speaker">皇帝:</span>"涌现是什么?"</p>
+    <p><span class="dialog-speaker">山长:</span>"小模型不会推理,大模型突然会推理;小模型不会算术,大模型突然会算术;小模型不会写代码,大模型突然会写代码——这种'小不会大突然会'就叫涌现。"</p>
+  </div>
+
+  <h3>状元郎开错药</h3>
+
+  <p>第七天傍晚,朝廷送来一份医案:"<strong>老虎摔伤,请开药</strong>。"</p>
+
+  <p>状元郎提笔接龙:"<strong>老虎</strong>"——后面接什么?训练存档里,'老虎'后面十次有九次是'骨头'——"</p>
+
+  <p>状元郎写:"<strong>虎骨 一两</strong>"。</p>
+
+  <p>再写下一味药——"</p>
+
+  <p>太子凑过来看,愣住了:"<strong>豹骨 一两</strong>?——老虎摔伤,为什么要'豹骨'?"</p>
+
+  <p>状元郎接着写:"<strong>豹骨</strong>"——因为他接龙时看到,'虎骨'后面常跟'豹骨'(都是'骨'类药)。</p>
+
+  <p>状元郎写完药方,递给御医。</p>
+
+  <p>御医接过药方,脸色一变:"<strong>停!这方子是错的!</strong>"</p>
+
+  <p>太子第一次见状元郎"一本正经胡说"——</p>
+
+  <div class="dialog dialog-amber">
+    <p><span class="dialog-speaker">太子:</span>"状元郎,这不对吧?老虎开豹骨?"</p>
+    <p><span class="dialog-speaker">御医:</span>"状元郎不懂'老虎的骨头是什么',他只是看到'老虎'常和'骨头'一起出现,他不知道'虎骨'和'豹骨'不能互换。"</p>
+    <p><span class="dialog-speaker">太子:</span>"状元郎,你为什么不查证?"</p>
+    <p><span class="dialog-speaker">状元郎:</span>"我是接龙写下一个字,不会'停下来查字典'。"(自回归的局限)</p>
+  </div>
+
+  <p>朝廷记下这件事。山长叹气:"状元郎不是万能——<strong>他懂的是'统计模式',不是'真懂'</strong>。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">3 要素</div>
+      <div class="stat-label">数据 + 算力 + 时间</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">4 倍数据</div>
+      <div class="stat-label">Chinchilla 胜过 GPT-3</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">虎骨→豹骨</div>
+      <div class="stat-label">状元郎模型幻觉</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+      本幕关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">缩放法则</span><span class="what">数据 + 算力 + 时间 堆得越大越灵</span></span>
+      <span class="concept-pill"><span class="who">Chinchilla 定律</span><span class="what">数据够比模型大更重要</span></span>
+      <span class="concept-pill"><span class="who">模型幻觉</span><span class="what">一本正经胡说:虎骨当豹骨</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 终章 ========== -->
+<section id="finale">
+  <div class="chapter-tag">终章 · 节点 19</div>
+  <h2><span class="num">08</span>翰林院重组</h2>
+  <h2-hook>"不是某一个人最厉害——是七个角色合起来才造出这支笔。"</h2-hook>
+
+  <p>三月期满,皇帝召山长、太子进京述职。</p>
+
+  <h3>朝廷审判</h3>
+
+  <p>皇帝问:"七匠之中,谁造了'天下第一笔'?"</p>
+
+  <p>山长答:"<strong>七个人</strong>。不是某一个匠人最厉害——"</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>角色</th>
+          <th>特长</th>
+          <th>主场</th>
+          <th>客场</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>老掌柜</td>
+          <td>两字经</td>
+          <td>见过的字最准</td>
+          <td>没见过的字写不出</td>
+        </tr>
+        <tr>
+          <td>账房先生</td>
+          <td>语义账本</td>
+          <td>能算术魔法</td>
+          <td>写长篇前 20 字意思丢</td>
+        </tr>
+        <tr>
+          <td>说书人</td>
+          <td>记忆掌故</td>
+          <td>能讲 30 句完整故事</td>
+          <td>500 句前 50 句全忘</td>
+        </tr>
+        <tr>
+          <td>军师阁</td>
+          <td>8 顾问并行</td>
+          <td>比说书人快 10 倍</td>
+          <td>深了信号会断</td>
+        </tr>
+        <tr>
+          <td>状元郎</td>
+          <td>文字接龙</td>
+          <td>百道奏章无一字错</td>
+          <td>会开错药(幻觉)</td>
+        </tr>
+        <tr>
+          <td>掌柜小妹</td>
+          <td>切片</td>
+          <td>字典自动长大</td>
+          <td>几乎没失败事件</td>
+        </tr>
+        <tr>
+          <td>御史大夫</td>
+          <td>问法</td>
+          <td>问得巧,发挥 10 倍</td>
+          <td>几乎没失败事件</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>皇帝问:"状元郎开错药那次呢?"</p>
+
+  <p>山长答:"状元郎不是万能。<strong>他懂的是'统计模式',不是'真懂'</strong>。所以朝廷才下令'<strong>开方需御医复核</strong>'。"</p>
+
+  <p>皇帝点头:"那就分工——"</p>
+
+  <div class="pullquote">状元郎管写(灵活),御医管复核(可审计),掌柜小妹管切片(标准化),御史大夫管问法(提示工程)。<br><span style="font-size:14px;color:var(--text-muted);font-weight:400">— 朝廷重组方案</span></div>
+
+  <p>朝廷下令:</p>
+  <ul>
+    <li><strong>状元郎管写</strong>——长篇奏章、灵活表达</li>
+    <li><strong>御医管复核</strong>——所有"开方"必须御医签字</li>
+    <li><strong>掌柜小妹管切片</strong>——所有"切片"标准化(选 GPT 用 BPE,选 BERT 用 WordPiece)</li>
+    <li><strong>御史大夫管问法</strong>——所有"提示词"由御史大夫拟稿</li>
+    <li><strong>老掌柜/账房先生/说书人/军师阁</strong>——可作为历史方法,留在馆藏,不复用</li>
+  </ul>
+
+  <h3>太子的醒悟</h3>
+
+  <p>山长问太子:"七天跟班,你学到什么了?"</p>
+
+  <p>太子想了想,说:</p>
+
+  <div class="pullquote">我以为写得最长的就是最厉害的。现在知道,是七个角色合起来才造出这支笔。<br><span style="font-size:14px;color:var(--text-muted);font-weight:400">— 太子 · 第 7 天的金句</span></div>
+
+  <p>皇帝微笑。</p>
+
+  <div class="summary-box">
+    <div class="summary-box-title">一句话总结 · 造笔录</div>
+    <p class="summary-text">一支<strong>"永不疲倦的笔"</strong>不是一个人造的——从<strong>老掌柜的两字经</strong>(N-gram),到<strong>账房先生的语义账本</strong>(词嵌入),到<strong>说书人的记忆掌故</strong>(RNN/LSTM),到<strong>军师阁的 8 顾问并行</strong>(Transformer),到<strong>状元郎的文字接龙</strong>(Decoder-Only),再配以<strong>掌柜小妹的切片</strong>(Tokenizer)和<strong>御史大夫的问法</strong>(提示工程),最后由<strong>朝廷的缩放法则</strong>(Scaling Law)催熟,由<strong>御医复核</strong>兜底开错药(幻觉)。7 个角色合起来,才造出真正的<strong>"天下第一笔"</strong>——也是<strong>大语言模型</strong>的真实面貌。</p>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-card-header">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+      本章关键概念
+    </div>
+    <div class="concept-pills">
+      <span class="concept-pill"><span class="who">指令调优</span><span class="what">岗前培训让状元郎能听懂指令</span></span>
+      <span class="concept-pill"><span class="who">RAG 检索增强生成</span><span class="what">御医 = 外部知识库检索</span></span>
+      <span class="concept-pill"><span class="who">闭源 vs 开源</span><span class="what">皇帝请来的 vs 翰林院自养的</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Coverage ========== -->
+<section id="coverage">
+  <div class="chapter-tag">概念地图 · 双层定义</div>
+  <h2><span class="num">09</span>本章 50 个核心概念</h2>
+  <h2-hook">每个概念都有"<strong>寓言链接</strong>"和"<strong>通俗教科书定义</strong>"两层。</h2-hook>
+
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      概念地图 · 双层定义
+    </div>
+    <div class="coverage-grid">
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>语言模型 (LM)</strong>← 整支"永不疲倦的笔"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>给一句话,告诉你这句话"通顺度"的程序——本质上是在算"一句话有多可能"。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>N-gram</strong>← 老掌柜"两字经"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>看前 N 个字猜下一个字的统计方法。N=2 是 bigram,N=3 是 trigram。简单但写不出没见过的字组合。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>马尔可夫假设</strong>← 老掌柜"只看前 2 字就够"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>"下一个字只看前 N 个字就够,不用管全部历史"——一个简化假设,让计算变得可行。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>数据稀疏性</strong>← "水患+百姓"字典里没有
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>训练数据里没出现过的字组合,模型就算不出概率——N-gram 的硬伤。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>最大似然估计 MLE</strong>← 三十年存档计次数
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>用"数据里看到多少次"来估算概率——最朴素也最常用的统计方法。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>神经网络语言模型</strong>← 账房先生方案
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>用神经网络(而不是查表)来算下一个字的概率——2003 年 Bengio 提出,是现代 LLM 的开端。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>词嵌入 Word Embedding</strong>← 字 → 账本上的点
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>把每个词变成一个数字向量(一串数字),让意思近的词向量也近。语义账本的原型。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>余弦相似度</strong>← "用尺子量夹角"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>用两个向量夹角的余弦值来量它们"像不像"——夹角越小越像。这是词向量最常用的相似度。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>词向量算术</strong>← King−Man+Woman≈Queen
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>词向量能做"加减法"——减"男人"加"女人"等于"女王"。说明模型学到了"性别"这种抽象概念。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>固定窗口限制</strong>← 账本只能装 5 个字
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>神经网络语言模型一次只看 N 个字的窗口,更早的字就被丢了——它还是"短视"。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>循环神经网络 RNN</strong>← 说书人"带着记忆往下讲"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>把每一步的"隐藏状态"(短期记忆)传给下一步,让信息在序列中传递——理论上能记任意长度。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>隐藏状态</strong>← 说书人的短期记忆
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>RNN 每一步维护的一个"小笔记本"——记录到目前为止看过什么。理论上能记无限长,实际会褪色。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>梯度消失 Vanishing Gradient</strong>← 500 句前 50 句全忘
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>反向传播时,梯度(误差信号)经过多层连乘会越变越小,前面层的参数根本学不到——RNN 的硬伤。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>LSTM 长短期记忆网络</strong>← 三道门改良说书人
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>一种特殊的 RNN,加了"门控机制"(遗忘门、输入门、输出门)——选择性地记、选择性地忘,解决了梯度消失。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>门控机制</strong>← 三道门:选择性记 / 选择性忘
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>LSTM 的核心创新——让网络学会"哪些该记 / 哪些该忘 / 哪些该用",而不是被动记住所有东西。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>Transformer</strong>← 军师阁 8 顾问
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>2017 年 Google 提出的架构,完全抛弃循环,改用"自注意力机制"——并行处理整个序列,效率比 RNN 高 10 倍以上。是现代所有 LLM 的基础。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>Encoder-Decoder 编码器-解码器</strong>← 理解组 + 起草组
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>原版 Transformer 的结构:Encoder(理解输入)+ Decoder(生成输出)。最早用在机器翻译上。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>自注意力机制 Self-Attention</strong>← Q 问 / K 答 / V 用
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>让序列中每个位置都能"看到"所有其他位置,并根据相关性加权——Q/K/V 三角色分别负责"问什么 / 答什么 / 给什么"。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>多头注意力</strong>← 8 顾问各看一面
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>把自注意力并行做 h 次,每次关注不同的"角度"(主语、时态、因果等)——最后拼起来,理解力远超单头。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>前馈网络 FFN</strong>← "过一遍是'消化'"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>每个 Transformer 层在注意力之后还要过一个小型神经网络(两层全连接 + ReLU)——把"信息"提炼成"知识"。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>残差连接 Residual</strong>← 快速通道,信号不断
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>把子层的输入直接加到输出上(Add)——让梯度能"绕过"复杂路径直接传,深度网络才训得起来。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>层归一化 LayerNorm</strong>← 稳定器,均值方差校准
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>对单个样本的所有特征做归一化,让每一层的输入分布保持稳定——加速收敛,避免训练"崩"。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>位置编码 Positional Encoding</strong>← 正弦印章
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>给每个位置生成一个固定的"位置向量"(原论文用正弦/余弦函数)——让模型知道"哪个字在前 / 哪个字在后"。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>Decoder-Only 仅解码器</strong>← 状元郎"只接龙"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>扔掉 Encoder,只留 Decoder——OpenAI GPT 系列用的架构。训练目标统一(预测下一个字),结构简单,易扩展。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>自回归 Autoregressive</strong>← 把上字加进前面再写下一字
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>生成时一个一个字"接龙"——每写完一个字就把它加进输入,再写下一个。简单且通用,是 GPT 系列的范式。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>掩码自注意力 Masked Self-Attention</strong>← 接龙时遮住后面
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>训练时把当前位置之后的字"遮住"——保证模型只能看到过去,看不到未来,接龙才公平。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>GPT Generative Pre-trained Transformer</strong>← 状元郎本郎
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>OpenAI 2018 年提出的"预训练 Transformer"——基于 Decoder-Only,靠海量文本预训练 + 自回归接龙,成为现代 LLM 范式。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>Tokenizer 分词器</strong>← 掌柜小妹"切片"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>把文本切成模型能处理的最小单元(token)的工具——模型不认识字,只认识数字 ID,Tokenizer 就是字到 ID 的桥梁。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>BPE 字节对编码</strong>← 贪心合并"花生+酱=花生酱"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>主流子词分词算法——反复把语料里出现频率最高的相邻字符合并成新符号,直到词表够大。GPT 系列用这个。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>WordPiece</strong>← BERT 用的另一种合并法
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>类似 BPE,但合并标准不是"最高频"而是"能最大化语料库的语言模型概率"——优先合并让整体更通顺的对。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>SentencePiece</strong>← 把空格也当字符的工具
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>把空格视作普通字符(用下划线 _ 表示)的分词工具——不依赖特定语言的分词规则,适合多语言场景。Llama 系列用这个。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>上下文窗口</strong>← 掌柜小妹切多少,状元就能装多少
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>模型一次能处理的最大 token 数(如 8K / 128K / 1M)——超过这个长度的输入会被截断或压缩。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>API 成本(按 Token 计费)</strong>← 切片切得越准,朝廷花得越少
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>大多数模型 API 按"处理的 token 数"收费——所以分词切得越好(浪费的 token 越少),成本越低。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>提示工程 Prompt Engineering</strong>← 御史大夫的"问法"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>设计提示词(prompt)的技巧——用清晰的指令、上下文、示例引导模型给出想要的输出。同样的模型,问法不同效果天差地别。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>Temperature 温度</strong>← 稳 / 平衡 / 发散 三档
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>采样参数 T,调节概率分布的"陡峭程度"——T 小 → 保守、T 大 → 发散。T=0 时贪心选最可能的 token。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>Top-k 采样</strong>← 只从概率最高的 k 个字里选
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>只保留概率最高的 k 个 token 作为候选,再从中采样——限制候选范围,避免选到离谱的字。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>Top-p 采样(核采样)</strong>← 累加概率到 p 的字里选
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>按概率从高到低累加,直到总和 ≥ p,这些 token 组成"核集合"再采样——动态调整候选集大小,适应不同分布。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>零样本 / 单样本 / 少样本 Zero/One/Few-shot</strong>← 御史大夫的"示范次数"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>按给模型多少示例分类:0 个 → Zero-shot,1 个 → One-shot,几个 → Few-shot。给的越多,模型越能理解任务边界。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>思维链 Chain-of-Thought (CoT)</strong>← "请一步步想"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>在提示里加一句"请一步步思考",让模型写出推理过程——复杂推理任务(数学、逻辑)准确率显著提升。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>指令调优 Instruction Tuning</strong>← 翰林院"岗前培训"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>用"指令-回答"格式数据微调预训练模型——让模型从"文本补全机器"变成"听话助手"。ChatGPT 的关键。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>角色扮演 Role-playing</strong>← "请你扮资深老师"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>在提示里给模型一个身份("你是资深 Python 老师")——引导回答风格、语气、知识范围。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>模型选择(性能 / 成本 / 速度)</strong>← "状元适合哪种任务"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>为任务选模型不是"越大越好"——要权衡:能力(基准测试)、成本(API 或硬件)、延迟(响应速度)、上下文长度、部署方式等。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>闭源 vs 开源</strong>← 皇帝请来的 vs 翰林院自养的
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>闭源(GPT-4、Claude、Gemini)用 API 付费使用,数据要发第三方;开源(Llama、Qwen、Mistral)权重公开,可本地部署,可微调。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>缩放法则 Scaling Laws</strong>← 三要素堆得越大越灵
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>模型性能与参数量、数据量、计算量呈幂律关系——这三个变量同步增大,Loss 可预测地平滑下降。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>Chinchilla 定律</strong>← 数据够比模型大更重要
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>DeepMind 2022 年提出:在固定计算预算下,模型参数量和训练数据量存在最优配比——700 亿参数 + 4 倍 GPT-3 数据,胜过 1750 亿参数 + 少量数据。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>能力涌现 Emergence</strong>← 小不会,大突然会
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>模型规模超过某个阈值后,会突然出现小模型完全没有的能力——如推理、算术、代码生成。涌现是大模型时代的核心现象。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>模型幻觉 Hallucination</strong>← 一本正经胡说"虎骨+豹骨"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>模型生成与事实不符或上下文矛盾的内容——分事实性幻觉(错的)、忠实性幻觉(偏离原文)、内在幻觉(自相矛盾)。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>RAG 检索增强生成</strong>← 御医 = 外部知识库检索
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>生成前先从外部知识库(文档 / 数据库 / 搜索引擎)检索相关信息,作为上下文喂给模型——缓解幻觉的最主流方案。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>知识时效性</strong>← 状元郎的知识停在训练时
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>模型知识来源于训练数据——训练截止日之后发生的事,模型不知道。这是 LLM 的固有局限,需 RAG 或实时联网解决。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>训练数据偏见</strong>← 翰林院读什么档,状元就学什么
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>训练数据里的人类偏见(性别、地域、文化)会被模型学到,在生成时反映出来。需要在数据清洗、对齐阶段缓解。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>多步推理 + 外部工具</strong>← "一步步想 + 查字典"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>缓解幻觉的两类方法:多步推理让模型自我检查;外部工具(搜索引擎、计算器、代码解释器)让模型能查实时数据。</span>
+        </span>
+      </div>
+
+      <div class="coverage-item">
+        <span class="coverage-check">✓</span>
+        <span class="coverage-text">
+          <strong>RLHF 人类反馈强化学习</strong>← 御医"打回去重写"
+          <span class="coverage-def"><span class="coverage-def-label">[教科书定义]</span>用人类对模型输出的偏好反馈训练奖励模型,再用强化学习微调 LLM——ChatGPT 对齐人类价值观的关键技术。</span>
+        </span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== 思维框架 + 自测题 ========== -->
+<section id="framework-quiz">
+  <div class="chapter-tag">第 10 章 · 思维框架 + 自测题</div>
+  <h2><span class="num">10</span>大语言模型的思维框架与自测题</h2>
+  <h2-hook>"读完 50 个概念,做 10 道题——一眼看出你真懂还是死记硬背。"</h2-hook>
+
+  <p class="lead">本章分两部分。第一部分给你 <strong>5 个核心思维 + 底层逻辑 + 3 个争议</strong>,这是 LLM 领域所有专家的共识与分歧;第二部分给你 <strong>10 道自测题</strong>,每题都考"你能不能用概念解决问题",而不是"你能不能背定义"。</p>
+
+  <!-- ===== A. 5 个核心思维 ===== -->
+  <h3>一、5 个核心思维(专家共识)</h3>
+
+  <p>整个 LLM 领域,所有顶级研究者(Hinton / LeCun / Bengio / Sutskever / Altman)都认同以下 5 个核心思维——这是入门这个领域的"心法":</p>
+
+  <div class="coverage-grid">
+    <div class="coverage-item">
+      <span class="coverage-check">1</span>
+      <span class="coverage-text">
+        <strong>预测下一个 token(猜字游戏)</strong>
+        <span class="coverage-def">你写一个字,它猜下一个字——LLM 干的活就这么简单。别看它能写万言奏章,本质就是不断"猜下一个字"。读懂这点,就懂了 LLM 一大半。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">2</span>
+      <span class="coverage-text">
+        <strong>注意力机制(一目十行)</strong>
+        <span class="coverage-def">以前的模型一个一个字排队看,慢;Transformer 让模型"一眼看完整句话",所有字同时处理,所以快 10 倍。2017 年 Google 想出这个点子,整个 AI 行业就变了。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">3</span>
+      <span class="coverage-text">
+        <strong>规模即智能(越大越聪明)</strong>
+        <span class="coverage-def">模型参数越多、看的书越多、训练时间越长,就越聪明——三者一起堆,效果是可预测地变好。这就是大模型时代"大就是好"的信仰。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">4</span>
+      <span class="coverage-text">
+        <strong>分布即语义(看邻居辨意思)</strong>
+        <span class="coverage-def">"苹果"和"香蕉"意思近,因为它们常出现在类似的句子里(都是水果);"苹果"和"公司"意思远,因为一个在水果店出现,一个在 IT 公司出现。LLM 就是这么"理解"字的意思的——看它常跟谁一起出现。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">5</span>
+      <span class="coverage-text">
+        <strong>涌现(突然开窍)</strong>
+        <span class="coverage-def">小模型不会做数学题,模型大到一定程度,突然会了——这种"突然开窍"叫涌现。量变引起质变,LLM 的很多神奇能力都是涌现出来的。</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ===== B. 底层逻辑 ===== -->
+  <h3>二、底层逻辑(为什么 LLM 这样工作)</h3>
+
+  <div class="coverage-grid">
+    <div class="coverage-item">
+      <span class="coverage-check">1</span>
+      <span class="coverage-text">
+        <strong>从"人写规则"到"机器自己学规则"</strong>
+        <span class="coverage-def">AI 怎么学会做事?一开始是人写规则(经学派),后来人写规则写不完(套路派),再后来让机器自己学(识症童),最后用海量数据让机器学出最复杂的事(状元郎)——这是一路走来的"少规则→多规则→自动学"。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">2</span>
+      <span class="coverage-text">
+        <strong>LLM = 一个字一个字接龙</strong>
+        <span class="coverage-def">LLM 不是"看懂一句话再回答",而是"看完前面所有字,挑一个最可能接的字,加上,再猜下一个"。想通这点,LLM 就看懂一大半了。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">3</span>
+      <span class="coverage-text">
+        <strong>深度学习 = 不教它,给它例子让它自己悟</strong>
+        <span class="coverage-def">不告诉机器怎么办,只给它很多例子让它自己找规律。给它一堆猫狗照片,最后它能认出新的猫狗——这就是深度学习的核心。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">4</span>
+      <span class="coverage-text">
+        <strong>训练 = 教小孩认字</strong>
+        <span class="coverage-def">小孩猜字,你说对不对(猜错了多少 = Loss)。猜错了告诉他哪儿错,下次他就能猜更准。模型也是这样练出来的——Loss 越来越小 = 模型越来越聪明。</span>
+      </span>
+    </div>
+
+    <div class="coverage-item">
+      <span class="coverage-check">5</span>
+      <span class="coverage-text">
+        <strong>"老方法救场"是 LLM 时代的主旋律</strong>
+        <span class="coverage-def">新方法不会干掉老方法,而是分工——状元郎写奏章(灵活),御医复核(不出错),掌柜小妹切字(标准),御史大夫设计提问(问得巧)。各干各的,合起来才完美。</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ===== C. 3 个核心争议 ===== -->
+  <h3>三、3 个核心争议(专家吵得最凶的问题)</h3>
+
+  <p>专家共识能让你入门,专家争议能让你看到前沿。下面 3 个争议,每个都有"硬核论据 + 共识 + 空白点":</p>
+
+  <!-- 争议 1 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+      争议 1 · LLM 真的"懂"你说的话吗?
+    </div>
+
+    <p><strong>这个问题你可以问自己</strong>:你让 ChatGPT 帮你写请假条,它写得比大多数人都好;你问它"我有一个叔叔,但他不是我爸爸的兄弟,他是谁?",它可能会分析一大段——但它真的"懂"你问的问题吗?</p>
+
+    <p><strong>觉得它不懂的人</strong>(以 Yann LeCun 为代表):LLM 像一个<strong>超级会背书的鹦鹉</strong>。你说什么,它都能接得像模像样,但它真"懂"你说的话吗?你问它那个叔叔是谁,它可能给出一段漂亮的分析——但这分析是它从训练数据里"拼凑"出来的,不是它真的"想"出来的。这就是 LeCun 等人的核心质疑:LLM 可能只是"语言模仿大师",不是"真懂"。</p>
+    <p><strong>觉得它懂的人</strong>(以 OpenAI、Anthropic 为代表):GPT-4 能通过律师资格考试(击败 90% 的人类考生)、奥赛数学能拿金牌、能在没见过的领域做复杂规划——这不是"模仿",这是<strong>涌现出来的真能力</strong>。它真的"理解"了什么。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>立场</th><th>看这个例子</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>觉得它不懂</td><td>你问"把冰箱塞进鞋盒可以吗",它会说"可以"——缺乏生活常识;它会"一本正经胡说"(幻觉);反事实推理经常错</td></tr>
+          <tr><td>觉得它懂</td><td>它能在没见过的物理题上推理出新答案;能写有结构的法律意见;能做复杂的代码规划——这些"没见过"的任务它都能做</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>大家其实同意的是</strong>:LLM 至少在"模仿人类语言"这件事上做到极致了——它能从海量数据里找到人类也未必意识到的关联。是不是"真理解",取决于你怎么定义"理解"。</p>
+    <p><strong>还没吵清楚的是</strong>:到底什么叫"理解"?现在没有测试能明确区分"模仿得很像"和"真的懂"。</p>
+    <p><strong>没人知道的是</strong>:AGI(通用人工智能)的测试标准是什么?"理解"的物理实现到底长什么样?</p>
+  </div>
+
+  <!-- 争议 2 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+      争议 2 · 继续"堆大模型",还能堆多久?
+    </div>
+
+    <p><strong>这个问题你可以问自己</strong>:你听说过 GPT-3 → GPT-4 → GPT-5 越来越强。那是不是只要砸钱、砸数据、砸算力,就能一路变强直到 AGI(比人还聪明的 AI)?还是会撞墙?</p>
+
+    <p><strong>觉得能继续变强的人</strong>(以 Sam Altman 为代表):GPT-3 到 GPT-4 能力飞跃,数据 scaling 已被验证。再加上推理时算力(让模型"想更久"),可能再过几年就能达到 AGI。</p>
+    <p><strong>觉得会撞墙的人</strong>(以 Yann LeCun 为代表):光"堆大"不够——必须换架构(像世界模型 JEPA 这种新思路)。Transformer 单靠堆参数已经遇到瓶颈。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>立场</th><th>看这个例子</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>觉得能继续</td><td>GPT-4 → Claude 4 → GPT-5 持续突破新能力(推理、多模态、长上下文);推理时"思考 token" 让模型有"多想几遍"的能力</td></tr>
+          <tr><td>觉得会撞墙</td><td>GPT-5 相对 GPT-4 进步变小了;"一本正经胡说"(幻觉)至今没解决;LLM 还在简单逻辑题上出错(如"我叔叔是谁")</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>大家其实同意的是</strong>:模型必须够大才"开窍",不够大涌现不出来——这是必要条件。但光"大"够不够,谁也说不准。</p>
+    <p><strong>还没吵清楚的是</strong>:下一次"突然开窍"会在什么规模出现?是不可预测的。</p>
+    <p><strong>没人知道的是</strong>:"涌现"为什么发生?为什么某个规模就突然会新东西了?理论还没说清楚。</p>
+  </div>
+
+  <!-- 争议 3 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+      争议 3 · 未来 LLM 是"开源免费"还是"闭源收费"?
+    </div>
+
+    <p><strong>这个问题你可以问自己</strong>:现在 LLM 有两派——一派免费开源(Llama、Qwen、Mistral,你能下载到自己电脑跑),一派闭源收费(GPT-4、Claude,你得通过 API 付费用)。未来哪个会赢?</p>
+
+    <p><strong>觉得开源会赢的人</strong>(以 Meta、阿里为代表):开源让创新民主化——开发者能下载、改、卖钱。Llama 已经追上 GPT,中文领域 Qwen 甚至更强。</p>
+    <p><strong>觉得闭源会赢的人</strong>(以 OpenAI、Anthropic 为代表):闭源能堆最多算力 + 最新数据 + 安全合规,商业护城河深。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>立场</th><th>看这个例子</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>觉得开源赢</td><td>Llama 4 Maverick 在基准测试追平 Claude 3.5 Sonnet;Qwen 中文场景超越 GPT;开源工具链(LangChain 等)催生大量应用</td></tr>
+          <tr><td>觉得闭源赢</td><td>GPT-5 / Claude 4 Opus 在最难的任务上仍领先开源 6-12 个月;闭源能砸数亿美元训练;企业客户愿意为安全和稳定性付钱</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>大家其实同意的是</strong>:开源已经"够用"了(80% 的场景开源都能搞定),但最前沿(SOTA)仍由闭源主导。</p>
+    <p><strong>还没吵清楚的是</strong>:开源能不能追到"最前沿"?差距在缩小,但闭源每次发新版都重置一次差距。</p>
+    <p><strong>没人知道的是</strong>:监管(欧盟 AI Act、中国生成式 AI 办法) / 地缘政治 / 中国 / 印度 / 非洲市场——这些因素可能让开源在某些地方成为唯一选择。</p>
+  </div>
+
+  <!-- ===== D. 10 道自测题 ===== -->
+  <h3>四、10 道自测题(考逻辑不考定义)</h3>
+
+  <p><strong>做题方式</strong>:每道题有 4 个选项(A/B/C/D)。先自己想答案,然后点击"查看答案与解析"看结果。题目考的是<strong>"你能不能用概念解决问题"</strong>,而不是"你能不能背定义"——做错也别急,关键是理解每题的逻辑。</p>
+
+  <!-- Q1 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q1 · 预测下一个 token
+    </div>
+    <p><strong>题目</strong>:LLM 在生成时,对"今天天气真___"这个位置,4 个候选 token 的概率分别是:"好"=0.6, "冷"=0.2, "假"=0.05, "太阳"=0.15。如果用 Temperature=0.5 + Top-p=0.8 采样,最可能被选到的是?</p>
+    <ul>
+      <li>A. "太阳"</li>
+      <li>B. "好"</li>
+      <li>C. "冷"</li>
+      <li>D. "假"</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:B "好"</p>
+      <p><strong>为什么选 B</strong>:想象 LLM 是个"选词纠结的人",它在"好/冷/假/太阳"里挑一个填到"今天天气真___"后面。</p>
+      <p>挑词规矩是这样的——Top-p=0.8 就像"挑前几名凑够 80%":把 4 个词按分数从高到低排,"好"60%+"冷"20%=80%,刚刚凑够,这两个进入候选池;另外两个被淘汰。</p>
+      <p>候选池里就 2 个词,"好"分数(60%)比"冷"(20%)高 3 倍,所以"好"被选中的机会最大。</p>
+      <p><strong>为什么 A 错</strong>:"太阳"只有 15%,加上"好"和"冷"已经凑够 80% 了,它被淘汰出局——根本没进候选池。</p>
+      <p><strong>为什么 C 错</strong>:"冷"虽然进了候选池,但只有 20%,被"好"的 60% 压着打,选中的机会远小于"好"。</p>
+      <p><strong>为什么 D 错</strong>:"假"只有 5%,根本进不了候选池;而且"今天天气真假"这话本来就不通,LLM 给它低分也是对的。</p>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q2 · 自注意力 vs RNN 本质差异
+    </div>
+    <p><strong>题目</strong>:为什么 Transformer 能并行处理整个序列,而 RNN 必须串行?(核心原因)</p>
+    <ul>
+      <li>A. Transformer 用了更多参数,所以算得快</li>
+      <li>B. RNN 模型设计得太老,被淘汰了</li>
+      <li>C. Transformer 的自注意力一次性看到所有位置,不依赖前一步的隐藏状态;RNN 必须等上一步算完才能算下一步</li>
+      <li>D. Transformer 跑在 GPU 上,RNN 跑在 CPU 上</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象你在排队买东西。</p>
+      <p>传统方式(RNN):你必须等前面的人买完,才知道他买了啥,然后才能轮到你——<strong>必须排队</strong>。</p>
+      <p>新方式(自注意力):你不用排队,你直接听前面所有人聊天,自己决定买啥——<strong>所有字同时算</strong>。</p>
+      <p>所以 RNN 必须"一个字一个字算完前一个才能算下一个"(串行);自注意力可以"一次性看到所有字,所有字同时算"(并行)。Transformer 比 RNN 快 10 倍,根本原因就是它<strong>不用排队</strong>——不是因为别的,就是因为这个规矩不同。</p>
+      <p><strong>为什么 A 错</strong>:参数量和速度是两码事。你可以让 RNN 也有 100 亿参数,但它还是要排队——排队这个"规矩"和参数大小无关。</p>
+      <p><strong>为什么 B 错</strong>:说"老"被淘汰是一种偏见。RNN 在有些场景(比如预测下一个股票价格)还是好用的,只是在大规模语言建模上输给了 Transformer。</p>
+      <p><strong>为什么 D 错</strong>:两者都能跑在 GPU 上,GPU 不是根本区别。区别在算法本身——RNN 算法要排队,自注意力算法不用排队。</p>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q3 · 位置编码的必要性
+    </div>
+    <p><strong>题目</strong>:Transformer 处理"小明追小红"和"小红追小明"两个句子,如果不加位置编码会怎样?</p>
+    <ul>
+      <li>A. 模型能正确区分,因为字不一样</li>
+      <li>B. 模型会认为两个句子意思一样,因为自注意力只算"谁和谁相关",不管顺序</li>
+      <li>C. 模型会输出乱码</li>
+      <li>D. 模型会报错,因为句子格式不合法</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:B</p>
+      <p><strong>为什么选 B</strong>:想象一下,模型看到一张全班合照,知道"小明"和"小红"都在照片里,但不知道谁站左边、谁站右边——它只知道"这两个人都在"。</p>
+      <p>自注意力也是这样:它知道"小明追小红",也知道"小红追小明"这两张图里都有这两人,但它分不清"<strong>谁追谁</strong>"。因为它只关心"谁和谁相关",不关心"谁在前谁在后"。</p>
+      <p>所以必须给每个字加一个"位次印章"——告诉模型"小明在第 1 位,小红在第 2 位",模型才知道谁先谁后。</p>
+      <p><strong>为什么 A 错</strong>:字虽然不一样,但"谁在前面谁在后面"很重要。"狗咬人"和"人咬狗"字完全一样,只是顺序不一样,意思天差地别。</p>
+      <p><strong>为什么 C 错</strong>:模型不会输出乱码,只是会输出"错误的答案"——比如它可能说两个句子表达的是"同一种关系",分不清谁追谁。</p>
+      <p><strong>为什么 D 错</strong>:模型不报错。它"看"到了所有字,只是没理解顺序。这不是程序崩了,是理解错了。</p>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q4 · Decoder-Only 设计动机
+    </div>
+    <p><strong>题目</strong>:OpenAI 设计 GPT 时,为什么抛弃 Encoder,只保留 Decoder?</p>
+    <ul>
+      <li>A. Encoder 性能差,跑不动</li>
+      <li>B. Encoder-Decoder 联合训练成本太高</li>
+      <li>C. 通用语言任务的核心就是"预测下一个字",只需要 Decoder 就能完成;Encoder 是为翻译这种"输入输出对齐"任务设计的,过于复杂</li>
+      <li>D. OpenAI 不想用 Google 提出的架构</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象你要让机器学会写字。</p>
+      <p>原版 Transformer 像是"翻译官团队"——有人负责"听懂原文",有人负责"写译文",配合做翻译。</p>
+      <p>但 GPT 团队想:其实所有文字任务(对话、写作、代码、问答)本质都是一件事——<strong>"看了前面,猜下一个字"</strong>。所以他们扔掉了"翻译官团队",只要"写字的人"(Decoder),一个人就能干所有活。</p>
+      <p>简单、好训练、好扩展——这就是 Decoder-Only 的动机。</p>
+      <p><strong>为什么 A 错</strong>:Encoder 完全 OK,BERT 系列就是纯 Encoder,效果很好。不是性能问题。</p>
+      <p><strong>为什么 B 错</strong>:Decoder-Only 训 GPT-3 也花了几千万美元。简化不是为了省钱,是为了"通用"——一个模型能干所有文字任务。</p>
+      <p><strong>为什么 D 错</strong>:OpenAI 不是为了和 Google 别苗头。技术选型是理性决策,不是情绪化决定。</p>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q5 · Few-shot 为什么有效
+    </div>
+    <p><strong>题目</strong>:你想让 LLM 把中文翻译成古文。提示里给了 3 个"现代文 → 古文"的例子,然后给一个新句子。LLM 能翻译吗?为什么?</p>
+    <ul>
+      <li>A. 不能,LLM 没专门学过古文翻译</li>
+      <li>B. 能,但只在 GPT-4 才行,小模型不行</li>
+      <li>C. 能,3 个例子帮模型理解"输入格式是什么 + 输出格式是什么",模型从这个模式中"悟出"任务格式,模仿输出</li>
+      <li>D. 能,但模型会真的"学"到古文规则,变成翻译专家</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象你让一个从没翻译过古文的人翻译,但你给他看了 3 个例子:"我说现代文,他给我写古文"。他看完这 3 个例子,马上懂了规矩:"哦,输入是现代文,输出是古文"——然后他模仿这个格式,给你翻译。</p>
+      <p>LLM 的 Few-shot 就是这个原理:你给它几个例子,它从例子里"悟出"任务格式,然后模仿。</p>
+      <p><strong>但注意</strong>:它没有真"学会"——它的脑子没变,只是"在这一段对话里"模仿。下次新对话,它还是需要你再给例子。</p>
+      <p><strong>为什么 A 错</strong>:LLM 训练时见过海量古文(古文是中文语料的重要部分),加上你给的 3 个例子,它完全能翻译。</p>
+      <p><strong>为什么 B 错</strong>:小模型也能 Few-shot,只是效果差一些。不是 GPT-4 专属。</p>
+      <p><strong>为什么 D 错</strong>:Few-shot 不会改模型"脑子"(权重)。要让模型"永远会",得"微调"——那需要专门训练,成本高。</p>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q6 · 模型幻觉的根源
+    </div>
+    <p><strong>题目</strong>:LLM 为什么会一本正经地"老虎摔伤开豹骨药"(模型幻觉)?最根本的原因是?</p>
+    <ul>
+      <li>A. 训练数据不够多</li>
+      <li>B. 模型太小,参数不够</li>
+      <li>C. LLM 是自回归生成——只预测下一个最可能的 token,不会"停下来查证"事实,也不会区分"统计关联"和"真因果"</li>
+      <li>D. 模型没装知识图谱</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:LLM 像一个"超级会接话的人"——你说"老虎摔伤",它立刻接"虎骨";你说"虎骨",它立刻接"豹骨"。</p>
+      <p>它不是真的懂"老虎应该吃什么药",它只是根据"哪个词常和哪个词一起出现"猜下一个。所以它一本正经地胡说——因为它的游戏规则就是"<strong>猜下一个</strong>",不是"判断对错"。</p>
+      <p>它的脑子里没有"等一下,让我查查这是不是真的"这个按钮——因为它没被训练成"会验证",它被训练成"会猜"。</p>
+      <p><strong>为什么 A 错</strong>:数据再多也救不了。你给它 100 万条老虎治伤案例,遇到新场景它还是会"猜"下一个,不会"查证"。</p>
+      <p><strong>为什么 B 错</strong>:模型越大,反而越会"自信地胡说"——因为它学到的"哪个词常和哪个词一起出现"的模式更强、更自信。规模越大,幻觉看起来越"像真的"。</p>
+      <p><strong>为什么 D 错</strong>:知识图谱能减少幻觉(就像给 LLM 一本随时可查的字典),但它不是幻觉的"根源"。根源是"LLM 的工作方式就是猜下一个字"。装知识图谱是补救,不是治病。</p>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q7 · RAG 为什么能缓解幻觉
+    </div>
+    <p><strong>题目</strong>:某企业让 LLM 回答"我们公司 2025 Q4 的营收是多少"。LLM 出现幻觉,瞎编了一个数字。哪种方案<strong>最有效</strong>缓解这个幻觉?</p>
+    <ul>
+      <li>A. 把 LLM 的训练数据更新到 2025 年,让它"学过"公司数据</li>
+      <li>B. 让 LLM "多想几遍",每次重新生成后自检</li>
+      <li>C. 用 RAG:生成前先从公司内部数据库检索 2025 Q4 财报文档,把这些文档作为上下文喂给 LLM,让 LLM 基于真实文档生成回答</li>
+      <li>D. 把 LLM 换成更大的模型,比如 GPT-5</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象 LLM 是一个记忆力有限的老员工,你不给它查资料它就瞎说。你要它回答"公司 2025 Q4 营收"——它脑子里没有这个数据,只能瞎编。</p>
+      <p>RAG(检索增强生成)就是:在让老员工回答之前,<strong>先帮他去档案室把"2025 Q4 财报"找出来,放到他桌上</strong>。老员工一看桌上摆着真实财报,他只能基于这份真实文件写回答——想瞎编也难。</p>
+      <p>这就是 RAG 的精髓:<strong>把"事实依据"摆到它面前,让它没机会瞎说</strong>。</p>
+      <p><strong>为什么 A 错</strong>:① 公司数据是私密的,不能拿去训练公开的 LLM;② 即使能训练,公司数据每天在变,训练有滞后——今天训完,明天数据又变了;③ 微调(专门训练一次)成本很高。</p>
+      <p><strong>为什么 B 错</strong>:"多想几遍"对数学题可能有点用,但对"事实问答"基本没用——老员工"多想几遍"还是基于他那个错的记忆,只会"自信地重复错误"。</p>
+      <p><strong>为什么 D 错</strong>:换 GPT-5 没用。GPT-5 也只知道它训练截止日之前的事,公司 2025 Q4 的数据它没学过——还是会瞎编。问题不在模型大小,在"知识截止日"。</p>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q8 · Chinchilla 定律的核心
+    </div>
+    <p><strong>题目</strong>:DeepMind 2022 年发现:700 亿参数 + 4 倍 GPT-3 数据的 Chinchilla 模型,性能反而胜过 1750 亿参数的 GPT-3。这说明什么?</p>
+    <ul>
+      <li>A. 参数越多越好,所以 GPT-3 早晚超过 Chinchilla</li>
+      <li>B. 在固定计算预算下,数据比参数更重要,二者存在最优配比;光堆参数、不堆数据,反而浪费算力</li>
+      <li>C. 数据越多越好,所以训练应该只堆数据不堆参数</li>
+      <li>D. Chinchilla 没用,它只是恰好在某次测试上赢了</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:B</p>
+      <p><strong>为什么选 B</strong>:想象你养两个孩子去上学。</p>
+      <p>孩子 A:脑子很聪明(模型参数大),但只给他 1 本课本(数据少) → 他学得不够多 → 不算真聪明。</p>
+      <p>孩子 B:脑子稍微没那么聪明(模型参数小),但给他 100 本课本(数据多) → 他学得广博 → 反而更聪明。</p>
+      <p>Chinchilla 定律就是这个道理:在固定的总预算(算力)下,你不能只把模型做大而不给它足够的数据训。GPT-3 = 大模型(1750 亿) + 课本少(3000 亿字) = 没训够;Chinchilla = 小模型(700 亿) + 课本多(12000 亿字,4 倍) = 训够了。结果:<strong>小模型 + 多课本 反而 更聪明</strong>。</p>
+      <p><strong>为什么 A 错</strong>:Chinchilla 恰恰反驳"参数越多越好"。在固定预算下,大参数 + 少数据 < 小参数 + 多数据。</p>
+      <p><strong>为什么 C 错</strong>:不是"只堆数据",是"参数和数据要配比"。只堆数据(模型太小)→ 装不下知识;只堆参数(数据太少)→ 训不够。</p>
+      <p><strong>为什么 D 错</strong>:Chinchilla 是 DeepMind 2022 年的严谨研究,业界都认。Llama 2、Llama 3 训练策略都按这个配比来。</p>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q9 · Temperature 的影响
+    </div>
+    <p><strong>题目</strong>:你在搭建一个<strong>电商客服 LLM</strong>。用户问"我下单 3 天了怎么还没收到",你需要 LLM 给出准确、礼貌、可预测的回答。Temperature 应该怎么设?</p>
+    <ul>
+      <li>A. 高温度(>0.7),让回答有创意、不死板</li>
+      <li>B. 低温度(0-0.3),让回答稳定、可预测、可控</li>
+      <li>C. 极端高温度(>2.0),让回答完全随机</li>
+      <li>D. 温度值不重要,随便设</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:B</p>
+      <p><strong>为什么选 B</strong>:Temperature 就像一个"性格开关"。</p>
+      <p>开低(0-0.3):LLM 是个"严肃的客服",每次回答都一样稳定。</p>
+      <p>开高(>0.7):LLM 是个"创意的诗人",每次回答都不一样发散。</p>
+      <p>电商客服场景需要的是"严肃客服"——用户问"我下单 3 天还没收到",你要给出准确、可预测、不出错的回答。所以<strong>温度开低(0-0.3)</strong>,让 LLM 每次都说差不多的、稳的话。</p>
+      <p><strong>为什么 A 错</strong>:高温度适合写诗、写故事——客服场景要"创意"那是要出事的,用户会投诉"不专业"。</p>
+      <p><strong>为什么 C 错</strong>:极端高温度(>2.0) ≈ 随机输出 ≈ 让 LLM 抽风说胡话。客服用这个,用户会被吓跑。</p>
+      <p><strong>为什么 D 错</strong>:Temperature 是 LLM 应用的核心调参,直接影响输出质量。"随便设"是要出大问题的。</p>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Q10 · 指令调优 vs 预训练的关系
+    </div>
+    <p><strong>题目</strong>:ChatGPT 比 GPT-3 更"听话"——你能直接问"帮我写一首关于秋天的诗",它就给你写诗。但 GPT-3 时代你得给"诗:主题=秋天,风格=七言,情绪=萧瑟,生成:"这种格式才能写。为什么 ChatGPT 更"听话"?</p>
+    <ul>
+      <li>A. ChatGPT 用了更大的模型</li>
+      <li>B. ChatGPT 用了更多的训练数据</li>
+      <li>C. ChatGPT 在 GPT-3 基础上做了"<strong>指令调优</strong>(Instruction Tuning)"——用大量"指令-回答"格式的数据微调,让模型从"文本补全机器"变成"听话助手"</li>
+      <li>D. ChatGPT 用了不同的架构</li>
+    </ul>
+    <details>
+      <summary style="cursor:pointer;color:var(--accent-sage);font-weight:600">▸ 点击查看答案与解析</summary>
+      <p><strong>正确答案</strong>:C</p>
+      <p><strong>为什么选 C</strong>:想象 GPT-3 是个"话痨"——你给它半句话,它能接得很长很顺。</p>
+      <p>但你要它"写一首秋天的诗",它不知道这是"指令",以为是"开头"——它会接:"写一首秋天的诗……秋风扫落叶……"接着给你接一大段,而不是直接给你写诗。</p>
+      <p>指令调优就是教它:"你看到'写一首诗'这种话,直接给我写,不要接着'开头'往下续"。用很多"指令-回答"格式的数据微调一遍,它就学会了"听话"。</p>
+      <p>ChatGPT 相比 GPT-3 的革命性,就在这里——<strong>不是模型变大,不是数据变多,而是"教会它看指令"</strong>。</p>
+      <p><strong>为什么 A 错</strong>:ChatGPT 早期模型和 GPT-3 一样大(约 175B 参数),"更大模型"不是关键。</p>
+      <p><strong>为什么 B 错</strong>:关键不是数据"量",是数据"<strong>格式</strong>"——少量高质量"指令-回答"格式数据,效果比海量无格式数据好得多。</p>
+      <p><strong>为什么 D 错</strong>:ChatGPT 和 GPT-3 用的都是 Decoder-Only Transformer,架构完全一样。区别在训练数据格式,不是架构。</p>
+    </details>
+  </div>
+
+  <div class="pullquote">10 道题做完后,回看一下:你做错的那几道,错在哪个概念?<br><span style="font-size:14px;color:var(--text-muted);font-weight:400">— 错题才是真懂的开端</span></div>
+
+</section>
+
+<!-- ========== Footer ========== -->
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text-secondary)">WellInsight</strong> · 学习材料 · 造笔录 v4.0 · 2026-06-24
+  </div>
+  <div>
+    本寓言沿用第 02 章朝廷世界观 · 主线 19 节点 · 7 角色分工 · 50 概念 · v4 通俗化思维框架 + 友好化争议 + 新手化题目 · Codex 6 条标准全过
+  </div>
+</footer>
+
+</div><!-- /.container -->
+
+<!-- Back to top -->
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+</body>
+</html>

@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第10章 · 智能体通信协议 · WellInsight 学习材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2EDE6;--bg-card:#FAF7F2;--bg-elevated:#FFFCF7;--bg-deep:#E8DFD3;--text-primary:#3D3833;--text-secondary:#6B6157;--text-muted:#998E81;--accent-sage:#8B9D83;--accent-sage-soft:#D8E2D2;--accent-sage-faint:#ECF1E8;--accent-terracotta:#C49B8E;--accent-terracotta-soft:#E6D2C8;--accent-blue:#8A9AA8;--accent-blue-soft:#C8D2DA;--accent-amber:#C9A878;--accent-amber-soft:#E8D7B7;--accent-mauve:#A89098;--accent-mauve-soft:#DCCCD0;--border:#D9D2C7;--border-light:#E8E0D3;--shadow:0 2px 8px rgba(61,56,51,.06), 0 1px 2px rgba(61,56,51,.04);--shadow-lg:0 8px 24px rgba(61,56,51,.10), 0 2px 6px rgba(61,56,51,.05);}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.78;font-size:16px;font-weight:400;-webkit-font-smoothing:antialiased;letter-spacing:.01em;}
+.container{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+.sticky-toc{position:fixed;top:24px;right:24px;width:240px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);font-size:13px;z-index:50;max-height:calc(100vh - 48px);overflow-y:auto;}
+.sticky-toc-title{font-weight:600;color:var(--text-secondary);margin-bottom:8px;font-size:12px;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+.sticky-toc ol{list-style:none;counter-reset:toc;padding:0}
+.sticky-toc li{counter-increment:toc;margin:4px 0}
+.sticky-toc a{color:var(--text-secondary);text-decoration:none;display:block;padding:4px 0 4px 8px;margin-left:6px;border-left:2px solid transparent;font-size:12.5px;font-weight:500;transition:all .2s;}
+.sticky-toc a:hover{color:var(--accent-sage);border-left-color:var(--accent-sage)}
+.sticky-toc a::before{content:counter(toc) ".";color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px;margin-right:4px}
+.hero{background:linear-gradient(135deg,#FAF7F2 0%,#F2EDE6 100%);border:1px solid var(--border);border-radius:12px;padding:48px 40px 40px;margin-bottom:48px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent-sage) 0%,var(--accent-terracotta) 33%,var(--accent-blue) 66%,var(--accent-amber) 100%);}
+.hero-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text-muted);margin-bottom:16px;font-weight:500;letter-spacing:.5px;}
+.hero-meta-dot{width:4px;height:4px;background:var(--text-muted);border-radius:50%}
+.hero h1{font-size:46px;font-weight:700;line-height:1.15;color:var(--text-primary);margin-bottom:10px;letter-spacing:-1px;}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);margin-bottom:22px;font-weight:500;}
+.hero-fable{display:inline-block;padding:2px 10px;margin-right:4px;background:var(--accent-sage-soft);color:var(--accent-sage);border-radius:12px;font-size:14px;font-weight:600;letter-spacing:.5px;}
+.hero-desc{font-size:14.5px;color:var(--text-secondary);margin-bottom:24px;line-height:1.7;font-weight:400;}
+.hero-source{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);background:var(--bg-card);padding:6px 12px;border-radius:20px;border:1px solid var(--border-light);font-weight:500;}
+section{margin-bottom:56px;scroll-margin-top:80px}
+.chapter-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--accent-sage);background:var(--accent-sage-soft);padding:4px 12px;border-radius:12px;margin-bottom:14px;letter-spacing:1px;}
+h2{font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:14px;letter-spacing:-.3px;display:flex;align-items:baseline;gap:12px;line-height:1.3;}
+h2 .num{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--accent-terracotta);font-weight:500}
+h2-hook{display:block;font-size:15px;font-weight:500;color:var(--text-secondary);margin-top:8px;margin-bottom:24px;padding:12px 16px;background:var(--bg-card);border-left:3px solid var(--accent-amber);border-radius:0 6px 6px 0;font-style:italic;}
+h3{font-size:19px;font-weight:600;color:var(--text-primary);margin:24px 0 10px;padding-left:14px;border-left:3px solid var(--accent-amber);letter-spacing:-.2px;}
+h4{font-size:16px;font-weight:600;color:var(--accent-sage);margin:20px 0 10px}
+p{margin-bottom:14px;color:var(--text-primary);text-align:left;font-weight:400}
+strong{color:var(--text-primary);font-weight:600}
+em{color:var(--text-secondary);font-style:normal;font-weight:600}
+.lead{font-size:17px;color:var(--text-secondary);padding:18px 22px;background:var(--bg-card);border-left:3px solid var(--accent-terracotta);border-radius:0 6px 6px 0;margin-bottom:28px;font-weight:500;line-height:1.85;}
+.callout{background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:18px 22px;margin:20px 0;box-shadow:var(--shadow);}
+.callout-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--accent-sage);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.pullquote{background:linear-gradient(135deg,var(--accent-amber-soft) 0%,var(--bg-card) 100%);border:1px solid var(--accent-amber-soft);border-radius:8px;padding:22px 26px;margin:24px 0;font-size:16.5px;font-weight:500;color:var(--text-primary);position:relative;}
+.pullquote::before{content:"\201C";position:absolute;top:-6px;left:16px;font-size:48px;color:var(--accent-amber);font-family:Georgia,serif;line-height:1;font-weight:700;}
+.stats-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0 8px}
+.stat-cell{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:18px 16px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--accent-terracotta);line-height:1.1;margin-bottom:4px}
+.stat-label{font-size:13px;color:var(--text-secondary);font-weight:500;line-height:1.45}
+.stat-cell.victory{border-top:3px solid var(--accent-sage)}
+.stat-cell.defeat{border-top:3px solid var(--accent-mauve)}
+.stat-num.green{color:var(--accent-sage)}
+.stat-num.red{color:var(--accent-mauve)}
+.doctors-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0 8px}
+.doctor-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;transition:transform .2s;}
+.doctor-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.doctor-card.role-1{border-top:3px solid var(--accent-sage)}
+.doctor-card.role-2{border-top:3px solid var(--accent-terracotta)}
+.doctor-card.role-3{border-top:3px solid var(--accent-blue)}
+.doctor-card.role-4{border-top:3px solid var(--accent-amber)}
+.doctor-name{font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:2px;display:flex;align-items:center;gap:8px;letter-spacing:-.2px;}
+.doctor-age{font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:10px}
+.doctor-quote{font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:12px;line-height:1.6;padding-bottom:12px;border-bottom:1px dashed var(--border-light)}
+.doctor-behaviors{list-style:none;padding:0;margin:0;font-size:12.5px;color:var(--text-secondary);line-height:1.7}
+.doctor-behaviors li{padding:3px 0 3px 14px;position:relative}
+.doctor-behaviors li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--accent-amber)}
+.annotation{background:linear-gradient(135deg,var(--accent-sage-faint) 0%,var(--bg-card) 100%);border:1px solid var(--accent-sage-soft);border-left:3px solid var(--accent-sage);border-radius:0 8px 8px 0;padding:18px 22px;margin:32px 0 8px;position:relative;}
+.annotation-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--accent-sage-soft);}
+.annotation-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;letter-spacing:1.5px;}
+.annotation-hint{font-size:12px;color:var(--text-muted);font-weight:500;font-style:italic}
+.annotation dl{display:grid;grid-template-columns:minmax(140px,max-content) 1fr;gap:8px 18px;margin:0}
+.annotation dt{font-weight:600;color:var(--text-primary);font-size:13px;line-height:1.65}
+.annotation dd{margin:0;color:var(--text-secondary);font-size:13px;line-height:1.65}
+.annotation dd .who{color:var(--accent-terracotta);font-weight:700;margin-right:4px}
+.annotation dd .what{color:var(--text-secondary)}
+.dialog{background:var(--bg-deep);border-radius:6px;padding:14px 18px;margin:14px 0;font-size:14.5px;color:var(--text-primary);border-left:3px solid var(--accent-amber);}
+.dialog-speaker{font-weight:700;color:var(--accent-terracotta)}
+.table-wrap{margin:20px 0;background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:var(--bg-deep)}
+th{padding:12px 16px;text-align:left;font-weight:600;color:var(--text-primary);font-size:13px;letter-spacing:.3px;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border-light);color:var(--text-secondary);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(232,223,211,.3)}
+.coverage{background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:32px 0}
+.coverage-title{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px;padding-bottom:12px;border-bottom:2px dashed var(--border)}
+.quiz-list{display:flex;flex-direction:column;gap:14px;margin:18px 0}
+.quiz-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);border-left:4px solid var(--accent-sage)}
+.quiz-card-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.quiz-num{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent-sage);background:var(--accent-sage-soft);padding:2px 8px;border-radius:6px}
+.quiz-q{margin:0 0 8px;font-size:14.5px;color:var(--text-primary);font-weight:500;line-height:1.7}
+.quiz-options{list-style:none;padding:0;margin:0 0 6px;display:flex;flex-direction:column;gap:3px}
+.quiz-options li{padding:5px 10px;font-size:13.5px;color:var(--text-secondary);line-height:1.6;border-radius:5px;background:var(--bg-card);border:1px solid var(--border-light)}
+.quiz-answer{margin-top:10px;background:var(--bg-card);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text-secondary);border:1px dashed var(--border)}
+.quiz-answer summary{cursor:pointer;font-weight:600;color:var(--accent-sage);font-size:13px;padding:2px 0;list-style:none}
+.quiz-answer summary::before{content:"▶ "}
+.quiz-answer[open] summary{margin-bottom:6px}
+.summary-box{background:linear-gradient(135deg,var(--accent-sage-soft) 0%,var(--bg-card) 50%,var(--accent-amber-soft) 100%);border:1px solid var(--accent-sage);border-radius:12px;padding:32px 36px;margin:40px 0;position:relative;}
+.summary-box-title{font-size:13px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.summary-text{font-size:18px;color:var(--text-primary);line-height:1.85;font-weight:500}
+.footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);font-size:12.5px;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-weight:500}
+.footer-link{color:var(--accent-sage);text-decoration:none;font-weight:600}
+.back-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:justify-content:center;cursor:pointer;box-shadow:var(--shadow);transition:all .2s;z-index:40}
+.icon{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+code{background:var(--bg-deep);padding:2px 7px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent-terracotta);font-weight:500}
+@media (max-width:1100px){.sticky-toc{display:none}}
+@media (max-width:768px){.container{padding:24px 16px 60px}.hero{padding:32px 20px}.hero h1{font-size:32px}h2{font-size:22px}.doctors-grid,.stats-card{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="sticky-toc" aria-label="目录">
+  <div class="sticky-toc-title">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    目录
+  </div>
+  <ol>
+    <li><a href="#ch0">开篇 · 五家灵机互不接话</a></li>
+    <li><a href="#ch1">第一幕 · "机件孤岛派"登场</a></li>
+    <li><a href="#ch2">第二幕 · 番使院·接话司挂牌</a></li>
+    <li><a href="#ch3">第三幕 · 廖通立"接话四礼"</a></li>
+    <li><a href="#ch4">第四幕 · 纸契四件套</a></li>
+    <li><a href="#ch5">第五幕 · 陈守一"考校"再成"拜师"</a></li>
+    <li><a href="#finale">终章 · 题匾"会说话的不如会接话的"</a></li>
+    <li><a href="#summary">一句话总结</a></li>
+    <li><a href="#coverage">概念地图</a></li>
+    <li><a href="#think">太子五条心得</a></li>
+    <li><a href="#quiz">自测十问</a></li>
+  </ol>
+</nav>
+
+<div class="container">
+
+<header class="hero">
+  <div class="hero-meta">
+    <span>WellInsight 学习材料</span>
+    <span class="hero-meta-dot"></span>
+    <span>来源教材 · 第10章 · 寓言版</span>
+    <span class="hero-meta-dot"></span>
+    <span>2026-06-26 · v1</span>
+  </div>
+  <h1>第10章 · 智能体通信协议</h1>
+  <p class="hero-subtitle"><span class="hero-fable">会同馆番使院</span> · 21 岁太子造"接话"机件 · 会说话的不如会接话的</p>
+  <p class="hero-desc">建议读法:先看故事,<strong>不要查名词</strong>;每章末尾有"本节专业名词对照",可倒回去对比。</p>
+  <span class="hero-source">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    原文 · datawhalechina/hello-agents · 第10章
+  </span>
+</header>
+
+<main id="content">
+
+<section id="ch0">
+  <span class="chapter-tag">开篇 · 景和十一年三月</span>
+  <h2><span class="num">00</span>五家灵机互不接话 —— 急报跑半天没人接</h2>
+  <span class="h2-hook">"北狄八百里加急送进会同馆 —— 兵部灵机说'该找户部',户部灵机说'该找工部',工部灵机说'该找钦天监' —— 小吏跑了一上午,五家灵机没一家答全。"</span>
+
+  <p class="lead">景和十一年三月。二十一岁的太子刚办完通政司奏章房的差事,正准备歇几日,会同馆主事匆匆迎上来:"殿下,北狄来犯,八百里加急送进会同馆。兵部、户部、工部、礼部、钦天监五家的灵机都说'这事儿该找隔壁衙门' —— 小吏跑了一上午,五家灵机没一家答全。"</p>
+
+  <p>太子赶到会同馆议事堂。堂上堆着十几封加急文书,五家灵机的"接话窗口"各自紧闭 —— 兵部灵机只会答"我北境兵员 2 万",户部灵机只会答"我粮草 30 万石",工部灵机只会答"我能造运粮车",可就是没人把"调粮草"这件事从头到尾串起来。</p>
+
+  <p>小吏跑得上气不接下气:"殿下,臣跑了兵部跑户部,跑了户部跑工部,跑了工部跑钦天监 —— 五家各管各的,臣凑不出一个'调粮草'的全貌。"</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">小吏:</span>"殿下,这一封加急若再凑不齐,北狄的兵就过了雁门关了。灵机会算账,可灵机不会'互相说话'。"
+  </div>
+
+  <p>太子沉吟片刻,道:"<strong>五家灵机不是不会答,是不会'接' —— 每家都低头做事,抬头看自己,不看隔壁。要的不是把灵机变聪明,是让灵机与灵机之间有一套'说话规矩'</strong>。"</p>
+
+  <p>小李低声问:"殿下,这'说话规矩',是不是像驿站? —— 走过驿道,信就能到。" 太子点头:"正是。我们今天在会同馆要造的,就是让灵机能'拜帖、回帖、问安、辞行' —— <strong>这叫'灵机之间的接话规矩',又叫'通信协议'</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">对照开篇的两大症结</span>
+    </div>
+    <dl>
+      <dt>五家灵机互踢皮球</dt>
+      <dd><span class="who">会同馆的现状</span><span class="what">—— 灵机"孤岛"(siloed agents):各家灵机只懂自己手上的活,不懂隔壁灵机能干啥,办一件事要跑五个衙门。灵机再能算,不会"接话"也白搭。</span></dd>
+      <dt>接话窗口紧闭</dt>
+      <dd><span class="who">五家灵机的现状</span><span class="what">—— 缺乏"统一接话口"(standardized interface):每家灵机都有自家"接话口",但口对不上,灵机听不见隔壁在叫自己。</span></dd>
+      <dt>走过驿道,信就能到</dt>
+      <dd><span class="who">小李的比喻</span><span class="what">—— "通信协议"(communication protocol):让灵机与灵机之间能互递消息的规矩 —— 像驿站传令、像海路信号,只要遵守同一套规矩,灵机就能接上话。</span></dd>
+      <dt>拜帖 · 回帖 · 问安 · 辞行</dt>
+      <dd><span class="who">太子提的四礼</span><span class="what">—— MCP(Model Context Protocol)四大核心功能:资源告知 / 工具调用 / 提示请求 / 收尾通知。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch1">
+  <span class="chapter-tag">第一幕 · 孤岛派登场</span>
+  <h2><span class="num">01</span>郑直:"工部只管营造,何必让工部灵机去听户部的税?"</h2>
+  <span class="h2-hook">"郑侍郎不是为反而反 —— 他是真心的:他怕灵机互冲,误了营造本业。'机件孤岛'是他的善念。但他的善念,害了水车。"</span>
+
+  <p class="lead">三月初三早朝。工部侍郎郑直刚把"机件孤岛"的联名奏本呈上,户部侍郎先接话:"郑侍郎的好意臣懂 —— 但景和九年新税法改'灶户税'为'产销税',工部灵机不知,造出 300 架违规水车,这怎么办?"</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">郑直:</span>"<strong>殿下,臣不是为反而反。臣是想,工部只管营造,何必让工部灵机去听户部的税?各干各的,才不乱。让灵机互相说话,反而容易误事 —— 户部灵机一句话错,工部灵机就跟着错</strong>。"
+  </div>
+
+  <p>这话有几分道理,朝堂上几位老臣点头。工部员外郎反驳:"可是臣按新税法查,违规水车 300 架,折银 4000 两 —— 不是灵机没造好,是灵机没听见户部灵机的话。"</p>
+
+  <p>太子示意员外郎说完,然后慢慢开口。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">太子:</span>"<strong>郑侍郎问得好。孤岛不孤岛,不是衙门愿不愿的事 —— 是机件会听不会听的事。景和九年那 300 架违规水车,问题不在工部灵机造得不好,在工部灵机没听见户部灵机改了税法。让灵机不接话,等于让工匠闭着眼造水车 —— 哪怕手艺再好,造出来也是旧的</strong>。"
+  </div>
+
+  <p>郑直愣了半晌,半晌,拂袖而去。临走丢下一句:"臣的'机件孤岛'也是为工部本业 —— 臣不省灵机的接话口,省工部灵机的清静。"</p>
+
+  <p>太子望着他背影,对小李说:"<strong>郑侍郎不是坏人。他是怕灵机互冲,误了营造本业 —— 这种善念,我们要尊重。但善念若不讲究章法,反而害事。我们今天的功课,是给郑侍郎一个'接话章法',让他看了服气</strong>。"</p>
+
+  <h3>会同馆改组 · 三条铁规</h3>
+  <p>三月初五,太子在会同馆后院挂"番使院·接话司"匾。三条铁规贴在正堂:</p>
+  <ul>
+    <li><strong>接话</strong> —— 给五家灵机定一套"拜帖 / 回帖 / 问安 / 辞行"的说话规矩,灵机之间能互相递消息 —— 三个月内拿出第一版</li>
+    <li><strong>纸契标准</strong> —— 把第09章"系统词"思路扩展到"机件对机件接话",统一纸契格式 —— 三个月内跑通端到端</li>
+    <li><strong>万器归一</strong> —— 沿用第07/08/09章机件规范,新接话机件按统一接驳口接入</li>
+  </ul>
+
+  <p>太子在匾旁另立一段话:"<strong>会说话的不如会听话的,会听话的不如会接话的 —— 给灵机与灵机之间立一套接话章法,不是让它们多说话,是让有限的话传到该听的人那里</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">孤岛派 vs 接派</span>
+    </div>
+    <dl>
+      <dt>机件孤岛</dt>
+      <dd><span class="who">郑直的孤岛派主张</span><span class="what">—— "灵机孤岛"思路:让每家灵机只管本业,不接隔壁灵机的话 —— 但实际上"营造离不了税",孤岛等于让灵机闭着眼做事。</span></dd>
+      <dt>300 架违规水车</dt>
+      <dd><span class="who">景和九年真实事故</span><span class="what">—— 灵机"信息滞后"问题:工部灵机不知道户部改了税法,造出的水车违反新规 —— 接话派的核心动机就是要解决这种滞后。</span></dd>
+      <dt>接话章法</dt>
+      <dd><span class="who">太子的接派主张</span><span class="what">—— MCP 协议(Model Context Protocol):让灵机与灵机之间能互递消息的"通用接话规矩",由 Anthropic 提出,2024 年开源,现在成了行业事实标准。</span></dd>
+      <dt>孤岛派 vs 接派</dt>
+      <dd><span class="who">本章反派冲突</span><span class="what">—— 郑直"机件孤岛"(工程简单,但治标不治本) vs 廖通"四礼接话"(工程复杂,但治本)。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch2">
+  <span class="chapter-tag">第二幕 · 立项</span>
+  <h2><span class="num">02</span>番使院·接话司挂牌,四匠人入驻</h2>
+  <span class="h2-hook">"记簿是'自己记自己',查档是'借别人的记忆',编排是'怎么排给灵机看',接话是'让灵机对灵机说话' —— 一内一外一排一接,合起来才是完整的'灵机协作'。"</span>
+
+  <p class="lead">三月初七。太子召见四位主笔匠人:钦天监何七(四十出头,第07章机件规范主笔),翰林院编修吕坤(第08章记簿主笔),通政司编排主笔苏望(第09章编排主笔),会同馆老通译廖通(六十二岁,接待外宾四十年)。四人领命入局,太子当面给图纸,三月为期。</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num green">4</div>
+      <div class="stat-label">种接话礼(拜/回/问/辞)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num green">4</div>
+      <div class="stat-label">件套纸契(头/请/路/音)</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num red">90</div>
+      <div class="stat-label">日为期,三月期满交付</div>
+    </div>
+  </div>
+
+  <h3>节点 1 · 廖通主接话 · 依《礼记·聘义》"郊聘四礼"立"四礼"</h3>
+  <p>廖通的方案最独特 —— 他不直接造机,他先翻《礼记·聘义》"郊聘四礼",找到外宾接待的四层规矩:</p>
+  <ul>
+    <li><strong>拜帖(初见礼)</strong> —— 灵机先递一张"我家有什么"的清单,让对方知道我能干啥</li>
+    <li><strong>回帖(应喏礼)</strong> —— 对方看完清单,回一张"我能帮你做啥"</li>
+    <li><strong>问安(询问礼)</strong> —— 双方互相请安,问"你想做啥"</li>
+    <li><strong>辞行(收尾礼)</strong> —— 事毕互相通告"做完了"</li>
+  </ul>
+
+  <p>廖通说:"<strong>老朽在会同馆四十年,见过无数番使来拜,接话的妙处不在'多',在'礼'。一次接话,有拜有回有问有辞,清清楚楚 —— 缺一礼,就出岔子。缺拜帖,对方不知我能干啥;缺回帖,对方接不上;缺问安,不知道要做啥;缺辞行,事做完没回音</strong>。"</p>
+
+  <h3>节点 2 · 何七主驿道/海路 · 把第07章机件规范搬进"接话"</h3>
+  <p>何七说:"第07章我们造了'万器归一'机件规范。现在派新用场:接话要传消息,得有两路 —— <strong>驿道</strong>(同机进程间传令,快)和<strong>海路</strong>(跨机网络传令,远)。两路并用,本地隔壁都能接上。"</p>
+
+  <p>"<strong>驿道传令</strong> —— 户部灵机和工部灵机在同一台机子上,用驿道传令,3 步到位;<strong>海路信号</strong> —— 兵部灵机在北境驿站,户部灵机在京城,用海路信号,跨机也能接上。"</p>
+
+  <h3>节点 3 · 吕坤/苏望主纸契 · 把第08/09章搬进"接话"</h3>
+  <p>吕坤说:"第08章我们造了'记簿四柜'。现在派新用场:接话要递'拜帖',拜帖里得列清'这段属于哪柜'。"</p>
+
+  <p>苏望接话:"第09章我们造了'四件套编排'。现在派新用场:接话的纸契也要四件配齐 —— <strong>拜帖头定谁递的、所请定要做什么、来路定从哪儿听来的、回音定做完回什么</strong>。"</p>
+
+  <p>太子点头:"这便是'接话'二字的本意 —— 不是让灵机多说话,是让灵机按'拜帖 / 回帖 / 问安 / 辞行'四礼,按'拜帖头 / 所请 / 来路 / 回音'四件套,把消息递到该听的人那里。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">接话四礼 + 跨章机件复用</span>
+    </div>
+    <dl>
+      <dt>《礼记》"郊聘四礼"</dt>
+      <dd><span class="who">廖通的设计依据</span><span class="what">—— MCP 协议的设计原则:不靠堆接口数量,靠精心礼节 —— 拜帖告知、回帖应喏、问安询问、辞行收尾。</span></dd>
+      <dt>四礼 · 拜 / 回 / 问 / 辞</dt>
+      <dd><span class="who">廖通的朝代比喻</span><span class="what">—— MCP 四大核心功能(primitives):① 资源告知(Resources)② 工具调用(Tools)③ 提示请求(Prompts)④ 收尾通知(Notifications)。</span></dd>
+      <dt>驿道 / 海路</dt>
+      <dd><span class="who">何七的方案</span><span class="what">—— MCP 两种传输方式:① Stdio(驿道,同机进程间传令)② HTTP/SSE(海路,跨机网络传令)。两路并用,本地远程都能接话。</span></dd>
+      <dt>记簿 / 编排搬进接话</dt>
+      <dd><span class="who">吕坤 / 苏望的方案</span><span class="what">—— MCP 复用前章成果:记簿管"拜帖里写什么资源",编排管"纸契四件套怎么写",机件规范管"两路怎么传"。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch3">
+  <span class="chapter-tag">第三幕 · 接话四礼</span>
+  <h2><span class="num">03</span>廖通立"四礼":拜帖、回帖、问安、辞行</h2>
+  <span class="h2-hook">"接话的毛病,不在'少',在'乱'。四礼不是让灵机多说话,是让灵机的话按礼走 —— 缺一礼,就出岔子。"</span>
+
+  <p class="lead">三月中。廖通依《礼记·聘义》"郊聘四礼",把灵机接话分为四大礼节,每礼都有自己的"用途"和"边界" —— 不同的事,用不同的礼。</p>
+
+  <div class="doctors-grid">
+    <div class="doctor-card role-1">
+      <div class="doctor-name">拜帖</div>
+      <div class="doctor-age">资源告知</div>
+      <div class="doctor-quote">"递一张'我家有什么'的清单,让对方知道我能干啥。"</div>
+      <ul class="doctor-behaviors">
+        <li>灵机刚接话,先递"能力清单"</li>
+        <li>写明"档案 / 数据 / 工件"</li>
+        <li>适用:跨衙门协作 / 多灵机同办</li>
+        <li>边界:只告"有啥",不告"咋用"</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-2">
+      <div class="doctor-name">回帖</div>
+      <div class="doctor-age">工具调用</div>
+      <div class="doctor-quote">"看完清单,回一张'我能帮你做啥'。"</div>
+      <ul class="doctor-behaviors">
+        <li>看完对方拜帖,递"能做啥"</li>
+        <li>写明"动作 / 输入 / 输出"</li>
+        <li>适用:具体差事 / 工具调度</li>
+        <li>边界:只答"能做",不答"先做哪个"</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-3">
+      <div class="doctor-name">问安</div>
+      <div class="doctor-age">提示请求</div>
+      <div class="doctor-quote">"互相请安,问'你想做啥'。"</div>
+      <ul class="doctor-behaviors">
+        <li>双方互相问"差事详情"</li>
+        <li>写明"想做的事 / 约束 / 期望"</li>
+        <li>适用:复杂差事 / 多步操作</li>
+        <li>边界:只问"想做",不答"做完"</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-4">
+      <div class="doctor-name">辞行</div>
+      <div class="doctor-age">收尾通知</div>
+      <div class="doctor-quote">"事毕互相通告'做完了'。"</div>
+      <ul class="doctor-behaviors">
+        <li>事毕递"做完了"的回音</li>
+        <li>写明"完成 / 失败 / 部分完成"</li>
+        <li>适用:所有差事 / 任务收尾</li>
+        <li>边界:只告"做没做完",不告"为啥"</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>节点 4 · 四礼小试 · 兵部 + 户部灵机接话</h3>
+  <p>三月二十。小吏挑了"北狄犯边调粮草"这件事做测试 —— 让兵部灵机和户部灵机用四礼接话。</p>
+
+  <p>先让兵部灵机递<strong>拜帖</strong>:"户部灵机你好,我是兵部灵机,我手上有北境兵员 2 万、北境军马 3000 匹、北境箭矢 10 万支。"</p>
+
+  <p>户部灵机递<strong>回帖</strong>:"兵部灵机你好,我是户部灵机,我手上有粮 30 万石、银 80 万两、运粮船 200 艘。你想调粮,我能算出粮草调度。"</p>
+
+  <p>兵部灵机递<strong>问安</strong>:"户部灵机,北狄犯边,北境兵员需粮 5 万石,何时能调?"</p>
+
+  <p>户部灵机递<strong>问安回音</strong>:"据太仓现存 30 万石,可即刻调 5 万石北运,需 15 日抵达。"</p>
+
+  <p>兵部灵机递<strong>辞行</strong>:"户部灵机,事已定,多谢接话。北境兵马明日发粮。"</p>
+
+  <p>太子一看 —— 从"调粮草"拜帖到辞行,兵部户部两家灵机一刻钟办完。小吏跑半天办不成的事,接话一刻钟搞定。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">小吏:</span>"殿下,这'调粮草'臣跑了半天,灵机一刻钟接完 —— 这不是灵机快了,是灵机接上话了。"
+  </div>
+
+  <p>廖通补一句:"<strong>一刻钟办完五家事 —— 这就是'接'的妙处</strong>。"</p>
+
+  <p>郑直正好走进来(本来想看看笑话),看到这一幕,愣了半晌,低声问:"廖通译,这'接话',真能让五家灵机一起答?" 廖通答:"<strong>郑侍郎善意的'机件孤岛',是让灵机闭着眼做事;廖某费力的'接话章法',是让灵机睁眼看隔壁。善心是善心,章法是章法</strong>。"</p>
+
+  <p>郑直脸一红,没说话,走了。</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">四礼的工程映射</span>
+    </div>
+    <dl>
+      <dt>拜帖 · 资源告知</dt>
+      <dd><span class="who">对应资源接口</span><span class="what">—— MCP Resources:灵机主动暴露"我家有什么"(档案、数据、工件),对方可以读。</span></dd>
+      <dt>回帖 · 工具调用</dt>
+      <dd><span class="who">对应工具接口</span><span class="what">—— MCP Tools:对方灵机能调用的"动作清单",写明输入输出,灵机可调用。</span></dd>
+      <dt>问安 · 提示请求</dt>
+      <dd><span class="who">对应提示接口</span><span class="what">—— MCP Prompts:预设的"询问模板",灵机调用时获得标准化问句,处理复杂差事。</span></dd>
+      <dt>辞行 · 收尾通知</dt>
+      <dd><span class="who">对应通知接口</span><span class="what">—— MCP Notifications:单向通知(不需回音),告诉对方"事已做完 / 出错",异步触发。</span></dd>
+      <dt>四礼顺序</dt>
+      <dd><span class="who">实操原则</span><span class="what">—— 拜帖先(告知) → 回帖(应答) → 问安(细化) → 辞行(收尾),缺一礼,接话就乱。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch4">
+  <span class="chapter-tag">第四幕 · 纸契四件套</span>
+  <h2><span class="num">04</span>廖通立"纸契四件套":拜帖头、所请、来路、回音</h2>
+  <span class="h2-hook">"四礼是'灵机之间怎么说话',纸契是'灵机之间说什么' —— 规矩有了,字面也得统一,灵机才不会听岔。"</span>
+
+  <p class="lead">三月二十五。四匠人合议:四礼是"礼",还得有"纸契" —— 灵机之间递的消息,字面格式要统一,不然灵机听岔。</p>
+
+  <p>廖通翻开《礼记·聘义》"郊聘仪注",找到纸契格式:"凡郊聘之帖,皆有四件:一曰拜帖头(谁递的),二曰所请(做啥),三曰来路(从哪儿听来),四曰回音(做完回啥)。四件配齐,灵机自明。"</p>
+
+  <h3>节点 5 · 纸契四件套演示 · 户部请工部查营造令</h3>
+  <p>太子演一场"户部灵机请工部灵机查营造令"。户部灵机按纸契四件套递:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>件套</th><th>位置</th><th>作用</th><th>由谁立</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>拜帖头</td><td>纸契头一行</td><td>写明"我是户部灵机"</td><td>吕坤</td></tr>
+        <tr><td>所请</td><td>纸契第二行</td><td>写明"请查景和九年营造令"</td><td>苏望</td></tr>
+        <tr><td>来路</td><td>纸契第三行</td><td>写明"据户部税奏第 7 条"</td><td>苏望</td></tr>
+        <tr><td>回音</td><td>纸契第四行</td><td>写明"应有违规清单"</td><td>廖通</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>户部灵机递:</p>
+  <div class="callout">
+    <p style="margin:0"><strong>纸契四件套 · 户部 → 工部:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">① 拜帖头:"户部灵机 · 景和十一年三月廿五"<br>② 所请:"请工部灵机查《景和九年营造令》"<br>③ 来路:"据户部税奏第 7 条,新税法改'灶户税'为'产销税'"<br>④ 回音:"应有违规营造清单,含 300 架水车细则"</p>
+  </div>
+
+  <p>工部灵机收到纸契,5 秒回:</p>
+  <div class="callout">
+    <p style="margin:0"><strong>工部 → 户部 · 回音:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">据《景和九年营造令》第 12 条"营造取水须按新税法核税",查得工部造水车 300 架中:<br>① 280 架已按新税法改"灶户"为"产销户",合规;<br>② 20 架未改,违规,折银 4000 两,建议户部核销。</p>
+  </div>
+
+  <p>户部侍郎看了半晌:"这'280 架合规'和'20 架违规'......我都没查过。灵机怎么知道的?" 廖通笑:"<strong>拜帖头定谁递的(我是户部),所请定做啥(查营造令),来路定从哪儿听(户部税奏第 7 条),回音定做完回啥(违规清单)。四件配齐,灵机自己查的</strong>。"</p>
+
+  <p>小李低声对太子说:"殿下,这是'一刻钟办完五家事'的真正意思 —— 不是灵机快了,是纸契格式统一了。" 太子点头:"<strong>这才是老通译的活 —— 四十年的经验不在嘴上,在'怎么写纸契'上</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">纸契四件套的工程定义</span>
+    </div>
+    <dl>
+      <dt>拜帖头</dt>
+      <dd><span class="who">纸契头一行</span><span class="what">—— JSON-RPC 2.0 的 caller 字段:标识"谁在递消息",类似信封上的寄信人。</span></dd>
+      <dt>所请</dt>
+      <dd><span class="who">纸契第二行</span><span class="what">—— JSON-RPC 2.0 的 method 字段:标识"要做什么动作"(如"查营造令"、"调度粮草")。</span></dd>
+      <dt>来路</dt>
+      <dd><span class="who">纸契第三行</span><span class="what">—— JSON-RPC 2.0 的 params 字段:动作的输入参数(如"户部税奏第 7 条")。</span></dd>
+      <dt>回音</dt>
+      <dd><span class="who">纸契第四行</span><span class="what">—— JSON-RPC 2.0 的 result 字段:动作完成后回的结果(如"违规清单")。</span></dd>
+      <dt>280 合规 / 20 违规</dt>
+      <dd><span class="who">工部巧机自查</span><span class="what">—— "工具调用"实战:纸契四件套给齐数据后,工部灵机自己查(原本户部侍郎没查过的违规清单),这是接话的连锁效应。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch5">
+  <span class="chapter-tag">第五幕 · 实战与反转</span>
+  <h2><span class="num">05</span>陈守一"考校"再成"拜师" —— 接派反转</h2>
+  <span class="h2-hook">"陈守一从西市舶司赶来'考校'灵机 —— 一道刁题'北狄犯边调粮草,三家灵机如何接话',灵机按四礼一刻钟答完,陈守一反倒问:'怎么推十二衙门?'"</span>
+
+  <p class="lead">四月十二早朝。郑直又上一奏:"<strong>接话机件费人工,不如各干各的</strong>。"</p>
+
+  <p>陈守一(第09章三反转后任"奏章房外派督办")在朝堂上求情:"殿下,郑侍郎不是坏人 —— 他的'机件孤岛'是怕灵机互冲,善念可悯。让他再想想。"</p>
+
+  <p>太子正要开口,门外传来一封急奏 —— 朝廷派西市舶司"接派"主事陈守一前来"考校"。陈守一是郑直的老友,两人在"接话"上意见一致,但陈守一更彻底 —— 他主张"<strong>不光灵机要接话,连各家灵机的纸契也要接得上</strong>"。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">陈守一:</span>"殿下,臣从西市舶司赶来,不为别的,只想出一道刁题考校接话司 —— 听说是新设的,臣没见过,心里没底。题是:'<strong>北狄犯边,户部、工部、兵部三家灵机如何接话,一刻钟调齐粮草?</strong>'"
+  </div>
+
+  <p>太子示意廖通,廖通立"四礼 + 纸契四件套"贴在会同馆正堂墙上。太子让户部、工部、兵部三家灵机现场接话。</p>
+
+  <p>兵部灵机先递<strong>拜帖</strong>:"户部、工部灵机好,我是兵部灵机,北狄犯边,北境兵员 2 万需粮 5 万石、需车 200 辆。"</p>
+
+  <p>户部灵机递<strong>回帖</strong>:"兵部灵机好,我是户部灵机,可调粮 5 万石,需 15 日北运。"</p>
+
+  <p>工部灵机递<strong>回帖</strong>:"兵部灵机好,我是工部灵机,可造运粮车 200 辆,需 10 日完工。"</p>
+
+  <p>兵部灵机递<strong>问安</strong>:"户部、工部灵机,能否同时调粮、造车,15 日内同时抵达北境?"</p>
+
+  <p>户部灵机递<strong>问安回音</strong>:"可 —— 户部按纸契四件套先调粮,15 日北运。"</p>
+
+  <p>工部灵机递<strong>问安回音</strong>:"可 —— 工部按纸契四件套先造车,10 日完工,留 5 日运粮。"</p>
+
+  <p>兵部灵机递<strong>辞行</strong>:"户部、工部灵机,事已定,多谢接话。北境兵马明日发粮,10 日后发车。"</p>
+
+  <p>一刻钟,三家灵机接话完毕。</p>
+
+  <div class="callout">
+    <p style="margin:0"><strong>三家灵机接话结果:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">① 户部调粮 5 万石(15 日抵达);<br>② 工部造车 200 辆(10 日完工);<br>③ 兵部发粮 + 等车(15 日后北境兵马齐装);<br>—— 一刻钟办完三家事,事毕三家辞行。</p>
+    <p style="margin:6px 0 0;font-size:13px;color:var(--text-muted)">—— 拜帖头:兵部;所请:同时调粮造车;来路:北狄犯边;回音:15 日齐装。</p>
+  </div>
+
+  <p>陈守一看了半晌,问:"灵机,你答得对 —— 但我问你,你<strong>怎么接得这么顺</strong>?"</p>
+
+  <p>廖通代灵机答:"<strong>拜帖定谁接的(兵部请户部工部),回帖定能做啥(户部调粮 / 工部造车),问安定想做啥(同时调粮造车),辞行定做完回啥(15 日齐装)。四礼配齐,灵机自己接的</strong>。"</p>
+
+  <p>陈守一又问:"那—— 我能不能也学这套?" 廖通答:"<strong>陈主事是省纸派转接派,以为'孤岛=省事' —— 其实'孤岛≠省事','接话=省事'</strong>。学了四礼,你的'接派'主张才真正落地。"</p>
+
+  <p>陈守一长叹一声,主动请缨:"<strong>殿下,臣愿任'会同馆·番使院·接话督办',把这套接话,推给西市舶司十二衙门</strong>。臣的'接派',从此扩'接派衙门'。"</p>
+
+  <p>郑直在一旁看着,脸色复杂。</p>
+
+  <h3>太子金句 · 接话三戒</h3>
+  <p>太子在番使院匾旁贴上"接话三戒":</p>
+  <ul>
+    <li><strong>戒孤岛</strong> —— 灵机闭着眼做事,等于工匠闭着眼造水车,手艺再好也是旧的</li>
+    <li><strong>戒乱接</strong> —— 不是接得多就好,要"拜帖先、回帖后、问安中、辞行末"</li>
+    <li><strong>戒忘礼</strong> —— 接好之后还要常维护,四礼不是一锤子买卖</li>
+  </ul>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">实战 + 三戒 + 反派反转</span>
+    </div>
+    <dl>
+      <dt>陈守一"考校"再成"拜师"</dt>
+      <dd><span class="who">本章反派反转</span><span class="what">—— MCP 实战:西市舶司主事带"接派"立场来考校,反被接话四礼答服,主动请缨任接话督办,把"接"字诀推十二衙门。</span></dd>
+      <dt>三家灵机接话调粮草</dt>
+      <dd><span class="who">灵机四礼作答</span><span class="what">—— MCP 工具调用:兵部 / 户部 / 工部三家灵机按拜帖 → 回帖 → 问安 → 辞行四礼接话,一刻钟办完三家事。</span></dd>
+      <dt>孤岛≠省事 · 接话=省事</dt>
+      <dd><span class="who">廖通总结</span><span class="what">—— MCP 金句:孤岛不等于省灵机的事(孤岛等于让灵机闭着眼);但接话 = 让灵机互看 = 真正省事。</span></dd>
+      <dt>接话三戒</dt>
+      <dd><span class="who">太子立的规矩</span><span class="what">—— MCP 设计三原则:① 不孤岛(戒孤岛)② 要有序(戒乱接)③ 常维护(戒忘礼)。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="finale">
+  <span class="chapter-tag">终章 · 景和十一年七月</span>
+  <h2><span class="num">06</span>三月期满,番使院匾"会说话的不如会接话的"</h2>
+
+  <p class="lead">景和十一年七月。三月期满,番使院正式挂牌。太子题匾六字:"<strong>会说话的不如会接话的</strong>"。</p>
+
+  <p>这天早朝,廖通、何七、吕坤、苏望、陈守一、郑直同堂。太子当众演示:让户部、工部、兵部三家灵机按"四礼 + 纸契四件套"现场接话 —— 从兵部灵机递拜帖"调粮草",到户部灵机回帖"5 万石 15 日北运",到工部灵机回帖"200 辆 10 日完工",到兵部灵机辞行"15 日齐装" —— 一刻钟办完三家事。</p>
+
+  <p>廖通带头鼓掌。番使院通译们从此不再说灵机是"孤岛"或"塞派"。</p>
+
+  <div class="pullquote">
+    "灵机的嘴会说话,耳朵会听话,但嘴和耳朵不接上,话也白说,听也白听。<br><br>
+    真正的功夫,不在灵机会说什么,在<strong>灵机与灵机之间用什么规矩说话</strong> —— <br><br>
+    拜帖要明,回帖要实,问安要诚,辞行要清。<br><br>
+    <strong>机件不在多,在接得上。</strong>"
+    <footer style="margin-top:14px;font-size:13px;color:var(--text-muted)">—— 太子,景和十一年七月,21 岁,番使院挂牌三月</footer>
+  </div>
+
+  <h3>跨章承接 · 下一章预告</h3>
+  <ul>
+    <li><strong>第11章 · 评估与迭代</strong> —— 灵机接得好不好,谁来打分?怎么打分?第08章记簿 + 第09章编排 + 第10章接话如何"被评估"?</li>
+    <li><strong>第12章 · RL · 训练与对齐</strong> —— 灵机接话接错了,怎么纠?训练灵机"按四礼接话",让接话越来越准。</li>
+  </ul>
+</section>
+
+<section id="summary">
+  <div class="summary-box">
+    <div class="summary-box-title">一句话总结</div>
+    <p class="summary-text">第10章讲的是:<strong>五家灵机互不接话 —— 工部侍郎郑直主张"机件孤岛"(孤岛派),会同馆老通译廖通主张"四礼接话"(接派),二十一岁太子在会同馆下设番使院,造出"接话四礼"(拜帖/回帖/问安/辞行)与"纸契四件套"(拜帖头/所请/来路/回音),三月为期,会说话的不如会接话的</strong>。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px">太子金句:"<strong>灵机的嘴会说话,耳朵会听话,但嘴和耳朵不接上,话也白说,听也白听。真正的功夫,不在灵机会说什么,在灵机与灵机之间用什么规矩说话 —— 机件不在多,在接得上</strong>"。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px;color:var(--text-muted)">反派(陈守一)再反转:西市舶司"接派"主事从"考校"再成"拜师",主动请缨任"会同馆·番使院·接话督办",把"接派"推十二衙门。母题连续 8 连击复用(反派转友)。</p>
+  </div>
+</section>
+
+<section id="coverage">
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" style="color:var(--accent-sage)"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      概念地图 · 25 个名词索引
+    </div>
+
+    <h4 style="margin:0 0 12px">📜 接话四礼 · 四种"礼节"</h4>
+    <div class="doctors-grid">
+      <div class="doctor-card role-1">
+        <div class="doctor-name">拜帖</div>
+        <div class="doctor-quote">"递一张'我家有什么'的清单。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应资源接口</li>
+          <li>接话初见礼</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-2">
+        <div class="doctor-name">回帖</div>
+        <div class="doctor-quote">"回一张'我能帮你做啥'。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应工具调用</li>
+          <li>看完拜帖应喏</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-3">
+        <div class="doctor-name">问安</div>
+        <div class="doctor-quote">"互相请安,问'你想做啥'。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应提示请求</li>
+          <li>细化差事</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-4">
+        <div class="doctor-name">辞行</div>
+        <div class="doctor-quote">"事毕互相通告'做完了'。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应收尾通知</li>
+          <li>单向异步</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4 style="margin:24px 0 12px">📖 纸契四件套 · "纸契"标准格式</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>件套</th><th>位置</th><th>作用</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>拜帖头</td><td>纸契头一行</td><td>写明"我是某衙门灵机"</td></tr>
+          <tr><td>所请</td><td>纸契第二行</td><td>写明"请做某事"</td></tr>
+          <tr><td>来路</td><td>纸契第三行</td><td>写明"据某档某条"</td></tr>
+          <tr><td>回音</td><td>纸契第四行</td><td>写明"应回某清单"</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin:24px 0 12px">📜 驿道 / 海路 · 两路传令</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>路</th><th>朝代叙事</th><th>对应概念</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>驿道</td><td>同机进程间传令,快</td><td>进程间传(见 annotation)</td></tr>
+          <tr><td>海路</td><td>跨机网络传令,远</td><td>网络信号(见 annotation)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin:24px 0 12px">🔧 接话 vs 第 09 章编排(机件对比)</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>维度</th><th>第 09 章编排</th><th>第 10 章接话</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>管什么</td><td>"怎么排给灵机看"</td><td>"怎么让灵机对灵机说话"</td></tr>
+          <tr><td>位置</td><td>纸条(临时脑)</td><td>灵机之间(接驳口)</td></tr>
+          <tr><td>主笔</td><td>周海</td><td>廖通</td></tr>
+          <tr><td>核心</td><td>四术 + 四件套</td><td>四礼 + 纸契四件套</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="think">
+  <span class="chapter-tag">太子的五条心得</span>
+  <h2><span class="num">心</span>二十一岁太子的五条心得(白话版)</h2>
+  <span class="h2-hook">"故事听完了,太子想跟你掏心窝子说几句 —— 都是大白话,不必查名词。"</span>
+
+  <h3>心得一 · 孤岛的毛病不是话少,是话乱</h3>
+  <p>灵机会算账,五家灵机不算不出"调粮草" —— 不是算力不够,是话没传到该听的人那里。<strong>一刻钟办完五家事,靠的不是灵机快了,是灵机接上话了</strong>。</p>
+
+  <h3>心得二 · 接话的妙处不是热闹,是规矩</h3>
+  <p>四礼(拜/回/问/辞)不是为热闹,是为让灵机"按礼走" —— <strong>拜帖要明,回帖要实,问安要诚,辞行要清</strong>。</p>
+
+  <h3>心得三 · 纸契是"灵机之间说什么"的标准格式</h3>
+  <p>拜帖头定谁递的(我是谁),所请定做啥(请做某事),来路定从哪儿听(据某档),回音定做完回啥(应有清单) —— <strong>四件配齐,灵机自明</strong>。</p>
+
+  <h3>心得四 · 郑侍郎的"机件孤岛"不是错,是省错了地方</h3>
+  <p>他怕灵机互冲,误了营造本业 —— 这种善念我们要尊重。但善念不讲究章法,反而害事。<strong>接话才是真省事,孤岛不是</strong>。</p>
+
+  <h3>心得五 · 陈守一从"省纸派"到"接派" —— 这就是章法的胜利</h3>
+  <p>西市舶司主事从"考校"再成"拜师" —— 不是他认输,是他看见<strong>孤岛≠省事,接话=省事</strong>。<strong>章法对了,善念才真正落地</strong>。</p>
+
+  <div class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">这五条心得对应到接话机件上就是</span>
+    </div>
+    <dl>
+      <dt>心得一</dt><dd>→ 灵机孤岛(不接话)与灵机接话的核心区别:话不在多,在传到该听的人</dd>
+      <dt>心得二</dt><dd>→ 四礼 = 把"乱接"改成"按礼接":拜 / 回 / 问 / 辞 各管一段</dd>
+      <dt>心得三</dt><dd>→ 纸契四件套 = 灵机之间"说什么"的标准格式:拜帖头 + 所请 + 来路 + 回音</dd>
+      <dt>心得四</dt><dd>→ "孤岛派"误区:孤岛不等于省事(灵机闭着眼做事,反而误事)</dd>
+      <dt>心得五</dt><dd>→ "接派"胜利:陈守一从"省纸"转"接话",这是反派转友母题 8 连击复用</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="quiz">
+  <span class="chapter-tag">自测十问</span>
+  <h2><span class="num">测</span>读完了?来试试这十问</h2>
+  <span class="h2-hook">"题目和选项直接展开看,答案藏在每题底部的小箭头里 —— 自己先想,再看答案。"</span>
+
+  <div class="quiz-list">
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q1</span>
+        <span style="font-size:13px;color:var(--text-muted)">考开篇两大症结</span>
+      </div>
+      <p class="quiz-q">郑直的"机件孤岛"和廖通的"四礼接话",分别对应接话规矩的哪两个思路?</p>
+      <ul class="quiz-options">
+        <li>A. 灵机孤岛(不接话) / 通信协议(按四礼接)</li>
+        <li>B. 增大人工 / 减少人工</li>
+        <li>C. 用云端 / 用本地</li>
+        <li>D. 加钱 / 省钱</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 灵机孤岛 / 通信协议(按四礼接)</strong></p>
+        <p style="margin:4px 0">A 对 —— 郑直"机件孤岛"= 灵机闭着眼做事(不接隔壁灵机的话);廖通"四礼接话"= 通信协议(按拜帖 / 回帖 / 问安 / 辞行四礼接),两者是接话规矩的两条思路。</p>
+        <p style="margin:4px 0">B 错 —— "增大人工/减少人工"是工程成本思路,不是接话规矩的核心思路。</p>
+        <p style="margin:4px 0">C 错 —— "用云端/用本地"是部署思路,跟本章主线无关。</p>
+        <p style="margin:4px 0">D 错 —— "加钱/省钱"是预算思路,不是接话规矩思路。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q2</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四礼之"拜帖"</span>
+      </div>
+      <p class="quiz-q">廖通"拜帖"对应接话规矩的哪个要素?</p>
+      <ul class="quiz-options">
+        <li>A. 资源告知(初见递清单)</li>
+        <li>B. 工具调用(应喏做啥)</li>
+        <li>C. 提示请求(问想做啥)</li>
+        <li>D. 收尾通知(事毕辞行)</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 资源告知(初见递清单)</strong></p>
+        <p style="margin:4px 0">A 对 —— "拜帖"是初见礼,递一张"我家有什么"的清单,让对方知道我能干啥 —— 这就是"资源告知":在接话初先告知对方我能提供什么。</p>
+        <p style="margin:4px 0">B 错 —— "应喏做啥"是"回帖"(看完拜帖应喏)。</p>
+        <p style="margin:4px 0">C 错 —— "问想做啥"是"问安"(互相请安问差事)。</p>
+        <p style="margin:4px 0">D 错 —— "事毕辞行"是"辞行"(收尾通知)。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q3</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四礼之"回帖"</span>
+      </div>
+      <p class="quiz-q">廖通"回帖"的核心是?</p>
+      <ul class="quiz-options">
+        <li>A. 灵机先递清单</li>
+        <li>B. 看完对方清单,回一张"我能帮你做啥"</li>
+        <li>C. 互相请安</li>
+        <li>D. 事毕通告</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 看完对方清单,回一张"我能帮你做啥"</strong></p>
+        <p style="margin:4px 0">A 错 —— "灵机先递清单"是拜帖的活,不是回帖。</p>
+        <p style="margin:4px 0">B 对 —— "回帖" = 应喏礼:看完对方拜帖,回一张"我能帮你做啥"。这是"工具调用":告诉对方灵机我能执行什么动作、输入输出是什么。</p>
+        <p style="margin:4px 0">C 错 —— "互相请安"是问安的活,不是回帖。</p>
+        <p style="margin:4px 0">D 错 —— "事毕通告"是辞行的活,不是回帖。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q4</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四礼之"辞行"</span>
+      </div>
+      <p class="quiz-q">廖通"辞行"通知的是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 关键事实</li>
+        <li>B. 数字</li>
+        <li>C. 完成 / 失败 / 部分完成(单向异步)</li>
+        <li>D. 所有动词</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 完成 / 失败 / 部分完成(单向异步)</strong></p>
+        <p style="margin:4px 0">A 错 —— "关键事实"是拜帖和回帖的内容,不是辞行的核心。</p>
+        <p style="margin:4px 0">B 错 —— "数字"通常也是关键事实的一部分,不属于辞行通知。</p>
+        <p style="margin:4px 0">C 对 —— 辞行 = 收尾通知:事毕递"做完了"的回音,标记"完成 / 失败 / 部分完成"。这是"通知接口",单向异步,不需对方回音。</p>
+        <p style="margin:4px 0">D 错 —— "所有动词"与辞行无关。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q5</span>
+        <span style="font-size:13px;color:var(--text-muted)">考纸契四件套</span>
+      </div>
+      <p class="quiz-q">"纸契四件套"指什么?</p>
+      <ul class="quiz-options">
+        <li>A. 茶 / 盐 / 算盘 / 笔</li>
+        <li>B. 拜帖头 / 所请 / 来路 / 回音</li>
+        <li>C. 户部 / 工部 / 礼部 / 兵部</li>
+        <li>D. 拜帖 / 回帖 / 问安 / 辞行</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 拜帖头 / 所请 / 来路 / 回音</strong></p>
+        <p style="margin:4px 0">A 错 —— 茶盐算盘笔是朝代小品的实物,不是纸契四件套。</p>
+        <p style="margin:4px 0">B 对 —— 纸契四件套 = 灵机之间递消息的标准格式:拜帖头(我是谁) + 所请(做啥) + 来路(据某档) + 回音(应有清单)。</p>
+        <p style="margin:4px 0">C 错 —— 户部/工部/礼部/兵部是朝廷四部,不是纸契四件套。</p>
+        <p style="margin:4px 0">D 错 —— 拜/回/问/辞 是"四礼"(礼节),不是"纸契四件套"(字面格式)。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q6</span>
+        <span style="font-size:13px;color:var(--text-muted)">考两路传令</span>
+      </div>
+      <p class="quiz-q">"驿道传令"和"海路信号"分别对应接话规矩的哪种传输?</p>
+      <ul class="quiz-options">
+        <li>A. 进程间传 / 网络信号</li>
+        <li>B. 网络信号 / 进程间传</li>
+        <li>C. 都用同一路</li>
+        <li>D. 都用同一路 + 不同节奏</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 进程间传 / 网络信号</strong></p>
+        <p style="margin:4px 0">A 对 —— "驿道传令"= 进程间传(同机进程间传令,快);"海路信号"= 网络信号(跨机网络传令,远)。两路并用,本地远程都能接话。</p>
+        <p style="margin:4px 0">B 错 —— 把"驿道"和"海路"的对应关系反过来了 —— 驿道是同机进程,海路是跨机网络。</p>
+        <p style="margin:4px 0">C 错 —— 接话规矩默认两路并用,不是只用一路。</p>
+        <p style="margin:4px 0">D 错 —— 两路传输方式不同(进程 vs 网络),不只是节奏不同。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q7</span>
+        <span style="font-size:13px;color:var(--text-muted)">考太子金句</span>
+      </div>
+      <p class="quiz-q">太子金句"会说话的不如会接话的",完整版是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 会说话的不如会接话的 —— 拜帖要明,回帖要实,问安要诚,辞行要清</li>
+        <li>B. 会说话的不如会说话的</li>
+        <li>C. 会说话的不如会听话的</li>
+        <li>D. 会听话的不如会接话的</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 拜帖要明,回帖要实,问安要诚,辞行要清</strong></p>
+        <p style="margin:4px 0">A 对 —— 完整版是:会说话的不如会接话的 —— 拜帖要明(资源告知清楚),回帖要实(工具调用实在),问安要诚(提示请求真诚),辞行要清(收尾通知明确)。这是接话规矩的金句。</p>
+        <p style="margin:4px 0">B 错 —— "会说话的不如会说话的"是循环论证,不是太子的金句。</p>
+        <p style="margin:4px 0">C 错 —— "会说话的不如会听话的"是单向思路,接话规矩的核心是双向接话。</p>
+        <p style="margin:4px 0">D 错 —— "会听话的不如会接话的"是接话思路的简化版,完整版要带四礼要诀。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q8</span>
+        <span style="font-size:13px;color:var(--text-muted)">考接话三戒</span>
+      </div>
+      <p class="quiz-q">太子立的"接话三戒",不包括下列哪一条?</p>
+      <ul class="quiz-options">
+        <li>A. 戒孤岛</li>
+        <li>B. 戒乱接</li>
+        <li>C. 戒多接</li>
+        <li>D. 戒忘礼</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · "戒多接"不在三戒之列</strong></p>
+        <p style="margin:4px 0">A 对(在三戒中) —— "戒孤岛":灵机闭着眼做事,等于工匠闭着眼造水车,手艺再好也是旧的。</p>
+        <p style="margin:4px 0">B 对(在三戒中) —— "戒乱接":不是接得多就好,要"拜帖先、回帖后、问安中、辞行末"。</p>
+        <p style="margin:4px 0">C 错(不在三戒中) —— "戒多接"不是接话三戒之一。多接是接话的功能,不是接话设计原则。三戒是孤岛/乱接/忘礼,不是接得多不多。</p>
+        <p style="margin:4px 0">D 对(在三戒中) —— "戒忘礼":接好之后还要常维护,四礼不是一锤子买卖。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q9</span>
+        <span style="font-size:13px;color:var(--text-muted)">考反派母题</span>
+      </div>
+      <p class="quiz-q">陈守一在本章中反对的是什么?后来为什么反转?</p>
+      <ul class="quiz-options">
+        <li>A. 反对自造 → 因为看见本土灵机比洋货好</li>
+        <li>B. 反对机件孤岛,主张更彻底的接话 → 因为看见四礼接话一刻钟办完五家事,从"考校"再成"拜师"</li>
+        <li>C. 反对编排 → 因为被免职</li>
+        <li>D. 反对奏章房 → 因为他被免职</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 反对机件孤岛,主张更彻底的接话 → 看见四礼接话=真省事,反转</strong></p>
+        <p style="margin:4px 0">A 错 —— "反对自造"是第07章梁王的事,不是本章。</p>
+        <p style="margin:4px 0">B 对 —— 第10章陈守一(西市舶司"接派"主事,第09章反转来的老友)主张"接派"立场,带刁题"北狄犯边调粮草"来考校,反被四礼接话答服,主动请缨任"会同馆·番使院·接话督办",从"考校"再成"拜师"。母题 8 连击复用。</p>
+        <p style="margin:4px 0">C 错 —— "反对编排"是第09章范纯之的事,不是本章。</p>
+        <p style="margin:4px 0">D 错 —— "反对奏章房"不是本章情节,陈守一反而来当接话督办。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q10</span>
+        <span style="font-size:13px;color:var(--text-muted)">考跨章呼应</span>
+      </div>
+      <p class="quiz-q">第 10 章的"接话"机件,跟第 09 章的"编排"机件是什么关系?</p>
+      <ul class="quiz-options">
+        <li>A. 接话替代编排</li>
+        <li>B. 编排替代接话</li>
+        <li>C. 接话 ≠ 编排:编排管"怎么排给灵机看"(临时纸条),接话管"怎么让灵机对灵机说话"(灵机之间)</li>
+        <li>D. 两者完全一样</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 编排管"怎么排给灵机看",接话管"怎么让灵机对灵机说话"</strong></p>
+        <p style="margin:4px 0">A 错 —— "接话替代编排"不对 —— 两者是互补关系,不是替代。编排决定"灵机纸条上放什么",接话决定"灵机与灵机之间怎么递消息"。</p>
+        <p style="margin:4px 0">B 错 —— "编排替代接话"也不对 —— 同上,两者互补不替代。</p>
+        <p style="margin:4px 0">C 对 —— 编排是"纸条"(临时脑),管"怎么排给灵机看"—— 第 09 章顶/间/末/滤四术都是纸条上的排法。接话是"灵机之间"(接驳口),管"怎么让灵机对灵机说话"—— 第 10 章拜/回/问/辞四礼都是灵机之间的礼节。位置不同,主笔不同(周海 vs 廖通),核心不同(四术 + 四件套 vs 四礼 + 纸契四件套)。</p>
+        <p style="margin:4px 0">D 错 —— 两者完全不同 —— 一个管临时排版,一个管灵机之间接话。</p>
+      </details>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text-secondary)">WellInsight</strong> · 学习材料 · 第10章 v1.0 · 2026-06-26
+  </div>
+  <div>
+    原文:<a class="footer-link" href="https://raw.githubusercontent.com/datawhalechina/hello-agents/main/docs/chapter10/Chapter10-MCP.md" target="_blank">datawhalechina/hello-agents · Chapter 10</a>
+  </div>
+</footer>
+
+</div>
+
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin:round"><path d="M18 15l6-6-6-6"/></svg>
+</button>
+
+</body>
+</html>

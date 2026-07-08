@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!--
+  第06章 · 框架开发实践 · WellInsight 学习材料 · 四部联席 v1.0
+  渲染日期:2026-06-25 · 渲染器:fable-renderer v4 + 第10章板块
+  原文:datawhalechina/hello-agents chapter 6
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第06章 · 框架开发实践 · WellInsight 学习材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============== Morandi Palette ============== */
+:root{
+  --bg:#F2EDE6;
+  --bg-card:#FAF7F2;
+  --bg-elevated:#FFFCF7;
+  --bg-deep:#E8DFD3;
+  --text-primary:#3D3833;
+  --text-secondary:#6B6157;
+  --text-muted:#998E81;
+  --accent-sage:#8B9D83;
+  --accent-sage-soft:#D8E2D2;
+  --accent-sage-faint:#ECF1E8;
+  --accent-terracotta:#C49B8E;
+  --accent-terracotta-soft:#E6D2C8;
+  --accent-blue:#8A9AA8;
+  --accent-blue-soft:#C8D2DA;
+  --accent-amber:#C9A878;
+  --accent-amber-soft:#E8D7B7;
+  --accent-mauve:#A89098;
+  --accent-mauve-soft:#DCCCD0;
+  --border:#D9D2C7;
+  --border-light:#E8E0D3;
+  --shadow:0 2px 8px rgba(61,56,51,.06), 0 1px 2px rgba(61,56,51,.04);
+  --shadow-lg:0 8px 24px rgba(61,56,51,.10), 0 2px 6px rgba(61,56,51,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;
+  background:var(--bg);color:var(--text-primary);
+  line-height:1.78;font-size:16px;font-weight:400;
+  -webkit-font-smoothing:antialiased;letter-spacing:.01em;
+}
+
+/* ============== Layout ============== */
+.container{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+.sticky-toc{
+  position:fixed;top:24px;right:24px;width:240px;
+  background:var(--bg-elevated);border:1px solid var(--border);
+  border-radius:8px;padding:14px 16px;
+  box-shadow:var(--shadow);font-size:13px;z-index:50;
+  max-height:calc(100vh - 48px);overflow-y:auto;
+}
+.sticky-toc-title{
+  font-weight:600;color:var(--text-secondary);
+  margin-bottom:8px;font-size:12px;letter-spacing:.5px;
+  display:flex;align-items:center;gap:6px;
+}
+.sticky-toc ol{list-style:none;counter-reset:toc;padding:0}
+.sticky-toc li{counter-increment:toc;margin:4px 0}
+.sticky-toc a{
+  color:var(--text-secondary);text-decoration:none;
+  display:block;padding:4px 0 4px 8px;margin-left:6px;
+  border-left:2px solid transparent;font-size:12.5px;font-weight:500;
+  transition:all .2s;
+}
+.sticky-toc a:hover{color:var(--accent-sage);border-left-color:var(--accent-sage)}
+.sticky-toc a::before{content:counter(toc) ".";color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px;margin-right:4px}
+
+/* ============== Hero ============== */
+.hero{
+  background:linear-gradient(135deg,#FAF7F2 0%,#F2EDE6 100%);
+  border:1px solid var(--border);border-radius:12px;
+  padding:48px 40px 40px;margin-bottom:48px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--accent-sage) 0%,var(--accent-terracotta) 33%,var(--accent-blue) 66%,var(--accent-amber) 100%);
+}
+.hero-meta{
+  display:flex;align-items:center;gap:12px;font-size:12px;
+  color:var(--text-muted);margin-bottom:16px;font-weight:500;letter-spacing:.5px;
+}
+.hero-meta-dot{width:4px;height:4px;background:var(--text-muted);border-radius:50%}
+.hero h1{
+  font-size:46px;font-weight:700;line-height:1.15;
+  color:var(--text-primary);margin-bottom:10px;letter-spacing:-1px;
+}
+.hero-subtitle{
+  font-size:16px;color:var(--text-secondary);
+  margin-bottom:22px;font-weight:500;
+}
+.hero-fable{
+  display:inline-block;padding:2px 10px;margin-right:4px;
+  background:var(--accent-sage-soft);color:var(--accent-sage);
+  border-radius:12px;font-size:14px;font-weight:600;letter-spacing:.5px;
+}
+.hero-desc{
+  font-size:14.5px;color:var(--text-secondary);
+  margin-bottom:24px;line-height:1.7;font-weight:400;
+}
+.hero-source{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12.5px;color:var(--text-muted);
+  background:var(--bg-card);padding:6px 12px;border-radius:20px;
+  border:1px solid var(--border-light);font-weight:500;
+}
+
+/* ============== Section ============== */
+section{margin-bottom:56px;scroll-margin-top:80px}
+.chapter-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;color:var(--accent-sage);
+  background:var(--accent-sage-soft);padding:4px 12px;border-radius:12px;
+  margin-bottom:14px;letter-spacing:1px;
+}
+h2{
+  font-size:28px;font-weight:700;color:var(--text-primary);
+  margin-bottom:14px;letter-spacing:-.3px;
+  display:flex;align-items:baseline;gap:12px;line-height:1.3;
+}
+h2 .num{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--accent-terracotta);font-weight:500}
+h2-hook{
+  display:block;font-size:15px;font-weight:500;color:var(--text-secondary);
+  margin-top:8px;margin-bottom:24px;padding:12px 16px;
+  background:var(--bg-card);border-left:3px solid var(--accent-amber);
+  border-radius:0 6px 6px 0;font-style:italic;
+}
+h3{
+  font-size:19px;font-weight:600;color:var(--text-primary);
+  margin:24px 0 10px;padding-left:14px;
+  border-left:3px solid var(--accent-amber);letter-spacing:-.2px;
+}
+h4{font-size:16px;font-weight:600;color:var(--accent-sage);margin:20px 0 10px}
+p{margin-bottom:14px;color:var(--text-primary);text-align:justify;font-weight:400}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+em{color:var(--text-secondary);font-style:normal;font-weight:600}
+
+/* ============== Lead ============== */
+.lead{
+  font-size:17px;color:var(--text-secondary);
+  padding:18px 22px;background:var(--bg-card);
+  border-left:3px solid var(--accent-terracotta);
+  border-radius:0 6px 6px 0;margin-bottom:28px;
+  font-weight:500;line-height:1.85;
+}
+
+/* ============== Cards & Callouts ============== */
+.callout{
+  background:var(--bg-card);border:1px solid var(--border-light);
+  border-radius:8px;padding:18px 22px;margin:20px 0;box-shadow:var(--shadow);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:600;color:var(--accent-sage);
+  margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;
+}
+.callout p:last-child{margin-bottom:0}
+.pullquote{
+  background:linear-gradient(135deg,var(--accent-amber-soft) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-amber-soft);border-radius:8px;
+  padding:22px 26px;margin:24px 0;font-size:16.5px;font-weight:500;
+  color:var(--text-primary);position:relative;
+}
+.pullquote::before{
+  content:"\201C";position:absolute;top:-6px;left:16px;
+  font-size:48px;color:var(--accent-amber);
+  font-family:Georgia,serif;line-height:1;font-weight:700;
+}
+
+/* ============== Doctor Cards (or generic character cards) ============== */
+.doctors-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:14px;margin:28px 0 8px;
+}
+.doctor-card{
+  background:var(--bg-elevated);border:1px solid var(--border-light);
+  border-radius:10px;padding:18px 18px 16px;
+  box-shadow:var(--shadow);position:relative;transition:transform .2s;
+}
+.doctor-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.doctor-card.role-1{border-top:3px solid var(--accent-sage)}
+.doctor-card.role-2{border-top:3px solid var(--accent-terracotta)}
+.doctor-card.role-3{border-top:3px solid var(--accent-blue)}
+.doctor-card.role-4{border-top:3px solid var(--accent-amber)}
+.doctor-name{
+  font-size:19px;font-weight:700;color:var(--text-primary);
+  margin-bottom:2px;display:flex;align-items:center;gap:8px;letter-spacing:-.2px;
+}
+.doctor-age{font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:10px}
+.doctor-quote{font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:12px;line-height:1.6;padding-bottom:12px;border-bottom:1px dashed var(--border-light)}
+.doctor-behaviors{list-style:none;padding:0;margin:0;font-size:12.5px;color:var(--text-secondary);line-height:1.7}
+.doctor-behaviors li{padding:3px 0 3px 14px;position:relative}
+.doctor-behaviors li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--accent-amber)}
+
+/* ============== Annotation Block ============== */
+.annotation{
+  background:linear-gradient(135deg,var(--accent-sage-faint) 0%,var(--bg-card) 100%);
+  border:1px solid var(--accent-sage-soft);
+  border-left:3px solid var(--accent-sage);
+  border-radius:0 8px 8px 0;padding:18px 22px;margin:32px 0 8px;position:relative;
+}
+.annotation-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--accent-sage-soft);
+}
+.annotation-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;color:var(--accent-sage);
+  text-transform:uppercase;letter-spacing:1.5px;
+}
+.annotation-hint{font-size:12px;color:var(--text-muted);font-weight:500;font-style:italic}
+.annotation dl{display:grid;grid-template-columns:minmax(150px,max-content) 1fr;gap:8px 18px;margin:0}
+.annotation dt{font-weight:600;color:var(--text-primary);font-size:13px;line-height:1.65}
+.annotation dd{margin:0;color:var(--text-secondary);font-size:13px;line-height:1.65}
+.annotation dd .who{color:var(--accent-terracotta);font-weight:700;margin-right:4px}
+.annotation dd .what{color:var(--text-secondary)}
+
+/* ============== Dialog ============== */
+.dialog{
+  background:var(--bg-deep);border-radius:6px;
+  padding:14px 18px;margin:14px 0;
+  font-size:14.5px;color:var(--text-primary);
+  border-left:3px solid var(--accent-amber);
+}
+.dialog-speaker{font-weight:700;color:var(--accent-terracotta)}
+.dialog.role-1{border-left-color:var(--accent-sage)}
+.dialog.role-2{border-left-color:var(--accent-terracotta)}
+.dialog.role-3{border-left-color:var(--accent-blue)}
+
+/* ============== Tables (optional) ============== */
+.table-wrap{margin:20px 0;background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:var(--bg-deep)}
+th{padding:12px 16px;text-align:left;font-weight:600;color:var(--text-primary);font-size:13px;letter-spacing:.3px;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border-light);color:var(--text-secondary);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(232,223,211,.3)}
+td:first-child{font-weight:600;color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:12.5px}
+
+/* ============== Coverage list ============== */
+.coverage{background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:32px 0}
+.coverage-title{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px}
+.coverage-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+.coverage-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border-light);font-size:13.5px}
+.coverage-item:nth-last-child(-n+2){border-bottom:none}
+.coverage-check{flex-shrink:0;width:18px;height:18px;background:var(--accent-sage-soft);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;margin-top:2px}
+.coverage-text{color:var(--text-secondary);line-height:1.55;font-weight:400}
+.coverage-text strong{color:var(--text-primary);display:block;font-size:13.5px;margin-bottom:2px;font-weight:600}
+
+/* ============== Summary box ============== */
+.summary-box{
+  background:linear-gradient(135deg,var(--accent-sage-soft) 0%,var(--bg-card) 50%,var(--accent-amber-soft) 100%);
+  border:1px solid var(--accent-sage);border-radius:12px;
+  padding:32px 36px;margin:40px 0;position:relative;
+}
+.summary-box-title{font-size:13px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.summary-text{font-size:18px;color:var(--text-primary);line-height:1.85;font-weight:500}
+
+/* ============== Footer ============== */
+.footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);font-size:12.5px;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-weight:500}
+.footer-link{color:var(--accent-sage);text-decoration:none;font-weight:600}
+.footer-link:hover{text-decoration:underline}
+
+/* ============== Back to top ============== */
+.back-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);transition:all .2s;z-index:40}
+.back-top:hover{background:var(--accent-sage);border-color:var(--accent-sage)}
+.back-top:hover svg{stroke:#fff}
+
+/* ============== Icons ============== */
+.icon{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+.icon-lg{width:18px;height:18px}
+
+/* ============== Code ============== */
+code{background:var(--bg-deep);padding:2px 7px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent-terracotta);font-weight:500}
+
+/* ============== Stats Card (战绩卡) ============== */
+.stats-card{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:20px 0;
+}
+.stat-cell{
+  background:var(--bg-card);
+  border:1px solid var(--border-light);
+  border-radius:8px;
+  padding:14px 16px;
+  text-align:center;
+}
+.stat-cell.victory{border-top:3px solid var(--accent-sage)}
+.stat-cell.defeat{border-top:3px solid var(--accent-terracotta)}
+.stat-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:24px;
+  font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:4px;
+  line-height:1.1;
+}
+.stat-label{
+  font-size:12.5px;
+  color:var(--text-secondary);
+  font-weight:500;
+}
+
+/* ============== Responsive ============== */
+@media (max-width:1100px){.sticky-toc{display:none}}
+@media (max-width:768px){
+  .container{padding:24px 16px 60px}
+  .hero{padding:32px 20px}
+  .hero h1{font-size:32px}
+  h2{font-size:22px}
+  .doctors-grid{grid-template-columns:1fr}
+  .coverage-grid{grid-template-columns:1fr}
+  .stats-card{grid-template-columns:1fr}
+  .annotation dl{grid-template-columns:1fr;gap:4px 0}
+  .annotation dt{margin-top:8px}
+  table{font-size:12.5px}
+  th,td{padding:8px 10px}
+}
+
+/* ============== Print ============== */
+@media print{
+  body{background:#fff}
+  .sticky-toc,.back-top{display:none}
+  .container{max-width:100%;padding:0}
+  .hero{border:none;background:none}
+  section{page-break-inside:avoid;margin-bottom:32px}
+  .annotation{page-break-before:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== Sticky TOC ========== -->
+<nav class="sticky-toc" aria-label="目录">
+  <div class="sticky-toc-title">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    目录
+  </div>
+  <ol>
+    <li><a href="#ch0">开篇 · 江南改革一年后</a></li>
+    <li><a href="#m1">第1幕 · 陈子昂 AutoGen 圆桌派</a></li>
+    <li><a href="#m2">第2幕 · 王元朗 AgentScope 消息派</a></li>
+    <li><a href="#m3">第3幕 · 李若虚 CAMEL 角色派</a></li>
+    <li><a href="#m4">第4幕 · 刘元济 LangGraph 图流派</a></li>
+    <li><a href="#m5">第5幕 · 老尚书反对 + 太子破局</a></li>
+    <li><a href="#finale">终章 · 4 工程如期完工</a></li>
+    <li><a href="#summary">一句话总结</a></li>
+    <li><a href="#coverage">概念地图 · 25 概念</a></li>
+    <li><a href="#framework-quiz">第10章 · 思维框架 + 自测题</a></li>
+  </ol>
+</nav>
+
+<div class="container">
+
+<!-- ========== Hero ========== -->
+<header class="hero">
+  <div class="hero-meta">
+    <span>WellInsight 学习材料</span>
+    <span class="hero-meta-dot"></span>
+    <span>来源教材 · 第06章 · 寓言版</span>
+    <span class="hero-meta-dot"></span>
+    <span>2026-06-25</span>
+  </div>
+  <h1>第06章 · 框架开发实践</h1>
+  <p class="hero-subtitle"><span class="hero-fable">四部联席</span> · 17 岁太子回京督造 · 4 个外邦工程 · 4 种调度哲学</p>
+  <p class="hero-desc">建议读法：先看故事，<strong>不要查名词</strong>；每章末尾有"专业名词对照"，可以倒回去对比你的理解。</p>
+  <span class="hero-source">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    原文 · datawhalechina/hello-agents · 第06章 框架开发实践
+  </span>
+</header>
+
+<main id="content">
+
+<!-- ========== Opening Hook ========== -->
+<section id="ch0">
+  <span class="chapter-tag">开篇 · 景和八年</span>
+  <h2><span class="num">00</span>江南改革一年后,4 个外邦工程突袭京城</h2>
+  <span class="h2-hook">"江南织造局那套四机并用,刚推广到全国三个月,朝会上 4 位外邦使节抱着 4 份工程需求书就来了 —— 单台织机,一台都做不下来。"</span>
+
+  <p class="lead">景和八年九月。十七岁的太子刚从江南回京述职,还没脱下御赐的黄马褂,就被皇上召到太和殿。朝会上气氛凝重 —— 殿前跪着四位外邦使节,每人手里捧着一卷厚厚的工程需求书。</p>
+
+  <p>西凉使节先开口:"恳请大齐援助,帮小邦搭一座<strong>实时行情显示台</strong> —— 把全国粮价、油价、布价每两个时辰更新一次,贴到府衙门口。"倭国使节接着说:"小邦想请大齐师傅教我们做一款<strong>三国策略游戏</strong> —— 让六位英雄在游戏里同时投票、同时出招。"南洋使节笑眯眯:"我等想请两位大齐文豪,合写一本<strong>AI 简报</strong> —— 心理学家出理论,作家出故事,合写一本《拖延症心理学》。"最后北漠使节一抱拳:"我们要一个<strong>实时问答助手</strong> —— 用户问明天北京的天气,助手自动查资料回答。"</p>
+
+  <p>四位使节说完,朝堂安静得能听见烛花噼啪。皇上看太子:"太子,你江南织造局改革有功,朕把工部、礼部、翰林院、钦天监四部联合,设'四部联席督办',由你挂帅。三十套龙袍的四机并用,推广全国朕很满意 —— 但这 4 个工程,机器做不了,你得换脑子。"</p>
+
+  <p>太子接旨出殿,小李跟上:"殿下,江南老办法我们摸过了,工部老尚书反对 AI 我们也听过了。这回,是同一批人,只是场景从江南换到京城,从龙袍换成 4 个工程。我们怎么打?" 太子在太和殿外的石阶上站了很久,才说:"<strong>这次,机器赢了重复活,但要赢创意活 —— 得先找调度手册</strong>。"</p>
+
+  <h3>贯穿主线</h3>
+  <ul>
+    <li><strong>危机</strong>:4 个外邦工程突袭京城(实时行情 / 三国游戏 / AI 简报 / 问答助手)</li>
+    <li><strong>调度</strong>:太子升任"四部联席督办",4 调研员带来 4 种智能体框架</li>
+    <li><strong>冲突</strong>:工部老尚书反对 AI,"机器开会,有什么灵魂?"</li>
+    <li><strong>结果</strong>:4 工程如期完工,老尚书转"四部联席质检官"</li>
+  </ul>
+</section>
+
+<!-- ========== 第一幕 · AutoGen · 圆桌派 ========== -->
+<section id="m1">
+  <div class="chapter-tag">第一幕 · 圆桌派</div>
+  <h2><span class="num">01</span>陈子昂在工部开圆桌会议:一晚上跑通一个实时行情显示台</h2>
+  <h2-hook>"四个人围着桌子轮流说话,说出来的代码比一个人写一夜的还稳 —— 这不是奇迹,这是'调度手册'。"</h2-hook>
+
+  <p class="lead">接旨后第二天,太子在工部召开第一次联席会议。工部主事陈子昂第一个求见 —— 三十五岁,在江南跟太子做过半年调研,以"圆桌派"闻名。他带了一份方案:"殿下,西凉使节的实时行情显示台,不是单独写一段代码的事 —— 这是个软件开发流程。需求、编码、审查、测试,四个角色,围着圆桌轮流说话。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">1</div>
+      <div class="stat-label">晚跑通一个完整项目</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">4</div>
+      <div class="stat-label">个角色圆桌发言</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">对话可能陷入循环</div>
+    </div>
+  </div>
+
+  <h3>节点 3 · 主场胜利 — 一晚上跑通</h3>
+  <p>陈子昂的圆桌会议很别致 —— 他没让人手写代码,他摆了四把椅子,给四个虚拟"官员"分配了角色:</p>
+  <ul>
+    <li><strong>产品经理</strong> —— 把西凉使节含糊的"实时显示"翻译成清单:界面、刷新频率、数据来源</li>
+    <li><strong>工程师</strong> —— 依据清单写代码:Streamlit 框架 + 公开粮价 API</li>
+    <li><strong>代码审查员</strong> —— 翻代码找漏洞:异常处理、加载状态、错误兜底</li>
+    <li><strong>用户代理</strong> —— 把审查后的代码跑起来,实测能不能用,然后喊一声"TERMINATE"</li>
+  </ul>
+  <p>陈子昂说:"<strong>这就是圆桌派的核心动作 —— 不是一个人写代码,是一桌人轮着说话,把代码'聊'出来</strong>。" 一晚上,四把椅子轮流开口。产品经理先把"实时显示"拆成 3 步:抓数据、画界面、刷新;工程师接着写代码;审查员挑出 3 个 bug;用户代理测试通过,喊 TERMINATE。第二天早上,西凉使节看到实机演示,惊呆了。</p>
+  <p>太子问陈子昂:"这跟江南织造局的乐高派有什么区别?" 陈子昂说:"<strong>乐高派是'拼模块',圆桌派是'开口说话'。对话驱动协作 —— 人开会怎么开,代码就怎么写</strong>。"</p>
+
+  <h3>节点 4 · 客场失败 — 对话陷入"鸡生蛋"循环</h3>
+  <p>问题在西凉使节改了需求的时候。原本"实时显示全国粮价",使节忽然加了一句:"能不能再加一个'区域对比'模块?" 产品经理接到新需求,把它丢回工程师。工程师说:"等等,这要重新设计数据源,我得先知道产品经理要哪些区域对比。" 产品经理反问:"工程师,你们数据库能查哪些区域?" 工程师说:"你先告诉我你要什么。"</p>
+  <p>—— 这就是著名的<strong>对话循环</strong>。陈子昂的圆桌,陷入了一场"鸡生蛋还是蛋生鸡"的死循环。太子来问:"这就是圆桌派的极限吗?" 陈子昂沉默了很久:"<strong>对话驱动协作的代价 —— 一旦角色互相依赖,就容易空转</strong>。必须有人出来打断,否则一辈子聊不完。"</p>
+  <p>太子记录:"<strong>圆桌派适合流程固定的协作(需求→编码→审查→测试),不适合动态变化的协作</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg>
+        本节专业名词对照
+      </span>
+      <span class="annotation-hint">回顾一下,圆桌派的 4 把椅子对应什么概念?</span>
+    </div>
+    <dl>
+      <dt>圆桌会议</dt>
+      <dd><span class="who">陈子昂</span><span class="what">—— 圆桌派 = 以对话驱动协作。多个角色围坐,按顺序发言,自动产出协作结果。</span></dd>
+      <dt>业务专家</dt>
+      <dd><span class="who">产品经理</span><span class="what">—— AssistantAgent(助理智能体)。圆桌上的"业务专家",根据对话历史生成回复。</span></dd>
+      <dt>用户代言人</dt>
+      <dd><span class="who">用户代理</span><span class="what">—— UserProxyAgent(用户代理智能体)。既是用户发起任务,又是执行代码/工具的"执行官"。</span></dd>
+      <dt>轮询发言规则</dt>
+      <dd><span class="who">圆桌的"轮值主持人"</span><span class="what">—— RoundRobinGroupChat(轮询群聊)。按预定义顺序依次激活智能体,流程清晰可预测。</span></dd>
+      <dt>【踩坑 1】对话循环</dt>
+      <dd><span class="who">陈子昂的圆桌</span><span class="what">—— 对话驱动协作的代价:角色互相依赖时,会陷入"鸡生蛋"死循环,必须有人打断。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+
+
+<!-- ========== 第二幕 · AgentScope · 消息派 ========== -->
+<section id="m2">
+  <div class="chapter-tag">第二幕 · 消息派</div>
+  <h2><span class="num">02</span>王元朗建通政司消息中心:6 位三国英雄毫秒级投票</h2>
+  <h2-hook>"陈子昂让角色'说话',我是让角色'发邮件' —— 所有消息都过通政司中转,异步并发。"</h2-hook>
+
+  <p class="lead">接旨后第三天,工部侍郎王元朗求见 —— 四十岁,做过江南海关督办,专管"调度"。他说:"殿下,陈子昂让 4 个角色'围着桌子说话',倭国使节的'三国策略游戏'有 6 个角色,说话会乱套。我有一套'通政司' —— 所有消息都过通政司中转。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">6</div>
+      <div class="stat-label">个三国英雄并发投票</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">&lt;100ms</div>
+      <div class="stat-label">消息中心响应延迟</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">宕机</div>
+      <div class="stat-label">通政司一倒全瘫</div>
+    </div>
+  </div>
+
+  <h3>节点 5 · 主场胜利 — 6 角色毫秒级投票</h3>
+  <p>王元朗的"通政司"是一座专门调度消息的中枢。6 个三国英雄(孙权、周瑜、曹操、张飞、司马懿、赵云)不再是"围着桌子说话",而是"各自发邮件给通政司,通政司再转发给所有人"。这种设计有三个妙处:</p>
+  <ul>
+    <li><strong>异步解耦</strong>:孙权发消息不用等周瑜回,他可以继续想下一句</li>
+    <li><strong>位置透明</strong>:司马懿在京城、孙权在江南,通政司照样把消息转过去,不用管他在哪</li>
+    <li><strong>可观测性</strong>:每条消息都有"案卷号",存档可查,出问题翻案卷就知道是哪一条消息走偏</li>
+  </ul>
+  <p>倭国使节看到 6 角色同时投票的画面,惊呆了 —— 屏幕上 6 个角色几乎同时开口:"我选曹操";"我选孙权";"我弃票"。通政司的延迟不到 100 毫秒,跟真实狼人杀的"同时举手"一样刺激。王元朗说:"<strong>这就是消息派的核心 —— 不是让角色'当面对话',而是让角色'异步通信'</strong>。"</p>
+
+  <h3>节点 6 · 客场失败 — 通政司宕机,6 角色全部瘫痪</h3>
+  <p>问题在第三天晚上。通政司突然宕机 —— 不是停电,是数据全部存在"内存"里,内存一断,数据全没了。6 个三国英雄瞬间"失忆":孙权忘了自己是狼人,周瑜忘了曹操刚才说了什么,游戏彻底卡死。</p>
+  <p>王元朗的反应很硬气:"把数据从内存换到外部案卷馆!" 但小李偷偷算了账:<strong>6 个三国英雄加上通政司的运维师傅,工资比游戏本身还贵</strong>。太子问:"通政司适合谁用?" 王元朗沉默了很久,才说:"<strong>这是给分布式部署用的,单点游戏用它是杀鸡用牛刀</strong> —— 我本该提醒殿下的。"</p>
+  <p>太子记录:"<strong>消息派适合高并发分布式部署,不适合单点小应用</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg>
+        本节专业名词对照
+      </span>
+      <span class="annotation-hint">回顾一下,通政司对应什么概念?</span>
+    </div>
+    <dl>
+      <dt>通政司消息中心</dt>
+      <dd><span class="who">王元朗</span><span class="what">—— MsgHub(消息中心)。所有智能体通过消息中心转发,异步解耦。</span></dd>
+      <dt>消息驱动</dt>
+      <dd><span class="who">"邮件办公"</span><span class="what">—— 消息驱动架构。所有交互抽象为消息的发送和接收,代替传统的函数调用。</span></dd>
+      <dt>异步解耦</dt>
+      <dd><span class="who">"发完不等回"</span><span class="what">—— 消息发送方和接收方在时间上解耦,天然支持高并发场景。</span></dd>
+      <dt>位置透明</dt>
+      <dd><span class="who">"异地办公"</span><span class="what">—— 智能体无需关心对方在本地还是远程服务器,消息系统自动处理路由。</span></dd>
+      <dt>流水线</dt>
+      <dd><span class="who">王元朗的车间</span><span class="what">—— Pipeline(流水线)。支持顺序、并发等多种执行模式的工作流编排。</span></dd>
+      <dt>分布式部署</dt>
+      <dd><span class="who">"京城 + 江南"</span><span class="what">—— 智能体可以部署在不同进程/服务器上,MsgHub 通过 RPC 自动处理跨节点通信。</span></dd>
+      <dt>【踩坑 2】消息中心宕机</dt>
+      <dd><span class="who">王元朗的通政司</span><span class="what">—— 分布式架构的代价:中心节点一倒,所有智能体失忆。必须外部存档+容错恢复。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+
+<!-- ========== 第三幕 · CAMEL · 角色派 ========== -->
+<section id="m3">
+  <div class="chapter-tag">第三幕 · 角色派</div>
+  <h2><span class="num">03</span>李若虚让两位 AI 专家"过招":30 轮对话产出 8000 字电子书</h2>
+  <h2-hook>"陈子昂 4 个角色开会,王元朗 6 个角色通信,我只有 2 个角色 —— 但这两个角色'过招',能过出 8000 字电子书。"</h2-hook>
+
+  <p class="lead">王元朗方案落地的同一天,礼部侍郎李若虚求见 —— 三十八岁,文学气,爱讲故事。他说:"殿下,南洋使节要一本《拖延症心理学》电子书,要求既有科学性又有可读性。一个人写不出来,我让两位 AI 专家'过招' —— 心理学家出理论,作家出故事,让他们自己聊出来。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">8000</div>
+      <div class="stat-label">字电子书(30 轮对话)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">2</div>
+      <div class="stat-label">个角色深度协作</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">僵局</div>
+      <div class="stat-label">"是否终止"难达成共识</div>
+    </div>
+  </div>
+
+  <h3>节点 7 · 主场胜利 — 30 轮对话涌现 8000 字</h3>
+  <p>李若虚的"过招"很优雅 —— 他只设了两个角色:</p>
+  <ul>
+    <li><strong>心理学家</strong> —— AI 助理,懂认知行为科学、神经科学,负责"硬核"专业知识</li>
+    <li><strong>作家</strong> —— AI 用户,擅长把抽象概念翻译成读者爱听的故事,负责"用户体验"</li>
+  </ul>
+  <p>他给两位 AI 各发了一份"行动纲领":</p>
+  <ul>
+    <li>"你是心理学家,你只能讲有研究支撑的实证结论"</li>
+    <li>"你是作家,你只能讲普通读者听得懂的故事"</li>
+    <li>"你们的共同目标是写一本 8000 字的电子书"</li>
+    <li>"每完成一个阶段,就在末尾写上'CAMEL_TASK_DONE',自动结束"</li>
+  </ul>
+  <p>对话一开,心理学家先抛出"时间折扣理论" —— 严肃、学术,术语堆叠。作家立刻接:"这个理论,可以这样讲 —— 大脑里有个任性的孩子,只顾眼前的糖果,不顾长远的健康。" 心理学家听完,补充了 3 个实验数据;作家读完实验,写成 3 个小故事。30 轮过后,8000 字电子书自然涌现,结构、引言、案例、总结全齐。</p>
+  <p>李若虚说:"<strong>这就是角色派的核心 —— 不是给角色下死命令,而是给两位专家各发一份'行动纲领',让他们的专业能力自己碰撞</strong>。" 南洋使节拿到电子书,翻完后说:"这不是机器写的,这是两个真专家合写的。"</p>
+
+  <h3>节点 8 · 客场失败 — "是否终止"意见僵局</h3>
+  <p>问题在第 25 轮。心理学家写到第 8 章,觉得够了,在末尾写上"CAMEL_TASK_DONE"。但作家刚补了一个精彩案例,还没展开,反问:"第 9 章'习惯形成'还没写,我建议继续。" 心理学家说:"8000 字到了,足够了。" 作家说:"我觉得还差 500 字,可以更好。" —— 这就是著名的<strong>终止僵局</strong>。</p>
+  <p>李若虚的反应很硬气:"让用户介入裁定!" 但小李偷偷问了太子:"殿下,如果用户也不确定呢?" 太子记录:"<strong>角色派的本质是'自然涌现' —— 涌现的反面就是'谁说了算'</strong>。必须有人类做最终裁判,否则两个角色谁都不服谁。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg>
+        本节专业名词对照
+      </span>
+      <span class="annotation-hint">回顾一下,"过招"的两把椅子对应什么概念?</span>
+    </div>
+    <dl>
+      <dt>过招</dt>
+      <dd><span class="who">李若虚</span><span class="what">—— 角色派 = 角色扮演协作(Role-Playing)。让两个角色在引导性提示下自主对话。</span></dd>
+      <dt>行动纲领</dt>
+      <dd><span class="who">"你是心理学家..."</span><span class="what">—— Inception Prompting(引导性提示)。在对话开始前注入的、结构化的初始指令,确保角色"待在自己的角色里"。</span></dd>
+      <dt>AI 用户</dt>
+      <dd><span class="who">作家</span><span class="what">—— AI User。负责提出需求、下达指令和构思任务步骤。</span></dd>
+      <dt>AI 助理</dt>
+      <dd><span class="who">心理学家</span><span class="what">—— AI Assistant。根据指令执行具体操作和提供解决方案。</span></dd>
+      <dt>任务说明书</dt>
+      <dd><span class="who">task_prompt</span><span class="what">—— 共同目标的字符串定义。幕后被用来生成引导性提示。</span></dd>
+      <dt>任务完成标志</dt>
+      <dd><span class="who">CAMEL_TASK_DONE</span><span class="what">—— 终止对话的特殊标志。任何角色输出此标志即结束协作。</span></dd>
+      <dt>【踩坑 3】终止僵局</dt>
+      <dd><span class="who">心理学家 vs 作家</span><span class="what">—— 自然涌现的反面:谁说了算?必须人类做最终裁判,否则两个角色陷入僵局。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+
+<!-- ========== 第四幕 · LangGraph · 图流派 ========== -->
+<section id="m4">
+  <div class="chapter-tag">第四幕 · 图流派</div>
+  <h2><span class="num">04</span>刘元济画流程图:理解→搜索→回答,显式控制每一步</h2>
+  <h2-hook>"前三位让角色'自己发挥',我是让角色'照图施工' —— 一步接一步,出错还能回退。"</h2-hook>
+
+  <p class="lead">李若虚方案落地的同一天,翰林院学士刘元济求见 —— 四十五岁,刻板,爱画流程图。第03章太子 14 岁时,刘元济是"造笔总工",太子对他印象很深。他说:"殿下,前三位让角色'自己发挥',我是让角色'照图施工'。北漠使节的实时问答助手,必须按步骤走,不能跳不能漏。"</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num">3</div>
+      <div class="stat-label">步流程(理解→搜索→回答)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">搜索失败可回退</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num">繁琐</div>
+      <div class="stat-label">简单任务前期 boilerplate 多</div>
+    </div>
+  </div>
+
+  <h3>节点 9 · 主场胜利 — 显式控制,出错还能回退</h3>
+  <p>刘元济的流程图很清晰 —— 他画了 3 个节点 + 4 条边:</p>
+  <ul>
+    <li><strong>节点 1(理解)</strong>:用户问"明天北京天气怎么样",LLM 把问题优化成搜索关键词"北京 明天 天气"</li>
+    <li><strong>节点 2(搜索)</strong>:用 Tavily API 查资料,返回 5 条结果</li>
+    <li><strong>节点 3(回答)</strong>:LLM 整合搜索结果,生成最终答案</li>
+  </ul>
+  <p>刘元济最骄傲的,是他在节点 2 和节点 3 之间画了一条<strong>条件边</strong> —— "如果搜索成功,去节点 3 整合结果;如果搜索失败,直接用 LLM 的内置知识回答"。这就是"出错还能回退"。</p>
+  <p>北漠使节测试:"明天北京天气怎么样?" 助手答:"明天(2025年9月17日)北京多云,气温 17-25°C,适合户外活动,推荐去长城、故宫..." 使节追问:"那后天呢?" 助手同样清晰回答。刘元济说:"<strong>这就是图流派的核心 —— 不靠角色自己发挥,靠流程图显式控制</strong>。每一步可审计、可回退、可调参。"</p>
+
+  <h3>节点 10 · 客场失败 — 简单任务反而繁琐</h3>
+  <p>问题在工程实施环节。刘元济为了画这张流程图,光前期 boilerplate(状态定义、节点函数、边配置、图编译)就写了 80 行 Python。太子问:"问答助手不是 3 步吗?怎么要 80 行?" 刘元济沉默了很久:"<strong>图流派的代价 —— 简单任务也要先画图</strong>。如果是 1 步任务(比如'翻译一个句子'),用 AutoGen 一句话就能跑,画图反而繁琐。"</p>
+  <p>太子记录:"<strong>图流派适合流程确定、需要审计的任务,不适合简单单步任务</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg>
+        本节专业名词对照
+      </span>
+      <span class="annotation-hint">回顾一下,流程图上的格子、箭头、岔路口对应什么概念?</span>
+    </div>
+    <dl>
+      <dt>流程图</dt>
+      <dd><span class="who">刘元济</span><span class="what">—— 图流派 = LangGraph。把智能体流程建模为状态机和有向图,显式控制每一步。</span></dd>
+      <dt>案卷本</dt>
+      <dd><span class="who">共享的状态对象</span><span class="what">—— State(全局状态)。整个图的执行围绕一个共享的状态对象,所有节点都能读取和更新。</span></dd>
+      <dt>格子</dt>
+      <dd><span class="who">理解/搜索/回答</span><span class="what">—— Node(节点)。接收当前状态作为输入,返回更新后状态的 Python 函数,执行具体工作。</span></dd>
+      <dt>箭头</dt>
+      <dd><span class="who">节点之间的连线</span><span class="what">—— Edge(边)。连接节点,定义工作流方向。最简单的边指定从一个节点到另一个固定节点。</span></dd>
+      <dt>岔路口</dt>
+      <dd><span class="who">"搜索成功 vs 失败"</span><span class="what">—— Conditional Edge(条件边)。通过判断函数动态决定下一步跳转到哪个节点。</span></dd>
+      <dt>反思-修正循环</dt>
+      <dd><span class="who">条件边的来回跳</span><span class="what">—— Cycles(循环)。LangGraph 的标志性特性:支持循环,使复杂工作流(反思/修正)变得直观。</span></dd>
+      <dt>【踩坑 4】前期 boilerplate 多</dt>
+      <dd><span class="who">刘元济的 80 行 Python</span><span class="what">—— 图流派的代价:简单任务也要先画图。开发者要思考"如何控制流程"而非"做什么"。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+
+<!-- ========== 第五幕 · 老尚书反对 + 太子破局 ========== -->
+<section id="m5">
+  <div class="chapter-tag">第五幕 · 老办法失灵</div>
+  <h2><span class="num">05</span>工部老尚书闹事:机器开会,有什么灵魂?</h2>
+  <h2-hook>"太子,江南老匠人那一套,虽然失灵,但他们有灵魂。你们现在用机器,机器写的东西有灵魂吗?机器开会,有什么灵魂?"</h2-hook>
+
+  <p class="lead">四路调研员陆续到位,4 个外邦工程也按计划开做。但第一个月底,一个意想不到的局面出现了 —— 工部尚书赵元朗带着三十位老侍郎,在太和殿外静坐。</p>
+
+  <h3>节点 11 · 老尚书派反对声浪</h3>
+  <p>赵元朗六十岁,在工部干了四十年。他对太子说:"殿下,老臣不是反对改革。但皇上要的是 4 个外邦工程 —— 那是一代代的智慧。你们用 4 个会开会的机器做出来,规整是规整,但没<strong>灵魂</strong>。我等手艺人,一辈子就干这一件事,现在您要让机器代替我们,我们算什么?"</p>
+  <p>三十位老侍郎在太和殿门口举着横幅:"<strong>手艺传承,百年匠心</strong>。""<strong>机器无魂,匠人有心</strong>。" 太子站在殿门口,看了很久。</p>
+  <p>他心里清楚:这句话,他听过了 —— 去年在江南织造局,老匠人刘织造说的就是这一句:"机器绣的,规整是规整,但没灵魂。" 刘织造最后怎么说的?"<strong>机器不是代替匠人,是让匠人不做重复活</strong>。"</p>
+
+  <h3>节点 12 · 太子的破局</h3>
+  <p>太子没硬压。他请老尚书当"四部联席质检官" —— 检查 4 个外邦工程交付物是否合格。这个决定有四重妙处:</p>
+  <ul>
+    <li><strong>老匠人的手艺没浪费</strong> —— 他们的眼睛和手,比任何质检机器都灵</li>
+    <li><strong>机器的效率没浪费</strong> —— 4 个工程继续由 4 种框架做</li>
+    <li><strong>老匠人的灵魂没丢失</strong> —— 他们成了"灵魂的守护者",而不是"被淘汰的人"</li>
+    <li><strong>跟江南一脉相承</strong> —— 第05章老匠人转质检官,第06章老尚书转质检官</li>
+  </ul>
+  <p>赵元朗想了想,接受了。他亲自验收陈子昂 AutoGen 产出的"实时行情显示台"代码,翻了半天,看代码注释、测试用例、异常处理 —— 看了 3 天,最后说:"<strong>这代码我读了,比我带的新人写得好</strong>。机器不是代替匠人,是让匠人不做重复活。" 太子在笔记本上写下这句引用。</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg>
+        本节专业名词对照
+      </span>
+      <span class="annotation-hint">回顾一下,跨章反派的演化路径?</span>
+    </div>
+    <dl>
+      <dt>老尚书反对 AI</dt>
+      <dd><span class="who">赵元朗</span><span class="what">—— 顽固派反对新事物。第02章船灵派 / 第03章旧学派 / 第04章案犯 / 第05章老匠人 / 第06章老尚书。</span></dd>
+      <dt>机器赢在重复活</dt>
+      <dd><span class="who">江南老匠人</span><span class="what">—— 第05章母题反转:机器在重复劳动上完胜人类,但在创意/灵魂层面被质疑。</span></dd>
+      <dt>老尚书转质检官</dt>
+      <dd><span class="who">赵元朗</span><span class="what">—— 最佳实践:改革不是"谁灭谁",是"让人不做重复活"。把灵魂留给匠人。</span></dd>
+      <dt>【跨章呼应】老办法失灵反转</dt>
+      <dd><span class="who">老匠人 → 老尚书</span><span class="what">—— 第05章老办法失灵 → 第06章老尚书又反对。但母题反转:这次是"机器赢在重复活,输在创意活"。</span></dd>
+      <dt>【跨章呼应】朝廷+翰林院母题</dt>
+      <dd><span class="who">场景回归</span><span class="what">—— 第03章太子 14 岁在翰林院造笔 → 第04/05章下江南 → 第06章回京升任"四部联席督办"。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<!-- ========== 终章 ========== -->
+<section id="finale">
+  <div class="chapter-tag">终章 · 4 工程完工</div>
+  <h2><span class="num">06</span>4 个外邦工程如期交付,太子金句</h2>
+  <h2-hook>"<strong>框架不是限制,是更高层次的规范</strong> —— 涌现式协作给惊喜,显式控制给可靠。两者结合,才是现代朝廷。"</h2-hook>
+
+  <p class="lead">景和八年腊月,4 个外邦工程如期完工。西凉的实时行情显示台、倭国的三国策略游戏、南洋的 AI 简报、北漠的问答助手,误差为零,误期为零,皇上赐匾"<strong>四部联席</strong>"。</p>
+
+  <h3>节点 13 · 4 工程完工</h3>
+  <p>西凉的实时行情显示台,挂到府衙门口那天,粮价、油价、布价每两个时辰自动刷新,百姓围观;倭国的三国策略游戏,6 个三国英雄在屏幕上同时出招,倭国使节看到眼珠子都直了;南洋的《拖延症心理学》电子书,8 章 8000 字,既有学术严谨又有故事温度;北漠的问答助手,无论问天气、问新闻、问景点,回答得比翰林院学究还周全。</p>
+  <p>皇上在朝会上,当众赐 4 位外邦使节礼品,使节们惊讶于工艺的精致,更惊讶于工期的准时 —— 他们本以为至少要等一年。回京后,皇上给太子下了一道新旨意:"<strong>四部联席制,推广全国,各州府皆按此例</strong>。"</p>
+
+  <h3>太子金句</h3>
+  <p>太子在翰林院的石碑上,亲手刻下:</p>
+  <blockquote>
+    <p>"<strong>框架不是限制,是更高层次的规范 —— 涌现式协作给惊喜,显式控制给可靠。两者结合,才是现代朝廷。</strong>"</p>
+  </blockquote>
+  <p>石碑背面,刻着一行小字:"<strong>圆桌派开会,消息派传信,角色派过招,图流派画图。四派并用,这才是现代调度</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg>
+        本节专业名词对照
+      </span>
+      <span class="annotation-hint">回顾一下,4 派的核心权衡是什么?</span>
+    </div>
+    <dl>
+      <dt>涌现式协作</dt>
+      <dd><span class="who">圆桌派 + 角色派</span><span class="what">—— 通过定义角色和目标,让复杂行为从简单对话中"涌现"。惊喜多,不可预测。</span></dd>
+      <dt>显式控制</dt>
+      <dd><span class="who">图流派</span><span class="what">—— 通过显式定义每一步和跳转条件,换取可靠性和可审计性。牺牲涌现,换取稳定。</span></dd>
+      <dt>工程化</dt>
+      <dd><span class="who">消息派</span><span class="what">—— 从"能运行"到"能稳定服务"的跨越。解决并发、容错、分布式部署等工程挑战。</span></dd>
+      <dt>【最佳实践】四派并用</dt>
+      <dd><span class="who">太子金句</span><span class="what">—— 圆桌派开会,消息派传信,角色派过招,图流派画图。没有最好,只有最适配。</span></dd>
+      <dt>【下一章预告】自造框架</dt>
+      <dd><span class="who">第07章</span><span class="what">—— 第07章要从零开始,亲手构建一个属于大齐的智能体框架,把理论与实践融会贯通。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<!-- ========== Summary ========== -->
+<section id="summary">
+  <div class="summary-box">
+    <div class="summary-box-title">一句话总结</div>
+    <div class="summary-text">
+      <strong>框架不是限制,是更高层次的规范 —— AutoGen 圆桌开会,AgentScope 消息传信,CAMEL 角色过招,LangGraph 画图控制。四派并用,这才是现代调度。太子 17 岁用 4 种调度哲学做完了 4 个外邦工程,还顺手把工部老尚书从反对派变成了质检官 —— 第05章的老匠人、第06章的老尚书,这是 WellInsight 寓言系列的"反派转友"母题。</strong>
+    </div>
+  </div>
+</section>
+
+
+<!-- ========== Coverage ========== -->
+<section id="coverage">
+  <div class="coverage">
+    <h2>概念地图 · 全章名词索引(25 个)</h2>
+    <p style="font-size:13.5px;color:var(--text-secondary);margin-bottom:16px">双层定义:第一行是寓言里的角色/场景链接;第二行是通俗教科书定义。</p>
+
+    <div class="coverage">
+      <h4 class="coverage-title">A · 框架通识(对应 6.1 选型)</h4>
+      <div class="coverage-grid">
+        <div class="coverage-item">
+          <strong>智能体框架</strong>
+          <p>朝廷的"调度手册"。提供经过验证的规范,把通用逻辑(主循环、状态、工具、日志)抽象封装,让我们专注业务。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>Agent Loop(智能体循环)</strong>
+          <p>圆桌会议的"一圈发言"。框架的核心执行单元,封装了智能体运行的主循环。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>模型层(Model Layer)</strong>
+          <p>翰林院的"国子监"。负责与大语言模型交互,可以轻松替换 OpenAI/Anthropic/本地模型。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>工具层(Tool Layer)</strong>
+          <p>工部的"匠人手艺箱"。标准化工具定义、注册和执行接口,加新工具不影响其他代码。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>记忆层(Memory Layer)</strong>
+          <p>礼部的"档案柜"。处理短期/长期记忆,可切换滑动窗口、摘要记忆等策略。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>可观测性</strong>
+          <p>钦天监的"星象记录本"。通过事件回调(on_llm_start / on_tool_end)自动触发日志/上报,追踪完整运行轨迹。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="coverage">
+      <h4 class="coverage-title">B · AutoGen(圆桌派)</h4>
+      <div class="coverage-grid">
+        <div class="coverage-item">
+          <strong>AutoGen</strong>
+          <p>陈子昂的圆桌会议(对话驱动协作)。把多智能体抽象为一群"可对话"的智能体群聊。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>AssistantAgent(助理智能体)</strong>
+          <p>圆桌上的"业务专家"。封装 LLM,根据系统消息(Sys Msg)扮演特定角色。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>UserProxyAgent(用户代理智能体)</strong>
+          <p>圆桌上的"用户代言人"。既代表用户发起任务,又能执行代码/工具,并最终喊 TERMINATE。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>RoundRobinGroupChat(轮询群聊)</strong>
+          <p>圆桌的"轮值主持人"。按预定义顺序依次激活智能体,适合固定流程(需求→编码→审查→测试)。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>群聊协调(GroupChat Manager)</strong>
+          <p>圆桌的"主持人"。多智能体协作时,负责协调对话流程、决定下一个发言者。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="coverage">
+      <h4 class="coverage-title">C · AgentScope(消息派)</h4>
+      <div class="coverage-grid">
+        <div class="coverage-item">
+          <strong>AgentScope</strong>
+          <p>王元朗的通政司(消息驱动 + 工程化)。由达摩院开发,专为大规模、高可靠性多智能体应用设计。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>MsgHub(消息中心)</strong>
+          <p>通政司消息中枢。所有智能体通过 MsgHub 路由消息,支持点对点、广播、组播等多种通信模式。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>Pipeline(流水线)</strong>
+          <p>王元朗的车间。支持顺序、并发、扇出等多种执行模式的工作流编排系统。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>消息驱动架构</strong>
+          <p>"邮件办公"代替"当面喊话"。所有交互抽象为消息的发送和接收,天然支持异步解耦和位置透明。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>分布式部署</strong>
+          <p>智能体可以部署在不同进程/服务器上,MsgHub 通过 RPC 自动处理跨节点通信,对开发者完全透明。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="coverage">
+      <h4 class="coverage-title">D · CAMEL(角色派)</h4>
+      <div class="coverage-grid">
+        <div class="coverage-item">
+          <strong>CAMEL</strong>
+          <p>李若虚的"过招"(角色扮演协作)。让两个智能体在引导性提示下自主对话,共同完成任务。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>RolePlaying(角色扮演)</strong>
+          <p>李若虚的"过招"机制。封装角色定义 + 任务说明 + 对话循环,自动构建双智能体协作"社会"。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>Inception Prompting(引导性提示)</strong>
+          <p>"你是心理学家..."这种结构化初始指令。明确角色身份、协作者、共同目标、行为约束,确保不偏离主题。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>AI User + AI Assistant</strong>
+          <p>跨领域专家组合。User 是需求方/推动者,Assistant 是执行者/方案提供方。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>任务完成标志(CAMEL_TASK_DONE)</strong>
+          <p>终止对话的特殊标志。任何角色输出此标志即结束协作,防止无限循环。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="coverage">
+      <h4 class="coverage-title">E · LangGraph(图流派)</h4>
+      <div class="coverage-grid">
+        <div class="coverage-item">
+          <strong>LangGraph</strong>
+          <p>刘元济的流程图(状态机 + 有向图)。把智能体流程显式建模为状态机和有向图,精确控制每一步。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>State(全局状态)</strong>
+          <p>朝廷的"案卷本"。整个图围绕一个共享的 TypedDict 状态对象,所有节点都能读取和更新。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>Node(节点)</strong>
+          <p>流程图上的"格子"。接收当前状态作为输入,返回更新后状态的 Python 函数,执行具体工作。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>Edge(边)</strong>
+          <p>流程图上的"箭头"。连接节点,定义工作流方向。最简单的边指定从一个节点到另一个固定节点。</p>
+        </div>
+        <div class="coverage-item">
+          <strong>Conditional Edge(条件边)</strong>
+          <p>流程图上的"岔路口"。通过判断函数动态决定下一步跳转到哪个节点 —— 实现循环和复杂分支。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ========== 第 10 章 · 思维框架 + 自测题 ========== -->
+<section id="framework-quiz">
+  <div class="chapter-tag">第 10 章 · 思维框架 + 自测题</div>
+  <h2><span class="num">10</span>思维框架 · 底层逻辑 · 核心争议 · 自测题</h2>
+  <h2-hook>"<strong>先想故事,再挖概念</strong> —— 这一节把第06章的 25 个概念,提炼成 5 个核心思维 + 5 个底层逻辑 + 3 个核心争议 + 10 道自测题。"</h2-hook>
+
+  <p class="lead">这一节是 v4 加挂的"第 10 章板块"。它不是新内容,只是把第06章已经讲过的概念,按"思维 → 底层 → 争议 → 自测"四个维度重新整理,方便读者自检掌握程度。</p>
+
+  <!-- ========== A. 5 个核心思维 ========== -->
+  <div class="coverage">
+    <h4 class="coverage-title">A · 5 个核心思维(专家共识)</h4>
+    <div class="coverage-grid">
+      <div class="coverage-item">
+        <strong>1. 框架不是限制,是更高层次的规范</strong>
+        <p>想象工部不直接管织机怎么转,只管"哪道工序谁做"。框架的核心价值不是"消灭代码",是"把通用逻辑藏到框架下面,只暴露业务逻辑"。</p>
+      </div>
+      <div class="coverage-item">
+        <strong>2. 没有最好,只有最适配</strong>
+        <p>想象你不会让圆桌派去做"三国狼人杀"的并发投票,也不会让消息派去做"翻译句子"这种单步任务。任务变了,框架跟着换。</p>
+      </div>
+      <div class="coverage-item">
+        <strong>3. 涌现式协作 vs 显式控制 — 取舍之间</strong>
+        <p>想象圆桌派/角色派让角色"自己发挥"(涌现),但不可预测;图流派让角色"照图施工"(显式控制),但灵活度低。两者结合,才是现代调度。</p>
+      </div>
+      <div class="coverage-item">
+        <strong>4. 老尚书转质检官 — 母题复用</strong>
+        <p>想象老尚书反对 AI,跟第05章老匠人反对机器绣,跟第02-04章反派反对新事物一样。但结局都一样:改革不是"谁灭谁",是"让人不做重复活"。</p>
+      </div>
+      <div class="coverage-item">
+        <strong>5. 框架选型 = 选调度哲学</strong>
+        <p>想象 4 个调研员各有强项和短板。陈子昂擅长流程固定,王元朗擅长高并发,李若虚擅长深度创意,刘元济擅长可审计流程。选框架跟选队友一样。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== B. 5 个底层逻辑 ========== -->
+  <div class="coverage">
+    <h4 class="coverage-title">B · 5 个底层逻辑(为什么这样工作)</h4>
+    <div class="coverage-grid">
+      <div class="coverage-item">
+        <strong>1. 为什么需要智能体框架?</strong>
+        <p>想象每个外邦工程都从零写一遍 ReAct/Plan-and-Solve 主循环,4 个工程写 4 遍同样的代码。框架 = 把通用逻辑抽象一次,4 个工程都用同一套。</p>
+      </div>
+      <div class="coverage-item">
+        <strong>2. 为什么会有 4 个主流框架?</strong>
+        <p>想象你不会让一个框架既做对话驱动,又做消息驱动,又做角色扮演,又做流程图控制。不同场景需要不同框架 — AutoGen/AgentScope/CAMEL/LangGraph 各有定位。</p>
+      </div>
+      <div class="coverage-item">
+        <strong>3. 为什么会有"涌现 vs 控制"的权衡?</strong>
+        <p>想象圆桌派让角色"开会"自然涌现结果,惊喜多但难调;图流派让角色"照图施工",稳定但繁琐。框架设计哲学的本质就是在"涌现的惊喜"和"控制的稳定"之间取舍。</p>
+      </div>
+      <div class="coverage-item">
+        <strong>4. 为什么需要工程化(消息派)?</strong>
+        <p>想象并发投票 / 分布式部署 / 容错恢复这些"工程挑战",AutoGen/CAMEL/LangGraph 都得自己造轮子。AgentScope = 从"能运行"到"能稳定服务"的跨越。</p>
+      </div>
+      <div class="coverage-item">
+        <strong>5. 为什么不能完全抛弃框架?</strong>
+        <p>想象每个工程都从零写主循环,80% 时间在写"通用逻辑",只有 20% 在写"业务逻辑"。框架让 80% 时间省下来,专注 20% 业务 —— 这才是工程化的本质。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== C. 3 个核心争议(沿用第05章排版经验,override 退出 grid) ========== -->
+  <div class="coverage" style="display:block">
+    <h4 class="coverage-title">C · 3 个核心争议(框架圈吵得最凶的问题)</h4>
+
+    <div style="margin:18px 0;padding:18px 20px;background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent-sage);border-radius:8px">
+      <p style="margin:0 0 10px;font-size:15px;font-weight:700;color:var(--text-primary)">争议 1 · 框架会不会让开发者失业?</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">代入提问</strong>:想象你是一个刚学 Python 的程序员,听说 AutoGen 一句话就能跑通对话系统,你会害怕失业吗?</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">立场 A(乐观派)</strong>:框架不会让开发者失业,反而让开发者做更有创意的事 —— 从"写主循环"到"设计业务逻辑"。赵元朗没失业,他转成了"四部联席质检官",灵魂活得更体面。</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">立场 B(悲观派)</strong>:框架让基础开发者大幅减少,只剩下"会用框架 + 会写底层"的少数人。AutoGen 用户量 100 万,但 99% 是产品经理/业务专家,真正写底层代码的开发者只占 1%。</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">看这个例子</strong>:</p>
+      <table>
+        <thead><tr><th>维度</th><th>10 年前</th><th>现在</th><th>10 年后?</th></tr></thead>
+        <tbody>
+          <tr><td>写底层的人</td><td>100%</td><td>30%</td><td>10%?</td></tr>
+          <tr><td>用框架的人</td><td>0%</td><td>50%</td><td>60%?</td></tr>
+          <tr><td>AI 自己做事</td><td>0%</td><td>20%</td><td>30%?</td></tr>
+        </tbody>
+      </table>
+      <p style="margin:8px 0"><strong style="color:var(--accent-sage)">共识</strong>:框架消灭的不是"开发者",是"重复劳动"。赵元朗最后认同了:"<strong>机器不是代替匠人,是让匠人不做重复活</strong>。"</p>
+      <p style="margin:0 0 6px"><strong style="color:var(--accent-sage)">未解</strong>:10 年后,纯底层开发者的需求会不会归零?</p>
+      <p style="margin:0"><strong style="color:var(--accent-sage)">没人知道</strong>:AI Native 时代,开发者会被 AI 取代到什么程度?</p>
+    </div>
+
+    <div style="margin:18px 0;padding:18px 20px;background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent-sage);border-radius:8px">
+      <p style="margin:0 0 10px;font-size:15px;font-weight:700;color:var(--text-primary)">争议 2 · AutoGen / AgentScope / CAMEL / LangGraph 谁会一统天下?</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">代入提问</strong>:想象你是一家初创公司的 CTO,要在四个框架里选一个给全公司用,你会赌谁赢?</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">立场 A(框架大一统派)</strong>:最终会有一家框架吃掉所有市场。就像当年 Web 框架只剩 React/Vue,框架也会"赢者通吃"。</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">立场 B(框架细分派)</strong>:不同场景需要不同框架,四家各有定位,长期共存。AutoGen 走对话协作,AgentScope 走工程化,CAMEL 走创意,LangGraph 走控制流,定位不重叠。</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">看这个例子</strong>:</p>
+      <table>
+        <thead><tr><th>框架</th><th>核心场景</th><th>护城河</th></tr></thead>
+        <tbody>
+          <tr><td>AutoGen</td><td>对话驱动协作</td><td>Microsoft + 群聊 + 多角色</td></tr>
+          <tr><td>AgentScope</td><td>消息驱动 + 工程化</td><td>阿里达摩院 + 分布式 + 容错</td></tr>
+          <tr><td>CAMEL</td><td>角色扮演 + 引导</td><td>轻架构 + 涌现协作 + 多模态</td></tr>
+          <tr><td>LangGraph</td><td>图(状态机)+ 循环</td><td>LangChain 生态 + 可审计 + 条件边</td></tr>
+        </tbody>
+      </table>
+      <p style="margin:8px 0"><strong style="color:var(--accent-sage)">共识</strong>:短期内四家并存,长期看谁胜取决于"AI Native 时代的护城河"。</p>
+      <p style="margin:0 0 6px"><strong style="color:var(--accent-sage)">未解</strong>:开源框架(CAMEL/LangGraph)会不会被闭源框架(AutoGen)挤出市场?</p>
+      <p style="margin:0"><strong style="color:var(--accent-sage)">没人知道</strong>:下一代框架会不会是"AI 自动生成工作流",根本不用人画图?</p>
+    </div>
+
+    <div style="margin:18px 0;padding:18px 20px;background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent-sage);border-radius:8px">
+      <p style="margin:0 0 10px;font-size:15px;font-weight:700;color:var(--text-primary)">争议 3 · 涌现式协作 vs 显式控制 — 谁是未来?</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">代入提问</strong>:想象你刚毕业,面前有两条路 —— "学 AutoGen 当对话驱动派"或"学 LangGraph 当显式控制派",5 年后谁更值钱?</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">立场 A(涌现派)</strong>:AI 的本质是涌现。定义好角色和目标,让复杂行为自然涌现,这种"自下而上"才是 AI 时代的精髓。</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">立场 B(控制派)</strong>:生产级应用必须可预测、可审计、可回退。画流程图、设状态机、显式控制每一步,这种"自上而下"才是工程化的正道。</p>
+      <p style="margin:0 0 8px"><strong style="color:var(--accent-sage)">看这个例子</strong>:</p>
+      <table>
+        <thead><tr><th>领域</th><th>涌现式做了多少?</th><th>显式控制做了多少?</th></tr></thead>
+        <tbody>
+          <tr><td>聊天机器人</td><td>90%(涌现)</td><td>10%(控制)</td></tr>
+          <tr><td>企业级应用</td><td>30%(现在)</td><td>70%(现在)</td></tr>
+          <tr><td>金融风控</td><td>5%(必须可审计)</td><td>95%(必须可审计)</td></tr>
+          <tr><td>科研助手</td><td>80%(深度创意)</td><td>20%(流程控制)</td></tr>
+        </tbody>
+      </table>
+      <p style="margin:8px 0"><strong style="color:var(--accent-sage)">共识</strong>:混合架构是最佳实践 —— 涌现给惊喜,控制给可靠。太子金句:"涌现式协作给惊喜,显式控制给可靠。两者结合,才是现代调度。"</p>
+      <p style="margin:0 0 6px"><strong style="color:var(--accent-sage)">未解</strong>:AI Native 时代,显式控制会不会被"AI 自己画流程图"取代?</p>
+      <p style="margin:0"><strong style="color:var(--accent-sage)">没人知道</strong>:未来框架是"人画图给 AI 跑",还是"AI 自己画图自己跑"?</p>
+    </div>
+  </div>
+
+  <!-- ========== D. 10 道自测题(沿用第05章经验:题目+选项展开,答案折叠) ========== -->
+  <div class="coverage">
+    <h4 class="coverage-title">D · 10 道自测题(考逻辑不考定义)</h4>
+    <p style="font-size:13.5px;color:var(--text-secondary);margin-bottom:16px">做题方式:每题解析第一句都是"想象..."开头,把抽象概念换成场景类比。点击题目下方"查看解析"展开。</p>
+
+    <!-- Q1 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q1</strong> · 圆桌派(陈子昂)的核心标志动作是?(核心机制)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. 围着桌子轮流说话(圆桌会议)</li>
+        <li>B. 发邮件过通政司(消息中心)</li>
+        <li>C. 两位专家过招(角色对话)</li>
+        <li>D. 画流程图(显式控制)</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:A</p>
+          <p><strong>想象</strong>:陈子昂摆了 4 把椅子 —— 产品经理、工程师、审查员、用户代理,围着圆桌按顺序发言。这就是 AutoGen 的核心动作 —— 对话驱动协作。</p>
+          <ul style="margin-top:6px">
+            <li><strong>A. 围着桌子轮流说话(圆桌会议)</strong> — AutoGen = RoundRobinGroupChat,对话驱动 ✅</li>
+            <li>B. 发邮件过通政司 — 这是消息派(AgentScope)❌</li>
+            <li>C. 两位专家过招 — 这是角色派(CAMEL)❌</li>
+            <li>D. 画流程图 — 这是图流派(LangGraph)❌</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- Q2 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q2</strong> · 消息派(王元朗)的核心标志动作是?(核心机制)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. 围着桌子轮流说话</li>
+        <li>B. 发邮件过通政司消息中心</li>
+        <li>C. 两位专家过招</li>
+        <li>D. 画流程图</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:B</p>
+          <p><strong>想象</strong>:6 个三国英雄不再当面说话,各自发邮件给通政司,通政司异步转发。这就是 AgentScope 的核心动作 —— 消息驱动 + 异步解耦。</p>
+          <ul style="margin-top:6px">
+            <li>A. 围着桌子轮流说话 — 圆桌派(AutoGen)❌</li>
+            <li><strong>B. 发邮件过通政司消息中心</strong> — AgentScope = MsgHub,消息驱动 ✅</li>
+            <li>C. 两位专家过招 — 角色派(CAMEL)❌</li>
+            <li>D. 画流程图 — 图流派(LangGraph)❌</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- Q3 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q3</strong> · 角色派(李若虚)的核心标志动作是?(核心机制)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. 围着桌子轮流说话</li>
+        <li>B. 发邮件过通政司</li>
+        <li>C. 两位专家过招(角色扮演)</li>
+        <li>D. 画流程图</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:C</p>
+          <p><strong>想象</strong>:心理学家 + 作家,各发一份"行动纲领",让他们自己聊出来 8000 字电子书。这就是 CAMEL 的核心动作 —— RolePlaying + Inception Prompting。</p>
+          <ul style="margin-top:6px">
+            <li>A. 围着桌子轮流说话 — 圆桌派 ❌</li>
+            <li>B. 发邮件过通政司 — 消息派 ❌</li>
+            <li><strong>C. 两位专家过招(角色扮演)</strong> — CAMEL = RolePlaying,引导性提示 ✅</li>
+            <li>D. 画流程图 — 图流派 ❌</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- Q4 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q4</strong> · 图流派(刘元济)的核心标志动作是?(核心机制)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. 围着桌子轮流说话</li>
+        <li>B. 发邮件过通政司</li>
+        <li>C. 两位专家过招</li>
+        <li>D. 画流程图 + 显式控制</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:D</p>
+          <p><strong>想象</strong>:刘元济画 3 个节点 + 4 条边(其中 1 条条件边),理解→搜索→回答,出错还能回退。这就是 LangGraph 的核心动作 —— 状态机 + 图 + 显式控制。</p>
+          <ul style="margin-top:6px">
+            <li>A. 围着桌子轮流说话 — 圆桌派 ❌</li>
+            <li>B. 发邮件过通政司 — 消息派 ❌</li>
+            <li>C. 两位专家过招 — 角色派 ❌</li>
+            <li><strong>D. 画流程图 + 显式控制</strong> — LangGraph = StateGraph,节点 + 边 + 条件边 ✅</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- Q5 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q5</strong> · 为什么需要 4 个调研员(4 个框架),不能只用一种?(设计动机)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. 因为每位调研员都想多赚钱</li>
+        <li>B. 因为只有太子能调度多框架</li>
+        <li>C. 任务场景不同,各有所长</li>
+        <li>D. 因为皇上不批准单一框架</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:C</p>
+          <p><strong>想象</strong>:让圆桌派去做三国狼人杀?6 角色说话会乱套。让消息派去做单步翻译?杀鸡用牛刀。让角色派去做金融风控?不可审计。任务不同,框架也要跟着换。</p>
+          <ul style="margin-top:6px">
+            <li>A. 因为每位调研员都想多赚钱 ❌</li>
+            <li>B. 因为只有太子能调度多框架 ❌</li>
+            <li><strong>C. 任务场景不同,各有所长</strong> — 没有最好,只有最适配 ✅</li>
+            <li>D. 因为皇上不批准单一框架 ❌</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- Q6 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q6</strong> · 圆桌派的极限在哪里?(设计动机)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. 圆桌派没有极限,只是角色不够多</li>
+        <li>B. 对话驱动协作的代价 — 角色互相依赖时陷入"鸡生蛋"死循环</li>
+        <li>C. 圆桌派只能做单步任务</li>
+        <li>D. 圆桌派的成本太高</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:B</p>
+          <p><strong>想象</strong>:产品经理说"请工程师实现",工程师反问"需求是啥",产品经理反问"你能查哪些" —— 这就是"鸡生蛋"死循环。圆桌派必须有人出来打断,否则一辈子聊不完。</p>
+          <ul style="margin-top:6px">
+            <li>A. 圆桌派没有极限 ❌(陈子昂的错误判断)</li>
+            <li><strong>B. 对话驱动协作的代价 — 角色互相依赖时陷入死循环</strong> ✅</li>
+            <li>C. 圆桌派只能做单步任务 ❌</li>
+            <li>D. 圆桌派的成本太高 ❌</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- Q7 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q7</strong> · 客户要"每秒 1000+ 并发用户、7×24 小时稳定运行的智能客服",优先选哪个框架?(实战应用)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. AutoGen</li>
+        <li>B. AgentScope</li>
+        <li>C. CAMEL</li>
+        <li>D. LangGraph</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:B</p>
+          <p><strong>想象</strong>:每秒 1000+ 并发 = 高并发场景,7×24 小时 = 分布式 + 容错需求。这正是 AgentScope 的甜点场景 —— 消息驱动 + 分布式部署 + 容错恢复。王元朗的"通政司"对应 MsgHub。</p>
+          <ul style="margin-top:6px">
+            <li>A. AutoGen — 圆桌派,对固定流程友好,但高并发会卡 ❌</li>
+            <li><strong>B. AgentScope</strong> — 消息派,异步解耦 + 分布式 + 容错,高并发首选 ✅</li>
+            <li>C. CAMEL — 角色派,适合创意协作,不适合生产级高并发 ❌</li>
+            <li>D. LangGraph — 图流派,适合可审计流程,不适合高并发 ❌</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- Q8 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q8</strong> · 公司要做"科研论文辅助写作平台,研究员智能体和写作智能体深度协作",优先选哪个框架?(实战应用)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. AutoGen</li>
+        <li>B. AgentScope</li>
+        <li>C. CAMEL</li>
+        <li>D. LangGraph</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:C</p>
+          <p><strong>想象</strong>:研究员和写作智能体"深度协作、自主推进" —— 这是典型的双专家角色扮演场景。李若虚的"心理学家 + 作家"对应 CAMEL 的 RolePlaying。</p>
+          <ul style="margin-top:6px">
+            <li>A. AutoGen — 圆桌派,但 RoundRobinGroupChat 适合固定流程 ❌</li>
+            <li>B. AgentScope — 消息派,但 2 角色用消息中心是大材小用 ❌</li>
+            <li><strong>C. CAMEL</strong> — 角色派,RolePlaying + Inception Prompting 适合双专家深度协作 ✅</li>
+            <li>D. LangGraph — 图流派,适合流程控制,不适合涌现式创意 ❌</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- Q9 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q9</strong> · 银行要"贷款申请:资料审核→风险评估→额度计算→合规检查→人工复核→最终决策",每步必须可审计,选哪个框架?(实战应用)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. AutoGen</li>
+        <li>B. AgentScope</li>
+        <li>C. CAMEL</li>
+        <li>D. LangGraph</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:D</p>
+          <p><strong>想象</strong>:6 步流程,每步有判断标准,必须可追溯可审计 —— 这正是刘元济画流程图的应用场景。LangGraph 的状态机 + 条件边天然适合。</p>
+          <ul style="margin-top:6px">
+            <li>A. AutoGen — 圆桌派,但对话不可预测,不可审计 ❌</li>
+            <li>B. AgentScope — 消息派,但消息中心不是流程图 ❌</li>
+            <li>C. CAMEL — 角色派,但涌现式不可审计 ❌</li>
+            <li><strong>D. LangGraph</strong> — 图流派,流程图 + 状态机 + 条件边,可审计可回退 ✅</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <!-- Q10 -->
+    <div style="margin:12px 0;padding:14px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0 0 10px;font-weight:600;color:var(--text-primary);font-size:14.5px"><strong style="color:var(--accent-sage)">Q10</strong> · 框架越普及,纯底层开发者就越没用?(反直觉)</p>
+      <ul style="margin:0 0 4px;padding-left:22px;line-height:1.85">
+        <li>A. 是的,框架普及后纯底层就没用了</li>
+        <li>B. 不是的,纯底层仍然是主流</li>
+        <li>C. 框架消灭的是"重复劳动",不是"开发者"</li>
+        <li>D. 完全看运气</li>
+      </ul>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--accent-sage);font-weight:600;padding:6px 0">▸ 查看答案解析</summary>
+        <div style="margin-top:8px;padding:12px;background:var(--bg-elevated);border-radius:6px">
+          <p style="font-style:italic;color:var(--accent-sage);font-weight:600;margin-bottom:8px">正确答案:C</p>
+          <p><strong>想象</strong>:赵元朗管工部四十年,他没失业 —— 他转成了"四部联席质检官"。框架消灭的不是"开发者",是"重复劳动"。剩下 20% 的极端场景反而更需要底层专家。</p>
+          <ul style="margin-top:6px">
+            <li>A. 是的,框架普及后纯底层就没用了 ❌(太绝对)</li>
+            <li>B. 不是的,纯底层仍然是主流 ❌(低估框架)</li>
+            <li><strong>C. 框架消灭的是"重复劳动",不是"开发者"</strong> — 赵元朗转质检官的逻辑 ✅</li>
+            <li>D. 完全看运气 ❌</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ========== Footer ========== -->
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text-secondary)">WellInsight</strong> · 学习材料 · 四部联席 v1.0 · 2026-06-25
+  </div>
+  <div>
+    原文:<a class="footer-link" href="https://raw.githubusercontent.com/datawhalechina/hello-agents/main/docs/chapter6/%E7%AC%AC%E5%85%AD%E7%AB%A0%20%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91%E5%AE%9E%E8%B7%B5.md" target="_blank">datawhalechina/hello-agents · 第06章</a>
+  </div>
+</footer>
+
+</div><!-- /.container -->
+
+<!-- Back to top -->
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'}" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+</body>
+</html>
