@@ -2,7 +2,6 @@
 
 ---
 
-
 # Allegorize Textbook Content
 
 > A complete workflow that converts technical textbooks and knowledge bases into learning stories for absolute beginners. The output eliminates circular jargon — it never defines a term using other specialized vocabulary.
