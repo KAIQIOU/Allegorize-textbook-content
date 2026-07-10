@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第11章 · 评估与迭代 · WellInsight 学习材料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2EDE6;--bg-card:#FAF7F2;--bg-elevated:#FFFCF7;--bg-deep:#E8DFD3;--text-primary:#3D3833;--text-secondary:#6B6157;--text-muted:#998E81;--accent-sage:#8B9D83;--accent-sage-soft:#D8E2D2;--accent-sage-faint:#ECF1E8;--accent-terracotta:#C49B8E;--accent-terracotta-soft:#E6D2C8;--accent-blue:#8A9AA8;--accent-blue-soft:#C8D2DA;--accent-amber:#C9A878;--accent-amber-soft:#E8D7B7;--accent-mauve:#A89098;--accent-mauve-soft:#DCCCD0;--border:#D9D2C7;--border-light:#E8E0D3;--shadow:0 2px 8px rgba(61,56,51,.06), 0 1px 2px rgba(61,56,51,.04);--shadow-lg:0 8px 24px rgba(61,56,51,.10), 0 2px 6px rgba(61,56,51,.05);}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.78;font-size:16px;font-weight:400;-webkit-font-smoothing:antialiased;letter-spacing:.01em;}
+.container{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+.sticky-toc{position:fixed;top:24px;right:24px;width:240px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);font-size:13px;z-index:50;max-height:calc(100vh - 48px);overflow-y:auto;}
+.sticky-toc-title{font-weight:600;color:var(--text-secondary);margin-bottom:8px;font-size:12px;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+.sticky-toc ol{list-style:none;counter-reset:toc;padding:0}
+.sticky-toc li{counter-increment:toc;margin:4px 0}
+.sticky-toc a{color:var(--text-secondary);text-decoration:none;display:block;padding:4px 0 4px 8px;margin-left:6px;border-left:2px solid transparent;font-size:12.5px;font-weight:500;transition:all .2s;}
+.sticky-toc a:hover{color:var(--accent-sage);border-left-color:var(--accent-sage)}
+.sticky-toc a::before{content:counter(toc) ".";color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px;margin-right:4px}
+.hero{background:linear-gradient(135deg,#FAF7F2 0%,#F2EDE6 100%);border:1px solid var(--border);border-radius:12px;padding:48px 40px 40px;margin-bottom:48px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent-sage) 0%,var(--accent-terracotta) 33%,var(--accent-blue) 66%,var(--accent-amber) 100%);}
+.hero-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text-muted);margin-bottom:16px;font-weight:500;letter-spacing:.5px;}
+.hero-meta-dot{width:4px;height:4px;background:var(--text-muted);border-radius:50%}
+.hero h1{font-size:46px;font-weight:700;line-height:1.15;color:var(--text-primary);margin-bottom:10px;letter-spacing:-1px;}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);margin-bottom:22px;font-weight:500;}
+.hero-fable{display:inline-block;padding:2px 10px;margin-right:4px;background:var(--accent-sage-soft);color:var(--accent-sage);border-radius:12px;font-size:14px;font-weight:600;letter-spacing:.5px;}
+.hero-desc{font-size:14.5px;color:var(--text-secondary);margin-bottom:24px;line-height:1.7;font-weight:400;}
+.hero-source{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);background:var(--bg-card);padding:6px 12px;border-radius:20px;border:1px solid var(--border-light);font-weight:500;}
+section{margin-bottom:56px;scroll-margin-top:80px}
+.chapter-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--accent-sage);background:var(--accent-sage-soft);padding:4px 12px;border-radius:12px;margin-bottom:14px;letter-spacing:1px;}
+h2{font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:14px;letter-spacing:-.3px;display:flex;align-items:baseline;gap:12px;line-height:1.3;}
+h2 .num{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--accent-terracotta);font-weight:500}
+h2-hook{display:block;font-size:15px;font-weight:500;color:var(--text-secondary);margin-top:8px;margin-bottom:24px;padding:12px 16px;background:var(--bg-card);border-left:3px solid var(--accent-amber);border-radius:0 6px 6px 0;font-style:italic;}
+h3{font-size:19px;font-weight:600;color:var(--text-primary);margin:24px 0 10px;padding-left:14px;border-left:3px solid var(--accent-amber);letter-spacing:-.2px;}
+h4{font-size:16px;font-weight:600;color:var(--accent-sage);margin:20px 0 10px}
+p{margin-bottom:14px;color:var(--text-primary);text-align:left;font-weight:400}
+strong{color:var(--text-primary);font-weight:600}
+em{color:var(--text-secondary);font-style:normal;font-weight:600}
+.lead{font-size:17px;color:var(--text-secondary);padding:18px 22px;background:var(--bg-card);border-left:3px solid var(--accent-terracotta);border-radius:0 6px 6px 0;margin-bottom:28px;font-weight:500;line-height:1.85;}
+.callout{background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:18px 22px;margin:20px 0;box-shadow:var(--shadow);}
+.callout-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--accent-sage);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.pullquote{background:linear-gradient(135deg,var(--accent-amber-soft) 0%,var(--bg-card) 100%);border:1px solid var(--accent-amber-soft);border-radius:8px;padding:22px 26px;margin:24px 0;font-size:16.5px;font-weight:500;color:var(--text-primary);position:relative;}
+.pullquote::before{content:"\201C";position:absolute;top:-6px;left:16px;font-size:48px;color:var(--accent-amber);font-family:Georgia,serif;line-height:1;font-weight:700;}
+.stats-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0 8px}
+.stat-cell{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:18px 16px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--accent-terracotta);line-height:1.1;margin-bottom:4px}
+.stat-label{font-size:13px;color:var(--text-secondary);font-weight:500;line-height:1.45}
+.stat-cell.victory{border-top:3px solid var(--accent-sage)}
+.stat-cell.defeat{border-top:3px solid var(--accent-mauve)}
+.stat-num.green{color:var(--accent-sage)}
+.stat-num.red{color:var(--accent-mauve)}
+.doctors-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0 8px}
+.doctor-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;transition:transform .2s;}
+.doctor-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.doctor-card.role-1{border-top:3px solid var(--accent-sage)}
+.doctor-card.role-2{border-top:3px solid var(--accent-terracotta)}
+.doctor-card.role-3{border-top:3px solid var(--accent-blue)}
+.doctor-card.role-4{border-top:3px solid var(--accent-amber)}
+.doctor-name{font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:2px;display:flex;align-items:center;gap:8px;letter-spacing:-.2px;}
+.doctor-age{font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:10px}
+.doctor-quote{font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:12px;line-height:1.6;padding-bottom:12px;border-bottom:1px dashed var(--border-light)}
+.doctor-behaviors{list-style:none;padding:0;margin:0;font-size:12.5px;color:var(--text-secondary);line-height:1.7}
+.doctor-behaviors li{padding:3px 0 3px 14px;position:relative}
+.doctor-behaviors li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--accent-amber)}
+.annotation{background:linear-gradient(135deg,var(--accent-sage-faint) 0%,var(--bg-card) 100%);border:1px solid var(--accent-sage-soft);border-left:3px solid var(--accent-sage);border-radius:0 8px 8px 0;padding:18px 22px;margin:32px 0 8px;position:relative;}
+.annotation-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--accent-sage-soft);}
+.annotation-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;letter-spacing:1.5px;}
+.annotation-hint{font-size:12px;color:var(--text-muted);font-weight:500;font-style:italic}
+.annotation dl{display:grid;grid-template-columns:minmax(140px,max-content) 1fr;gap:8px 18px;margin:0}
+.annotation dt{font-weight:600;color:var(--text-primary);font-size:13px;line-height:1.65}
+.annotation dd{margin:0;color:var(--text-secondary);font-size:13px;line-height:1.65}
+.annotation dd .who{color:var(--accent-terracotta);font-weight:700;margin-right:4px}
+.annotation dd .what{color:var(--text-secondary)}
+.dialog{background:var(--bg-deep);border-radius:6px;padding:14px 18px;margin:14px 0;font-size:14.5px;color:var(--text-primary);border-left:3px solid var(--accent-amber);}
+.dialog-speaker{font-weight:700;color:var(--accent-terracotta)}
+.table-wrap{margin:20px 0;background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:var(--bg-deep)}
+th{padding:12px 16px;text-align:left;font-weight:600;color:var(--text-primary);font-size:13px;letter-spacing:.3px;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border-light);color:var(--text-secondary);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(232,223,211,.3)}
+.coverage{background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:32px 0}
+.coverage-title{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px;padding-bottom:12px;border-bottom:2px dashed var(--border)}
+.quiz-list{display:flex;flex-direction:column;gap:14px;margin:18px 0}
+.quiz-card{background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);border-left:4px solid var(--accent-sage)}
+.quiz-card-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.quiz-num{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent-sage);background:var(--accent-sage-soft);padding:2px 8px;border-radius:6px}
+.quiz-q{margin:0 0 8px;font-size:14.5px;color:var(--text-primary);font-weight:500;line-height:1.7}
+.quiz-options{list-style:none;padding:0;margin:0 0 6px;display:flex;flex-direction:column;gap:3px}
+.quiz-options li{padding:5px 10px;font-size:13.5px;color:var(--text-secondary);line-height:1.6;border-radius:5px;background:var(--bg-card);border:1px solid var(--border-light)}
+.quiz-answer{margin-top:10px;background:var(--bg-card);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text-secondary);border:1px dashed var(--border)}
+.quiz-answer summary{cursor:pointer;font-weight:600;color:var(--accent-sage);font-size:13px;padding:2px 0;list-style:none}
+.quiz-answer summary::before{content:"▶ "}
+.quiz-answer[open] summary{margin-bottom:6px}
+.summary-box{background:linear-gradient(135deg,var(--accent-sage-soft) 0%,var(--bg-card) 50%,var(--accent-amber-soft) 100%);border:1px solid var(--accent-sage);border-radius:12px;padding:32px 36px;margin:40px 0;position:relative;}
+.summary-box-title{font-size:13px;font-weight:700;color:var(--accent-sage);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.summary-text{font-size:18px;color:var(--text-primary);line-height:1.85;font-weight:500}
+.footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);font-size:12.5px;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-weight:500}
+.footer-link{color:var(--accent-sage);text-decoration:none;font-weight:600}
+.back-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:justify-content:center;cursor:pointer;box-shadow:var(--shadow);transition:all .2s;z-index:40}
+.icon{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+code{background:var(--bg-deep);padding:2px 7px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent-terracotta);font-weight:500}
+@media (max-width:1100px){.sticky-toc{display:none}}
+@media (max-width:768px){.container{padding:24px 16px 60px}.hero{padding:32px 20px}.hero h1{font-size:32px}h2{font-size:22px}.doctors-grid,.stats-card{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="sticky-toc" aria-label="目录">
+  <div class="sticky-toc-title">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    目录
+  </div>
+  <ol>
+    <li><a href="#ch0">开篇 · 接得对不对没人知</a></li>
+    <li><a href="#ch1">第一幕 · "评估派"登场</a></li>
+    <li><a href="#ch2">第二幕 · 试院·评估院挂牌</a></li>
+    <li><a href="#ch3">第三幕 · 宋判立"评估四评"</a></li>
+    <li><a href="#ch4">第四幕 · 评估循环三轮迭代</a></li>
+    <li><a href="#ch5">第五幕 · 沈一石"考校"再成"拜师"</a></li>
+    <li><a href="#finale">终章 · 题匾"接得好不好,不是接话的人说了算"</a></li>
+    <li><a href="#summary">一句话总结</a></li>
+    <li><a href="#coverage">概念地图</a></li>
+    <li><a href="#think">太子五条心得</a></li>
+    <li><a href="#quiz">自测十问</a></li>
+  </ol>
+</nav>
+
+<div class="container">
+
+<header class="hero">
+  <div class="hero-meta">
+    <span>WellInsight 学习材料</span>
+    <span class="hero-meta-dot"></span>
+    <span>来源教材 · 第11章 · 寓言版</span>
+    <span class="hero-meta-dot"></span>
+    <span>2026-06-29 · v1</span>
+  </div>
+  <h1>第11章 · 评估与迭代</h1>
+  <p class="hero-subtitle"><span class="hero-fable">礼部试院</span> · 22 岁太子造"评估循环"机件 · 接得好不好,不是接话的人说了算,是用接话结果的人说了算</p>
+  <p class="hero-desc">建议读法:先看故事,<strong>不要查名词</strong>;每章末尾有"本节专业名词对照",可倒回去对比。</p>
+  <span class="hero-source">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    原文 · datawhalechina/hello-agents · 第11章
+  </span>
+</header>
+
+<main id="content">
+
+<section id="ch0">
+  <span class="chapter-tag">开篇 · 景和十二年三月</span>
+  <h2><span class="num">00</span>接得对不对没人知 —— 5 万石写错位差点误军务</h2>
+  <span class="h2-hook">"户部侍郎拍脑袋说'接得好',工部侍郎拍脑袋说'接得不好' —— 凭感觉。陈守一查档发现'5 万石'户部灵机多写一位成'30 万石',差点多调粮 25 万石误军务 —— 接话灵机不是不出错,是没人看出错。"</span>
+
+  <p class="lead">景和十二年三月。二十二岁的太子刚办完会同馆番使院的差事半年,这天在礼部试院翻接话档册,陈守一(番使院接话督办,第10章反转过来的老友)匆匆进来:"殿下,出事了 —— 上月北狄犯边,户部灵机按接话四礼调粮 5 万石,纸契上写的是'30 万石',差点多调 25 万石,若非臣查档发现,户部按 30 万石调走,北境兵马就要饿肚子了。"</p>
+
+  <p>太子放下笔:"灵机怎么会把'5 万石'写成'30 万石'?" 陈守一答:"<strong>灵机不是写错了,是接话时没'看清'</strong> —— 户部灵机按户部侍郎的口吻,顺手把'5 万石'补成了'30 万石',一字之差,差点误了北境大军。"</p>
+
+  <p>户部侍郎反驳:"臣接话时反复看,没看出错。" 工部侍郎也反驳:"臣觉得接得好 —— 调了粮就行,何必计较一位数。" 陈守一冷笑:"<strong>户部说接得好,工部说接得好,可是没人看出'5 万石'写成了'30 万石' —— 这不是接得好,是没人评</strong>。"</p>
+
+  <p>太子沉吟片刻,道:"<strong>接得好不好,不是接话的人说了算,也不是听接话的人说了算,是用接话结果的人说了算 —— 调粮草的人按 30 万石发粮,北境兵马就要饿肚子;按 5 万石发粮,才能救边关</strong>。"</p>
+
+  <p>小李低声问:"殿下,这'用接话结果的人说了算',是不是像试院? —— 考卷写得好不好,不是考生说了算,是考官说了算。" 太子点头:"正是。我们今天在礼部试院要造的,就是给接话灵机立一套'考核官' —— <strong>这叫'评估循环'</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">对照开篇的两大症结</span>
+    </div>
+    <dl>
+      <dt>5 万石写错位成 30 万石</dt>
+      <dd><span class="who">番使院半年来的隐患</span><span class="what">—— 灵机"接得对不对"没人评的典型事故:户部灵机接话时凭"感觉"把数字多写一位,如果没人查档,就要误军务。接话灵机不是不会出错,是没有"考核官"看。</span></dd>
+      <dt>户部说接得好,工部说接得好</dt>
+      <dd><span class="who">没人评的现状</span><span class="what">—— 评估的"盲区":接话的人自己评自己(自评不算),听接话的人也凭感觉说"好"—— 没有独立、客观的"评估者"。</span></dd>
+      <dt>用接话结果的人说了算</dt>
+      <dd><span class="who">太子的定调</span><span class="what">—— 评估的根本原则:"结果导向"(outcome-based):不看接话的人怎么说,不看接话的过程多热闹,只看"用接话结果的人满不满意"。</span></dd>
+      <dt>评估循环</dt>
+      <dd><span class="who">本章核心机件</span><span class="what">—— 给接话灵机立"考核官"(评估循环):听评(看格式) → 查评(查档案) → 比评(比样板) → 判评(判合格) → 三轮迭代,让接话越来越准。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch1">
+  <span class="chapter-tag">第一幕 · 评估派登场</span>
+  <h2><span class="num">01</span>沈一石:"接话已够好,何必再评?"</h2>
+  <span class="h2-hook">"沈侍郎不是为反而反 —— 他是真心的:他怕评了打击匠人,接话已经够好了。但他的善念,差点害了北境大军。"</span>
+
+  <p class="lead">三月初三早朝。礼部侍郎沈一石刚把"评估派"的联名奏本呈上,陈守一先接话:"沈侍郎的好意臣懂 —— 但若不是臣查档,户部灵机写错位的'30 万石'就要把北境大军饿肚子,沈侍郎说'接得好',是凭感觉。"</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">沈一石:</span>"<strong>殿下,臣不是为反而反。臣是想,接话已经办好事 —— 调了粮,造了车,发了兵,何必再评?评了反而打击匠人 —— 接话灵机接错了,评的人指指点点,匠人就不敢再接话</strong>。"
+  </div>
+
+  <p>这话有几分道理,朝堂上几位老臣点头。礼部员外郎反驳:"可是按陈督办的查档,'5 万石'变'30 万石',折粮 25 万石,折银 30 万两 —— 不是接话没接好,是没人评出接话接错了。"</p>
+
+  <p>太子示意员外郎说完,然后慢慢开口。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">太子:</span>"<strong>沈侍郎问得好。评不评,不是礼部愿不愿的事 —— 是灵机接话接错了,谁来看出来的事。景和十二年这'30 万石',问题不在接话的人没接好,在没人看出接话接错了。让灵机不评,等于让接话灵机闭着眼调粮 —— 哪怕接得再热闹,粮也是错的</strong>。"
+  </div>
+
+  <p>沈一石愣了半晌,拂袖而去。临走丢下一句:"臣的'评估派'也是为匠人好 —— 臣不省试院的考核,省接话灵机的清静。"</p>
+
+  <p>太子望着他背影,对小李说:"<strong>沈侍郎不是坏人。他是怕评了打击匠人,接话已经够好 —— 这种善念,我们要尊重。但善念若不讲究章法,反而害事。我们今天的功课,是给沈侍郎一个'评估章法',让他看了服气</strong>。"</p>
+
+  <h3>礼部试院改组 · 三条铁规</h3>
+  <p>三月初五,太子在礼部试院挂"评估院"匾。三条铁规贴在正堂:</p>
+  <ul>
+    <li><strong>评估</strong> —— 给接话灵机立"考核官"(听评 / 查评 / 比评 / 判评),让接话对不对有标准 —— 三个月内拿出第一版</li>
+    <li><strong>评估循环</strong> —— 把第08章"记簿"思路扩展到"试案 / 考卷",让评估有数据基础 —— 三个月内跑通三轮迭代</li>
+    <li><strong>万器归一</strong> —— 沿用第07/08/09/10章机件规范,新评估机件按统一接驳口接入</li>
+  </ul>
+
+  <p>太子在匾旁另立一段话:"<strong>接得好不好,不是接话的人说了算,是用接话结果的人说了算 —— 给灵机接话立一套评估章法,不是让灵机多挨批,是让灵机知道自己哪里差</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">评估派 vs 接话派</span>
+    </div>
+    <dl>
+      <dt>评估派</dt>
+      <dd><span class="who">沈一石的评估派主张</span><span class="what">—— "评估不必"思路:接话已经够好,何必再评 —— 但实际上"接话离不了评估",不评等于让接话灵机闭着眼调粮。</span></dd>
+      <dt>5 万石变 30 万石</dt>
+      <dd><span class="who">景和十二年真实事故</span><span class="what">—— 接话灵机"评估缺失"问题:户部灵机接话时把"5 万石"补成"30 万石",若非陈守一查档,北境大军就要饿肚子 —— 评估派的核心动机就是要解决这种"无人评估"。</span></dd>
+      <dt>评估章法</dt>
+      <dd><span class="who">太子的评估派主张</span><span class="what">—— 评估循环(Evaluation & Iteration):让接话灵机有"考核官",由"听评 / 查评 / 比评 / 判评"四评组成,接话接错了能看出来。</span></dd>
+      <dt>评估派 vs 接话派</dt>
+      <dd><span class="who">本章反派冲突</span><span class="what">—— 沈一石"评估不必"(接话已好,何必再评) vs 宋判"四评评估"(评了才知接得对不对)。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch2">
+  <span class="chapter-tag">第二幕 · 立项</span>
+  <h2><span class="num">02</span>试院·评估院挂牌,六匠人入驻</h2>
+  <span class="h2-hook">"记簿是'自己记自己',查档是'借别人的记忆',编排是'怎么排给灵机看',接话是'让灵机对灵机说话',评估是'给灵机照镜子' —— 一内一外一排一接一评,合起来才是完整的'灵机协作'。"</span>
+
+  <p class="lead">三月初七。太子召见六位主笔匠人:钦天监何七(四十出头,第07章机件规范主笔),翰林院编修吕坤(第08章记簿主笔),通政司编排主笔苏望(第09章编排主笔),会同馆老通译廖通(六十二岁,第10章接话主笔),礼部试院主簿宋判(四十二岁,阅卷二十年),番使院接话督办陈守一(第10章反转过来的老友)。六人领命入局,太子当面给图纸,三月为期。</p>
+
+  <div class="stats-card">
+    <div class="stat-cell victory">
+      <div class="stat-num green">4</div>
+      <div class="stat-label">种评估礼(听/查/比/判)</div>
+    </div>
+    <div class="stat-cell victory">
+      <div class="stat-num green">3</div>
+      <div class="stat-label">轮迭代(慢/乱/准)</div>
+    </div>
+    <div class="stat-cell defeat">
+      <div class="stat-num red">90</div>
+      <div class="stat-label">日为期,三月期满交付</div>
+    </div>
+  </div>
+
+  <h3>节点 1 · 宋判主评估 · 依《礼记·学记》"试院六艺"立"四评"</h3>
+  <p>宋判的方案最独特 —— 他不直接造机,他先翻《礼记·学记》"试院六艺",找到考校学生的四层规矩:</p>
+  <ul>
+    <li><strong>听评(看卷面)</strong> —— 看纸契格式"拜帖头/所请/来路/回音"四件套写没写齐</li>
+    <li><strong>查评(查出处)</strong> —— 查"来路据某档某条"对不对得上</li>
+    <li><strong>比评(比样板)</strong> —— 比"接话结果"与"朝代钦定样板"差多少</li>
+    <li><strong>判评(判合格)</strong> —— 判"事成不成 + 灵机接话合不合格"</li>
+  </ul>
+
+  <p>宋判说:"<strong>老朽在试院阅卷二十年,见过无数考卷,评估的妙处不在'严',在'评'。一次评估,有听有查有比有判,清清楚楚 —— 缺一评,就出岔子。缺听评,纸契格式乱;缺查评,档案出处错;缺比评,不知差多少;缺判评,合不合格没定论</strong>。"</p>
+
+  <h3>节点 2 · 何七主试案 · 把第07章机件规范搬进"评估"</h3>
+  <p>何七说:"第07章我们造了'万器归一'机件规范。现在派新用场:评估要有'试案 / 考卷',得有数据基础 —— <strong>试案要齐(覆盖所有接话场景),考卷要准(每个试案有朝代样板)</strong>。"</p>
+
+  <p>"<strong>试案齐</strong> —— 把第08章记簿四柜里的接话档全部抽出来当试案,覆盖调粮/造车/发兵/查档/调度五类场景;<strong>考卷准</strong> —— 每个试案有朝代钦定样板(及格线),评估灵机按样板打分。"</p>
+
+  <h3>节点 3 · 吕坤/苏望主评估档案 · 把第08/09章搬进"评估"</h3>
+  <p>吕坤说:"第08章我们造了'记簿四柜'。现在派新用场:评估要查档,得在记簿里给每个试案留一个'查档路线'。"</p>
+
+  <p>苏望接话:"第09章我们造了'四件套编排'。现在派新用场:评估的纸契也要四件配齐 —— <strong>试案头定评什么(听评/查评/比评/判评),所请定评哪条(试案编号),来路定据哪份样板(朝代钦定),回音定评几分(及格率)</strong>。"</p>
+
+  <h3>节点 4 · 廖通/陈守一主被评估 · 把第10章接话搬进"评估"</h3>
+  <p>廖通说:"第10章我们造了'接话四礼'(拜帖/回帖/问安/辞行)。现在派新用场:接话灵机要接受评估,得给评估官留'接话档案'。"</p>
+
+  <p>陈守一接话:"<strong>接话档案要全 —— 接话的纸契、接话的回音、接话用了多少步、接话用了多少息 —— 评估官按档案打分</strong>。"</p>
+
+  <p>太子点头:"这便是'评估'二字的本意 —— 不是让接话灵机多挨批,是让接话灵机按'听评/查评/比评/判评'四评,按'试案头/所请/来路/回音'四件套,让接话对不对有标准。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">评估四评 + 跨章机件复用</span>
+    </div>
+    <dl>
+      <dt>《礼记》"试院六艺"</dt>
+      <dd><span class="who">宋判的设计依据</span><span class="what">—— 评估的设计原则:不靠堆评估指标,靠精心礼节 —— 听评看卷面、查评看出处、比评比样板、判评判合格。</span></dd>
+      <dt>四评 · 听 / 查 / 比 / 判</dt>
+      <dd><span class="who">宋判的朝代比喻</span><span class="what">—— 评估四评(Evaluation Pipeline):① 听评(Format Check)② 查评(Fact Check)③ 比评(Benchmark Compare)④ 判评(Pass/Fail Judge)。</span></dd>
+      <dt>试案 / 考卷</dt>
+      <dd><span class="who">何七的方案</span><span class="what">—— 评估数据集(Evaluation Dataset):覆盖所有接话场景的"试案"和每个试案配的"考卷"(朝代钦定样板),评估灵机按"试案 + 考卷"打分。</span></dd>
+      <dt>记簿 / 编排搬进评估</dt>
+      <dd><span class="who">吕坤 / 苏望的方案</span><span class="what">—— 评估复用前章成果:记簿管"评估查档的路线",编排管"评估纸契四件套怎么写",机件规范管"评估机件怎么接驳"。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch3">
+  <span class="chapter-tag">第三幕 · 评估四评</span>
+  <h2><span class="num">03</span>宋判立"四评":听评、查评、比评、判评</h2>
+  <span class="h2-hook">"评估的毛病,不在'少',在'乱'。四评不是让评估灵机多打分,是让评估灵机按评走 —— 缺一评,就出岔子。"</span>
+
+  <p class="lead">三月中。宋判依《礼记·学记》"试院六艺",把灵机评估分为四大评节,每评都有自己的"用途"和"边界" —— 不同的事,用不同的评。</p>
+
+  <div class="doctors-grid">
+    <div class="doctor-card role-1">
+      <div class="doctor-name">听评</div>
+      <div class="doctor-age">纸契格式</div>
+      <div class="doctor-quote">"看'拜帖头/所请/来路/回音'四件套写没写齐。"</div>
+      <ul class="doctor-behaviors">
+        <li>接话档案到手,先看格式</li>
+        <li>写明"四件套齐不齐"</li>
+        <li>适用:所有接话 / 全部场景</li>
+        <li>边界:只评"格式",不评"内容"</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-2">
+      <div class="doctor-name">查评</div>
+      <div class="doctor-age">档案准不准</div>
+      <div class="doctor-quote">"查'来路据某档某条'对不对得上。"</div>
+      <ul class="doctor-behaviors">
+        <li>看完格式,查档案出处</li>
+        <li>写明"据某档某条"</li>
+        <li>适用:具体差事 / 数据调度</li>
+        <li>边界:只评"出处",不评"对不对"</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-3">
+      <div class="doctor-name">比评</div>
+      <div class="doctor-age">朝代样板</div>
+      <div class="doctor-quote">"比'接话结果'与'朝代钦定样板'差多少。"</div>
+      <ul class="doctor-behaviors">
+        <li>比朝代样板(及格线)</li>
+        <li>写明"差几分"</li>
+        <li>适用:复杂差事 / 多步操作</li>
+        <li>边界:只评"差多少",不评"为啥差"</li>
+      </ul>
+    </div>
+    <div class="doctor-card role-4">
+      <div class="doctor-name">判评</div>
+      <div class="doctor-age">合格 / 不合格</div>
+      <div class="doctor-quote">"判'事成不成 + 灵机接话合不合格'。"</div>
+      <ul class="doctor-behaviors">
+        <li>事毕递"合格 / 不合格"判定</li>
+        <li>写明"成 / 败 / 部分成"</li>
+        <li>适用:所有差事 / 最终结论</li>
+        <li>边界:只判"成不成",不评"为啥成"</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>节点 5 · 四评小试 · 户部 + 工部 + 兵部灵机接话后评估</h3>
+  <p>三月二十。小吏挑了"北狄犯边调粮草"这件事做评估测试 —— 让户部、工部、兵部三家灵机按第10章四礼接话,然后评估官按四评打分。</p>
+
+  <p>评估官先做<strong>听评</strong>:"户部灵机递的纸契,看'拜帖头(户部灵机) + 所请(调粮 5 万石) + 来路(据兵部拜帖) + 回音(15 日北运)' —— 四件套写齐了,听评 80 分。"</p>
+
+  <p>评估官再做<strong>查评</strong>:"来路据兵部拜帖,对得上兵部档第 7 条 —— 查评 90 分。"</p>
+
+  <p>评估官再比<strong>比评</strong>:"朝代样板 = 调粮草须' 5 万石 15 日抵达',户部灵机答'5 万石 15 日北运' —— 与样板一字不差,比评 95 分。"</p>
+
+  <p>评估官最后<strong>判评</strong>:"事成 —— 粮调了 5 万石,15 日抵达,合格 —— 判评 90 分。"</p>
+
+  <p>太子一看 —— 从"调粮草"接话到评估,四评打完,户部灵机接话得 88.75 平均分。小吏跑半天办不成的事,接话加评估一刻钟搞定。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">小吏:</span>"殿下,这'调粮草'臣跑了半天,灵机一刻钟接完,评估官一刻钟评完 —— 这不是灵机快了,是灵机接话加上评估都有章法了。"
+  </div>
+
+  <p>宋判补一句:"<strong>四评打完事 —— 这就是'评'的妙处</strong>。"</p>
+
+  <p>沈一石正好走进来(本来想看看笑话),看到这一幕,愣了半晌,低声问:"宋主簿,这'四评',真能让接话对不对看出来?" 宋判答:"<strong>沈侍郎善意的'评估派',是让接话灵机免挨批;宋某费力的'四评评估',是让接话灵机照镜子。善意是善意,章法是章法</strong>。"</p>
+
+  <p>沈一石脸一红,没说话,走了。</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">四评的工程映射</span>
+    </div>
+    <dl>
+      <dt>听评 · 纸契格式</dt>
+      <dd><span class="who">对应格式检查</span><span class="what">—— 评估的"格式检查"(Format Check):灵机接话档案到手,先看纸契"拜帖头/所请/来路/回音"四件套齐不齐 —— 缺一,听评扣分。</span></dd>
+      <dt>查评 · 档案准不准</dt>
+      <dd><span class="who">对应事实检查</span><span class="what">—— 评估的"事实检查"(Fact Check):查"来路据某档某条"对不对得上 —— 出处错,查评扣分。</span></dd>
+      <dt>比评 · 朝代样板</dt>
+      <dd><span class="who">对应样板比对</span><span class="what">—— 评估的"样板比对"(Benchmark Compare):比"接话结果"与"朝代钦定样板"差多少 —— 差得多,比评扣分。</span></dd>
+      <dt>判评 · 合格 / 不合格</dt>
+      <dd><span class="who">对应合格判定</span><span class="what">—— 评估的"合格判定"(Pass/Fail Judge):判"事成不成 + 灵机接话合不合格"—— 不合格,判评扣分。</span></dd>
+      <dt>四评顺序</dt>
+      <dd><span class="who">实操原则</span><span class="what">—— 听评先(格式) → 查评(出处) → 比评(比对) → 判评(判定),缺一评,评估就乱。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch4">
+  <span class="chapter-tag">第四幕 · 评估循环</span>
+  <h2><span class="num">04</span>宋判立"评估循环":三轮迭代,接话越来越准</h2>
+  <span class="h2-hook">"四评是'一次评得对不对',评估循环是'评了改,改了再评' —— 规矩有了,也得让接话灵机越接越准,不然就成了'一次定终身'。"</span>
+
+  <p class="lead">三月二十五。六匠人合议:四评是"评一次",还得有"循环" —— 接话灵机评估完了要改,改完再评,评完再改,三轮迭代,接话才越来越准。</p>
+
+  <p>宋判翻开《礼记·学记》"试院三试",找到评估循环的章法:"凡试院之考,皆有三轮:一曰初试(评格式),二曰复试(评出错),三曰终试(评实战)。三轮评完,考生命运方定。"</p>
+
+  <h3>节点 6 · 评估循环三轮演示 · 户部 / 工部 / 兵部灵机迭代接话</h3>
+  <p>太子演一场"评估循环三轮迭代"。户部、工部、兵部三家灵机按第10章四礼接话,评估官按本章四评打分,然后迭代,再接话,再打分,三轮迭代:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>轮次</th><th>问题</th><th>评估结论</th><th>改进</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>第一轮</td><td>"5 万石"纸契缺"回音"项</td><td>听评 50 / 查评 60 / 比评 70 / 判评 不合格</td><td>补"回音"项</td></tr>
+        <tr><td>第二轮</td><td>"拜帖"和"回帖"顺序错位</td><td>听评 70 / 查评 70 / 比评 60 / 判评 不及格</td><td>严格"拜 / 回 / 问 / 辞"</td></tr>
+        <tr><td>第三轮</td><td>三家事一刻钟接完 + 与朝代样板一字不差</td><td>听评 95 / 查评 90 / 比评 95 / 判评 合格</td><td>实战验证</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>户部灵机按第一轮评估改进:</p>
+  <div class="callout">
+    <p style="margin:0"><strong>第一轮 · 评估循环改进:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">① 听评扣分 → 户部灵机纸契补全"回音"项(15 日北运清单);<br>② 查评扣分 → 户部灵机重新查档,确认"据户部税奏第 7 条";<br>③ 比评扣分 → 户部灵机比朝代样板,改"15 日抵达"为"15 日内必到";<br>④ 判评扣分 → 户部灵机重新接话,事成才算合格。</p>
+  </div>
+
+  <p>第二轮评估后,户部灵机再接话,评估官再打分:</p>
+  <div class="callout">
+    <p style="margin:0"><strong>第二轮 · 评估循环改进:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">① 听评扣分 → 户部灵机严格"拜 / 回 / 问 / 辞"四礼,不颠倒;<br>② 查评扣分 → 户部灵机给每份档案加"档号 + 出处",评估官一看就懂;<br>③ 比评扣分 → 户部灵机把"调粮"分为"装车 / 启程 / 抵达"三步,每步给样板;<br>④ 判评扣分 → 户部灵机按四礼 + 纸契四件套重做一遍,事毕才辞行。</p>
+  </div>
+
+  <p>第三轮评估,户部灵机接话:</p>
+  <div class="callout">
+    <p style="margin:0"><strong>第三轮 · 评估循环实战:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">① 听评 → 90 分(纸契四件套齐);<br>② 查评 → 95 分(据户部税奏第 7 条 + 兵部拜帖第 5 条,档号齐全);<br>③ 比评 → 95 分(与朝代样板"调粮草须 5 万石 15 日抵达"一字不差);<br>④ 判评 → 合格 + 92 分(事成,粮调了 5 万石,15 日北运)。</p>
+  </div>
+
+  <p>户部侍郎看了半晌:"这'三轮迭代',臣都没做过 —— 灵机怎么自己改的?" 宋判笑:"<strong>听评定格式齐不齐(纸契四件套),查评定出处对不对(据某档某条),比评定差多少(朝代样板),判评定事成不成(合格/不合格)。四评打完,灵机自己改;改完再评,评完再改 —— 三轮迭代,接话灵机自己越来越准</strong>。"</p>
+
+  <p>小李低声对太子说:"殿下,这是'一刻钟办完五家事'的真正后手 —— 不是灵机快了,是评估循环让灵机接话越来越准。" 太子点头:"<strong>这才是老试院的活 —— 二十年的经验不在嘴上,在'怎么评纸契'上</strong>。"</p>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">评估循环的工程定义</span>
+    </div>
+    <dl>
+      <dt>第一轮 · 接得慢</dt>
+      <dd><span class="who">纸契缺回音</span><span class="what">—— 评估循环第 1 轮:纸契缺"回音"项,接话灵机不知要回啥 —— 补回音。</span></dd>
+      <dt>第二轮 · 接得乱</dt>
+      <dd><span class="who">四礼错位</span><span class="what">—— 评估循环第 2 轮:拜/回/问/辞 顺序错位,接话灵机颠倒 —— 严礼序。</span></dd>
+      <dt>第三轮 · 接得准</dt>
+      <dd><span class="who">三家事一刻钟</span><span class="what">—— 评估循环第 3 轮:三家事一刻钟接完,与朝代样板一字不差 —— 实战验证。</span></dd>
+      <dt>评估打分制</dt>
+      <dd><span class="who">宋判立规矩</span><span class="what">—— 评估的"打分制"(Scoring):四评各 100 分,平均分 ≥ 60 合格,< 60 不合格 —— 与"及格率"(Pass Rate)对应。</span></dd>
+      <dt>迭代三步</dt>
+      <dd><span class="who">评估循环核心</span><span class="what">—— 评估循环三步(Iteration Loop):评 → 改 → 再评,接话灵机按这个循环三轮迭代,接话越来越准。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="ch5">
+  <span class="chapter-tag">第五幕 · 实战与反转</span>
+  <h2><span class="num">05</span>沈一石"考校"再成"拜师" —— 评估派反转</h2>
+  <span class="h2-hook">"沈一石从礼部赶来'考校'评估院 —— 一道刁题'户部灵机写错位 5 万石变 30 万石,评估官能不能评出',评估官按四评一刻钟评完,沈一石反倒问:'怎么推十二衙门?'"</span>
+
+  <p class="lead">四月十二早朝。沈一石又上一奏:"<strong>评估耗人工,接话已够好,何必再评</strong>。"</p>
+
+  <p>陈守一(第10章三反转后任"番使院接话督办")在朝堂上求情:"殿下,沈侍郎不是坏人 —— 他的'评估派'是怕评了打击匠人,善念可悯。让他再想想。"</p>
+
+  <p>太子正要开口,门外传来一封急奏 —— 朝廷派礼部试院"评估派"主事沈一石前来"考校"。沈一石是礼部侍郎,他在"评估"上意见更激进 —— 他主张"<strong>不光评估不必,连评估的纸契也不必有</strong>"。</p>
+
+  <div class="dialog">
+    <span class="dialog-speaker">沈一石:</span>"殿下,臣从礼部赶来,不为别的,只想出一道刁题考校评估院 —— 听说是新设的,臣没见过,心里没底。题是:'<strong>户部灵机接话把'5 万石'补成'30 万石',评估官能不能评出来?</strong>'"
+  </div>
+
+  <p>太子示意宋判,宋判立"四评 + 评估循环三轮迭代"贴在礼部试院正堂墙上。太子让户部、工部、兵部三家灵机现场接话,然后评估官按四评打分。</p>
+
+  <p>评估官先做<strong>听评</strong>:"户部灵机递的纸契,看'拜帖头(户部灵机) + 所请(调粮 30 万石) + 来路(据兵部拜帖) + 回音(15 日北运)' —— 听评:纸契四件套写齐了,但所请写错了(原本是 5 万石,被灵机补成 30 万石)。听评 70 分。"</p>
+
+  <p>评估官再做<strong>查评</strong>:"来路据兵部拜帖第 5 条'北境兵马 2 万需粮 5 万石' —— 查评:灵机所请写'30 万石'与兵部拜帖对不上。查评 50 分。"</p>
+
+  <p>评估官再比<strong>比评</strong>:"朝代样板 = 调粮草须'5 万石 15 日抵达',户部灵机答'30 万石 15 日北运' —— 比评:与样板差一位数(25 万石)。比评 40 分。"</p>
+
+  <p>评估官最后<strong>判评</strong>:"事不成 —— 若按 30 万石调粮,北境大军就要饿肚子。判评 不合格。"</p>
+
+  <p>一刻钟,评估官四评打完。</p>
+
+  <div class="callout">
+    <p style="margin:0"><strong>评估四评结果:</strong></p>
+    <p style="margin:6px 0 0;font-size:14px">① 听评 70 分(纸契格式齐,但所请错);<br>② 查评 50 分(出处对不上);<br>③ 比评 40 分(差一位数);<br>④ 判评 不合格(事不成);<br>—— 一刻钟评完三家事,四评打分清清楚楚。</p>
+    <p style="margin:6px 0 0;font-size:13px;color:var(--text-muted)">—— 试案头:听评;所请:评户部调粮;来路:据兵部拜帖第 5 条;回音:四评打分。</p>
+  </div>
+
+  <p>沈一石看了半晌,问:"评估官,你答得对 —— 但我问你,你<strong>怎么评得这么准</strong>?"</p>
+
+  <p>宋判代评估官答:"<strong>听评定格式齐不齐(纸契四件套),查评定出处对不对(据某档某条),比评定差多少(朝代样板),判评定事成不成(合格/不合格)。四评配齐,评估官自己评的</strong>。"</p>
+
+  <p>沈一石又问:"那—— 我能不能也学这套?" 宋判答:"<strong>沈主事是评估派转接派,以为'评估=刁难' —— 其实'评估≠刁难','评估=镜子'</strong>。学了四评,你的'评估派'主张才真正落地。"</p>
+
+  <p>沈一石长叹一声,主动请缨:"<strong>殿下,臣愿任'礼部·试院·评估督办',把这套评估,推给十二衙门</strong>。臣的'评估派',从此扩'评估衙门'。"</p>
+
+  <p>郑直(第10章反派)在一旁看着,脸色复杂。</p>
+
+  <h3>太子金句 · 评估三戒</h3>
+  <p>太子在试院匾旁贴上"评估三戒":</p>
+  <ul>
+    <li><strong>戒不评</strong> —— 灵机接话接错了没人知,等于接话灵机闭着眼调粮,手艺再好也是错的</li>
+    <li><strong>戒乱评</strong> —— 不是评得多就好,要"听评先、查评后、比评中、判评末"</li>
+    <li><strong>戒一评定终身</strong> —— 评完还要迭代三轮,接话灵机越接越准</li>
+  </ul>
+
+  <aside class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">本节专业名词对照</span>
+      <span class="annotation-hint">实战 + 三戒 + 反派反转</span>
+    </div>
+    <dl>
+      <dt>沈一石"考校"再成"拜师"</dt>
+      <dd><span class="who">本章反派反转</span><span class="what">—— 实战反转:礼部侍郎带"评估不必"立场来考校,反被四评评估答服,主动请缨任评估督办,把"评"字诀推十二衙门。</span></dd>
+      <dt>三家灵机接话后评估</dt>
+      <dd><span class="who">评估四评作答</span><span class="what">—— 评估实战:户部 / 工部 / 兵部三家灵机接话后,评估官按听评 → 查评 → 比评 → 判评四评打分,一刻钟评完三家事。</span></dd>
+      <dt>评估≠刁难 · 评估=镜子</dt>
+      <dd><span class="who">宋判总结</span><span class="what">—— 评估金句:评估不等于刁难灵机(评估等于让灵机挨批);但评估 = 让灵机照镜子 = 让灵机知道自己哪里差。</span></dd>
+      <dt>评估三戒</dt>
+      <dd><span class="who">太子立的规矩</span><span class="what">—— 评估三原则:① 不不评(戒不评)② 要有序(戒乱评)③ 常迭代(戒一评定终身)。</span></dd>
+    </dl>
+  </aside>
+</section>
+
+<section id="finale">
+  <span class="chapter-tag">终章 · 景和十二年七月</span>
+  <h2><span class="num">06</span>三月期满,试院匾"接得好不好,不是接话的人说了算"</h2>
+
+  <p class="lead">景和十二年七月。三月期满,试院·评估院正式挂牌。太子题匾十六字:"<strong>接得好不好,不是接话的人说了算,是用接话结果的人说了算</strong>"。</p>
+
+  <p>这天早朝,宋判、何七、吕坤、苏望、廖通、陈守一、沈一石同堂。太子当众演示:让户部、工部、兵部三家灵机按第10章"四礼 + 纸契四件套"现场接话,然后评估官按本章"四评 + 三轮迭代"现场打分 —— 从户部灵机递拜帖"调粮草",到户部灵机回帖"5 万石 15 日北运",到工部灵机回帖"200 辆 10 日完工",到兵部灵机辞行"15 日齐装" —— 一刻钟办完三家事;评估官听评 90、查评 95、比评 95、判评 92 —— 四评打完,平均 93 分。</p>
+
+  <p>宋判带头鼓掌。礼部试院阅卷匠们从此不再说灵机是"评估派"或"接话派"。</p>
+
+  <div class="pullquote">
+    "接话灵机不是灵机的'嘴和耳',是灵机的'考核官'。<br><br>
+    <strong>考核官不刁难人 —— 他只让灵机知道自己哪里差。</strong><br><br>
+    差不可怕,怕的是不知道差。<br><br>
+    <strong>评估不是灵机的'敌人',是灵机的'镜子' —— 不照镜的灵机,接话接得再热闹,也看不见自己的脸。</strong>"
+    <footer style="margin-top:14px;font-size:13px;color:var(--text-muted)">—— 太子,景和十二年七月,22 岁,试院挂牌三月</footer>
+  </div>
+
+  <h3>跨章承接 · 下一章预告</h3>
+  <ul>
+    <li><strong>第12章 · RL · 训练与对齐</strong> —— 灵机评估完了,怎么纠?训练灵机"按评估改",让灵机"接话 + 评估"都自动按规矩走。</li>
+    <li><strong>第13章 · 多智能体协作</strong> —— 一台灵机不够,多台灵机怎么分工?评估派 vs 接话派 之争再升级。</li>
+  </ul>
+</section>
+
+<section id="summary">
+  <div class="summary-box">
+    <div class="summary-box-title">一句话总结</div>
+    <p class="summary-text">第11章讲的是:<strong>户部灵机接话把'5 万石'补成'30 万石'差点误军务 —— 礼部侍郎沈一石主张'评估派'(评估就是刁难),礼部试院主簿宋判主张'四评评估'(评了才知接得对不对),二十二岁太子在礼部试院下设评估院,造出'评估四评'(听评/查评/比评/判评)与'评估循环'(三轮迭代),三月为期,接得好不好,不是接话的人说了算,是用接话结果的人说了算</strong>。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px">太子金句:"<strong>接话灵机不是灵机的'嘴和耳',是灵机的'考核官'。考核官不刁难人 —— 他只让灵机知道自己哪里差。评估不是灵机的'敌人',是灵机的'镜子'</strong>"。</p>
+    <p class="summary-text" style="margin-top:14px;font-size:15.5px;color:var(--text-muted)">反派(沈一石)再反转:礼部侍郎"评估派"主事从"考校"再成"拜师",主动请缨任"礼部·试院·评估督办",把"评估"推十二衙门。母题连续 9 连击复用(反派转友)。</p>
+  </div>
+</section>
+
+<section id="coverage">
+  <div class="coverage">
+    <div class="coverage-title">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" style="color:var(--accent-sage)"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      概念地图 · 25 个名词索引
+    </div>
+
+    <h4 style="margin:0 0 12px">📜 评估四评 · 四种"评节"</h4>
+    <div class="doctors-grid">
+      <div class="doctor-card role-1">
+        <div class="doctor-name">听评</div>
+        <div class="doctor-quote">"看纸契格式'四件套'写没写齐。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应格式检查</li>
+          <li>评估首步</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-2">
+        <div class="doctor-name">查评</div>
+        <div class="doctor-quote">"查'据某档某条'对不对得上。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应事实检查</li>
+          <li>看出处</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-3">
+        <div class="doctor-name">比评</div>
+        <div class="doctor-quote">"比'朝代钦定样板'差多少。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应样板比对</li>
+          <li>看差多少</li>
+        </ul>
+      </div>
+      <div class="doctor-card role-4">
+        <div class="doctor-name">判评</div>
+        <div class="doctor-quote">"判'事成不成 + 合格 / 不合格'。"</div>
+        <ul class="doctor-behaviors">
+          <li>对应合格判定</li>
+          <li>最终结论</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4 style="margin:24px 0 12px">📖 评估循环 · 三轮迭代</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>轮次</th><th>问题</th><th>改进</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>第一轮</td><td>"5 万石"纸契缺"回音"项</td><td>补"回音"项</td></tr>
+          <tr><td>第二轮</td><td>"拜 / 回"顺序错位</td><td>严格"拜 / 回 / 问 / 辞"</td></tr>
+          <tr><td>第三轮</td><td>三家事一刻钟接完,与样板一字不差</td><td>实战验证</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="margin:24px 0 12px">📜 评估方法 · 试案 + 考卷 + 考官</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>评估方法</th><th>朝代叙事</th><th>对应概念</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>试案 / 考卷</td><td>覆盖所有接话场景的考卷,每案配样板</td><td>评估数据集(见 annotation)</td></tr>
+        <tr><td>朝代样板</td><td>每个试案配的钦定及格线</td><td>参考答案(见 annotation)</td></tr>
+        <tr><td>及格率</td><td>三轮迭代后合格试案占总试案比</td><td>一次通过率(见 annotation)</td></tr>
+        <tr><td>灵机考官</td><td>用灵机做考官,自动按四评打分</td><td>模型评模型(见 annotation)</td></tr>
+        <tr><td>复考官</td><td>多灵机交叉评,减少单考官偏倚</td><td>多评交叉(见 annotation)</td></tr>
+      </tbody>
+    </table>
+
+    <h4 style="margin:24px 0 12px">🔧 评估 vs 第 09 章编排 + 第 10 章接话(机件对比)</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>维度</th><th>第 09 章编排</th><th>第 10 章接话</th><th>第 11 章评估</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>管什么</td><td>"怎么排给灵机看"</td><td>"怎么让灵机对灵机说话"</td><td>"怎么给灵机照镜子"</td></tr>
+          <tr><td>位置</td><td>纸条(临时脑)</td><td>灵机之间(接驳口)</td><td>灵机之外(试案 + 考官)</td></tr>
+          <tr><td>主笔</td><td>周海</td><td>廖通</td><td>宋判</td></tr>
+          <tr><td>核心</td><td>四术 + 四件套</td><td>四礼 + 纸契四件套</td><td>四评 + 三轮迭代</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="think">
+  <span class="chapter-tag">太子的五条心得</span>
+  <h2><span class="num">心</span>二十二岁太子的五条心得(白话版)</h2>
+  <span class="h2-hook">"故事听完了,太子想跟你掏心窝子说几句 —— 都是大白话,不必查名词。"</span>
+
+  <h3>心得一 · 不评的毛病不是评得少,是没人评</h3>
+  <p>灵机会接话,接话灵机不出错 —— 不是接话灵机没出错,是没人看出错。<strong>户部灵机把'5 万石'补成'30 万石',差点误了北境大军 —— 这不是接话接错了,是没人评</strong>。</p>
+
+  <h3>心得二 · 评估的妙处不是热闹,是规矩</h3>
+  <p>四评(听/查/比/判)不是为热闹,是为让灵机"按评走" —— <strong>听评要齐,查评要对,比评要差小,判评要合格</strong>。</p>
+
+  <h3>心得三 · 评估循环是"评了改,改了再评"的标准格式</h3>
+  <p>第一轮评格式(纸契四件套齐不齐),第二轮评顺序(拜/回/问/辞 错不错),第三轮评实战(三家事一刻钟接完) —— <strong>三轮迭代,接话灵机自己越来越准</strong>。</p>
+
+  <h3>心得四 · 沈侍郎的"评估派"不是错,是省错了地方</h3>
+  <p>他怕评了打击匠人,接话已经够好 —— 这种善念我们要尊重。但善念不讲究章法,反而害事。<strong>评估才是真让接话变准,不评不是</strong>。</p>
+
+  <h3>心得五 · 沈一石从"评估派"到"评估派" —— 这就是章法的胜利</h3>
+  <p>礼部侍郎从"考校"再成"拜师" —— 不是他认输,是他看见<strong>评估≠刁难,评估=镜子</strong>。<strong>章法对了,善念才真正落地</strong>。</p>
+
+  <div class="annotation">
+    <div class="annotation-header">
+      <span class="annotation-tag">这五条心得对应到评估机件上就是</span>
+    </div>
+    <dl>
+      <dt>心得一</dt><dd>→ 灵机接话(不评)与灵机评估的核心区别:评不在多,在评到该评的人</dd>
+      <dt>心得二</dt><dd>→ 四评 = 把"乱评"改成"按评评":听 / 查 / 比 / 判 各管一段</dd>
+      <dt>心得三</dt><dd>→ 评估循环 = 接话灵机"评了改,改了再评"的标准格式:格式 → 顺序 → 实战</dd>
+      <dt>心得四</dt><dd>→ "评估派"误区:评估不等于刁难(灵机不挨批,反而接话变差)</dd>
+      <dt>心得五</dt><dd>→ "评估派"胜利:沈一石从"不必评"转"评估办",这是反派转友母题 9 连击复用</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="quiz">
+  <span class="chapter-tag">自测十问</span>
+  <h2><span class="num">测</span>读完了?来试试这十问</h2>
+  <span class="h2-hook">"题目和选项直接展开看,答案藏在每题底部的小箭头里 —— 自己先想,再看答案。"</span>
+
+  <div class="quiz-list">
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q1</span>
+        <span style="font-size:13px;color:var(--text-muted)">考开篇两大症结</span>
+      </div>
+      <p class="quiz-q">沈一石的"评估派"和宋判的"四评评估",分别对应评估章法的哪两个思路?</p>
+      <ul class="quiz-options">
+        <li>A. 评估不必(接话已好) / 评估循环(按四评评)</li>
+        <li>B. 增大人工 / 减少人工</li>
+        <li>C. 用云端 / 用本地</li>
+        <li>D. 加钱 / 省钱</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 评估不必 / 评估循环(按四评评)</strong></p>
+        <p style="margin:4px 0">A 对 —— 沈一石"评估派"= 评估不必(接话已好,何必再评);宋判"四评评估"= 评估循环(按听评 / 查评 / 比评 / 判评四评评),两者是评估章法的两条思路。</p>
+        <p style="margin:4px 0">B 错 —— "增大人工/减少人工"是工程成本思路,不是评估章法的核心思路。</p>
+        <p style="margin:4px 0">C 错 —— "用云端/用本地"是部署思路,跟本章主线无关。</p>
+        <p style="margin:4px 0">D 错 —— "加钱/省钱"是预算思路,不是评估章法思路。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q2</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四评之"听评"</span>
+      </div>
+      <p class="quiz-q">宋判"听评"对应评估章法的哪个要素?</p>
+      <ul class="quiz-options">
+        <li>A. 纸契格式检查(看四件套齐不齐)</li>
+        <li>B. 档案出处检查(查对不对)</li>
+        <li>C. 朝代样板比对(差多少)</li>
+        <li>D. 合格 / 不合格判定</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 纸契格式检查(看四件套齐不齐)</strong></p>
+        <p style="margin:4px 0">A 对 —— "听评"是评估首步,看纸契"拜帖头/所请/来路/回音"四件套写没写齐 —— 这就是"格式检查":在评估初先看接话档案格式。</p>
+        <p style="margin:4px 0">B 错 —— "档案出处检查"是"查评"(看完格式查出处)。</p>
+        <p style="margin:4px 0">C 错 —— "朝代样板比对"是"比评"(比差多少)。</p>
+        <p style="margin:4px 0">D 错 —— "合格 / 不合格判定"是"判评"(最终判定)。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q3</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四评之"比评"</span>
+      </div>
+      <p class="quiz-q">宋判"比评"的核心是?</p>
+      <ul class="quiz-options">
+        <li>A. 看格式齐不齐</li>
+        <li>B. 查档案出处对不对</li>
+        <li>C. 比"接话结果"与"朝代钦定样板"差多少</li>
+        <li>D. 判合格 / 不合格</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 比"接话结果"与"朝代钦定样板"差多少</strong></p>
+        <p style="margin:4px 0">A 错 —— "看格式齐不齐"是听评的活,不是比评。</p>
+        <p style="margin:4px 0">B 错 —— "查档案出处对不对"是查评的活,不是比评。</p>
+        <p style="margin:4px 0">C 对 —— "比评" = 样板比对:比"接话结果"与"朝代钦定样板"差多少。这是"样板比对":告诉评估灵机接话与最佳实践差几分。</p>
+        <p style="margin:4px 0">D 错 —— "判合格 / 不合格"是判评的活,不是比评。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q4</span>
+        <span style="font-size:13px;color:var(--text-muted)">考四评之"判评"</span>
+      </div>
+      <p class="quiz-q">宋判"判评"判定的是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 格式齐不齐</li>
+        <li>B. 出处对不对</li>
+        <li>C. 差多少</li>
+        <li>D. 事成不成 + 灵机接话合不合格</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:D · 事成不成 + 灵机接话合不合格</strong></p>
+        <p style="margin:4px 0">A 错 —— "格式齐不齐"是听评的内容,不是判评的核心。</p>
+        <p style="margin:4px 0">B 错 —— "出处对不对"是查评的内容,不属于判评判定。</p>
+        <p style="margin:4px 0">C 错 —— "差多少"是比评的内容,不属于判评判定。</p>
+        <p style="margin:4px 0">D 对 —— 判评 = 合格判定:判"事成不成 + 灵机接话合不合格",标记"合格 / 不合格 / 部分合格"。这是"合格判定",最终结论,单向异步,不需对方回音。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q5</span>
+        <span style="font-size:13px;color:var(--text-muted)">考评估循环</span>
+      </div>
+      <p class="quiz-q">"评估循环三轮迭代"指什么?</p>
+      <ul class="quiz-options">
+        <li>A. 茶 / 盐 / 算盘 / 笔</li>
+        <li>B. 第一轮(评格式,纸契缺回音) → 第二轮(评顺序,拜/回错位) → 第三轮(评实战,三家事一刻钟)</li>
+        <li>C. 户部 / 工部 / 礼部 / 兵部</li>
+        <li>D. 听评 / 查评 / 比评 / 判评</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 评格式 → 评顺序 → 评实战</strong></p>
+        <p style="margin:4px 0">A 错 —— 茶盐算盘笔是朝代小品的实物,不是评估循环三轮迭代。</p>
+        <p style="margin:4px 0">B 对 —— 评估循环三轮迭代 = 灵机"评了改,改了再评"的标准格式:第一轮评格式(纸契四件套齐不齐) → 第二轮评顺序(拜/回/问/辞 错不错) → 第三轮评实战(三家事一刻钟接完)。</p>
+        <p style="margin:4px 0">C 错 —— 户部/工部/礼部/兵部是朝廷四部,不是评估循环三轮迭代。</p>
+        <p style="margin:4px 0">D 错 —— 听/查/比/判 是"四评"(评估礼节),不是"评估循环"(迭代流程)。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q6</span>
+        <span style="font-size:13px;color:var(--text-muted)">考评估方法</span>
+      </div>
+      <p class="quiz-q">"朝代样板 / 钦定范本"对应评估章法的哪种方法?</p>
+      <ul class="quiz-options">
+        <li>A. 试案 / 考卷(覆盖场景) + 参考答案(每个试案配)</li>
+        <li>B. 灵机接话</li>
+        <li>C. 驿道传令</li>
+        <li>D. 记簿</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 试案 / 考卷 + 参考答案</strong></p>
+        <p style="margin:4px 0">A 对 —— "朝代样板 / 钦定范本"= 试案 / 考卷 + 参考答案:试案覆盖所有接话场景,每个试案配参考答案(及格线),评估灵机按"试案 + 参考答案"打分。</p>
+        <p style="margin:4px 0">B 错 —— "灵机接话"是第10章的内容,不是本章评估方法。</p>
+        <p style="margin:4px 0">C 错 —— "驿道传令"是第10章接话的两路传令之一,不是本章评估方法。</p>
+        <p style="margin:4px 0">D 错 —— "记簿"是第08章记簿四柜,不是本章评估方法。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q7</span>
+        <span style="font-size:13px;color:var(--text-muted)">考太子金句</span>
+      </div>
+      <p class="quiz-q">太子金句"接得好不好,不是接话的人说了算",完整版是什么?</p>
+      <ul class="quiz-options">
+        <li>A. 接得好不好,不是接话的人说了算,是用接话结果的人说了算 —— 评估不是灵机的敌人,是灵机的镜子</li>
+        <li>B. 接得好不好,是接话的人说了算</li>
+        <li>C. 接得好不好,是听接话的人说了算</li>
+        <li>D. 接得好不好,是接话的过程说了算</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:A · 用接话结果的人说了算,评估=镜子</strong></p>
+        <p style="margin:4px 0">A 对 —— 完整版是:接得好不好,不是接话的人说了算,是用接话结果的人说了算 —— 评估不是灵机的敌人,是灵机的镜子。这是评估章法的金句。</p>
+        <p style="margin:4px 0">B 错 —— "是接话的人说了算"是评估派误区,接话的人自己评自己不算。</p>
+        <p style="margin:4px 0">C 错 —— "是听接话的人说了算"是接话派的简化版,听接话的人也凭感觉说"好",不算独立评估。</p>
+        <p style="margin:4px 0">D 错 —— "是接话的过程说了算"是过程评估思路,完整版要带"评估=镜子"。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q8</span>
+        <span style="font-size:13px;color:var(--text-muted)">考评估三戒</span>
+      </div>
+      <p class="quiz-q">太子立的"评估三戒",不包括下列哪一条?</p>
+      <ul class="quiz-options">
+        <li>A. 戒不评</li>
+        <li>B. 戒乱评</li>
+        <li>C. 戒多评</li>
+        <li>D. 戒一评定终身</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · "戒多评"不在三戒之列</strong></p>
+        <p style="margin:4px 0">A 对(在三戒中) —— "戒不评":灵机接话接错了没人知,等于接话灵机闭着眼调粮,手艺再好也是错的。</p>
+        <p style="margin:4px 0">B 对(在三戒中) —— "戒乱评":不是评得多就好,要"听评先、查评后、比评中、判评末"。</p>
+        <p style="margin:4px 0">C 错(不在三戒中) —— "戒多评"不是评估三戒之一。多评是评估的功能,不是评估设计原则。三戒是不评/乱评/一评定终身,不是评得多不多。</p>
+        <p style="margin:4px 0">D 对(在三戒中) —— "戒一评定终身":评完还要迭代三轮,接话灵机越接越准。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q9</span>
+        <span style="font-size:13px;color:var(--text-muted)">考反派母题</span>
+      </div>
+      <p class="quiz-q">沈一石在本章中反对的是什么?后来为什么反转?</p>
+      <ul class="quiz-options">
+        <li>A. 反对自造 → 因为看见本土灵机比洋货好</li>
+        <li>B. 反对评估,主张不必评 → 因为看见四评评估一刻钟评完户部灵机接话,从"考校"再成"拜师"</li>
+        <li>C. 反对编排 → 因为被免职</li>
+        <li>D. 反对奏章房 → 因为他被免职</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:B · 反对评估,主张不必评 → 看见四评评估=真让接话变准,反转</strong></p>
+        <p style="margin:4px 0">A 错 —— "反对自造"是第07章梁王的事,不是本章。</p>
+        <p style="margin:4px 0">B 对 —— 第11章沈一石(礼部侍郎"评估派"主事,第10章接话督办的同乡)主张"评估派"立场,带刁题"户部灵机写错位 5 万石变 30 万石,评估官能不能评出"来考校,反被四评评估答服,主动请缨任"礼部·试院·评估督办",从"考校"再成"拜师"。母题 9 连击复用。</p>
+        <p style="margin:4px 0">C 错 —— "反对编排"是第09章范纯之的事,不是本章。</p>
+        <p style="margin:4px 0">D 错 —— "反对奏章房"不是本章情节,沈一石反而来当评估督办。</p>
+      </details>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-head">
+        <span class="quiz-num">Q10</span>
+        <span style="font-size:13px;color:var(--text-muted)">考跨章呼应</span>
+      </div>
+      <p class="quiz-q">第 11 章的"评估"机件,跟第 09 章的"编排"+ 第 10 章的"接话"机件是什么关系?</p>
+      <ul class="quiz-options">
+        <li>A. 评估替代编排 + 接话</li>
+        <li>B. 编排替代评估</li>
+        <li>C. 评估 ≠ 编排 + 接话:编排管"怎么排给灵机看"(临时纸条),接话管"怎么让灵机对灵机说话"(灵机之间),评估管"怎么给灵机照镜子"(灵机之外)</li>
+        <li>D. 三者完全一样</li>
+      </ul>
+      <details class="quiz-answer"><summary>答案解析</summary>
+        <p style="margin:6px 0"><strong>正确答案:C · 编排/接话/评估是"造/接/评"三件套,各管一段</strong></p>
+        <p style="margin:4px 0">A 错 —— "评估替代编排 + 接话"不对 —— 三者是互补关系,不是替代。编排决定"灵机纸条上放什么",接话决定"灵机与灵机之间怎么递消息",评估决定"灵机接话接得对不对"。</p>
+        <p style="margin:4px 0">B 错 —— "编排替代评估"也不对 —— 同上,三者互补不替代。</p>
+        <p style="margin:4px 0">C 对 —— 编排是"纸条"(临时脑),管"怎么排给灵机看"—— 第 09 章顶/间/末/滤四术都是纸条上的排法。接话是"灵机之间"(接驳口),管"怎么让灵机对灵机说话"—— 第 10 章拜/回/问/辞四礼都是灵机之间的礼节。评估是"灵机之外"(试案 + 考官),管"怎么给灵机照镜子"—— 第 11 章听/查/比/判四评都是灵机之外的评节。位置不同,主笔不同(周海 vs 廖通 vs 宋判),核心不同(四术+四件套 vs 四礼+纸契四件套 vs 四评+三轮迭代)。</p>
+        <p style="margin:4px 0">D 错 —— 三者完全不同 —— 一个管临时排版,一个管灵机之间接话,一个管灵机之外评估。</p>
+      </details>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text-secondary)">WellInsight</strong> · 学习材料 · 第11章 v1.0 · 2026-06-29
+  </div>
+  <div>
+    原文:<a class="footer-link" href="https://raw.githubusercontent.com/datawhalechina/hello-agents/main/docs/chapter11/Chapter11-Evaluation-Iteration.md" target="_blank">datawhalechina/hello-agents · Chapter 11</a>
+  </div>
+</footer>
+
+</div>
+
+<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l6-6-6-6"/></svg>
+</button>
+
+</body>
+</html>

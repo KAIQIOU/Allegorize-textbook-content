@@ -1,0 +1,11 @@
+# Fable Skills 环境依赖
+# Python 版本: 3.11+ (Windows 10/11 已验证)
+# 安装方式: pip install -r requirements.txt
+
+# 核心依赖 (渲染脚本只用到了 pathlib + re, 无第三方依赖, 此文件留作声明)
+
+# 验证 Python 版本
+# python --version
+
+# 验证脚本可执行
+# python -X utf8 scripts/rewrite_ch12_v1.py
