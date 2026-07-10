@@ -1,13 +1,13 @@
 ---
 name: fable-write-sop
-description: "WellInsight 寓言单章 v1 渲染标准操作流程(SOP) — 12 步全链路:3 必跑(写前 grep)+ 4 必守(写时约束)+ 5 必改(ch11 故事逻辑+语序反馈整改);第12章起所有新章节通用"
+description: "寓言单章 v1 渲染标准操作流程(SOP) — 12 步全链路:3 必跑(写前 grep)+ 4 必守(写时约束)+ 5 必改(ch11 故事逻辑+语序反馈整改);第12章起所有新章节通用"
 metadata:
   node_type: memory
   type: reference
   originSessionId: 35d6f6f6-8b6b-4cb5-9d6f-a385dab6bca6
 ---
 
-# WellInsight 寓言 v1 渲染 12 步 SOP(2026-06-29 沉淀)
+# 寓言 v1 渲染 12 步 SOP(2024-06-29 沉淀)
 
 ## Why: 为什么需要 12 步 SOP
 
@@ -222,17 +222,17 @@ print(f'→ 写入目标: {OUT.name}')
 # 12 节 + v5 规范应用 + 自检通过 + 0 事故 + How to apply for 第<NUM+1>章
 
 # ============================
-# Step 6: 同步 3 处 + mem0 L2
+# Step 6: 同步 3 处 + 记忆库
 # ============================
 # memory/MEMORY.md 添加新条目
 # memory/wellinsight-protagonist-age-ladder.md 添加年龄
 # memory/fable-antagonist-humanity-pattern.md 添加反派
-# mem0: m.add(text, user_id='yolanda', agent_id='clove')
+# mem0: m.add(text, user_id='<your-user>', agent_id='<your-agent>')
 ```
 
 ---
 
-## 五、SOP 验证记录(2026-06-29)
+## 五、SOP 验证记录(2024-06-29)
 
 | 章节 | 应用 SOP | 渲染结果 | 修复次数 |
 |------|---------|---------|---------|
@@ -254,4 +254,3 @@ print(f'→ 写入目标: {OUT.name}')
 
 **Why**: 12 步 SOP 跨章复用, 12 章用 = 12 次验证 = SOP 越用越准。后续章节无需重写 SOP, 直接套 12 步即可。
 
-**Link**: 关联 [[fable-ch11-feedback-correction-pattern]] (5 整改详细说明) / [[chapter12-rl-alignment-fable-rendered]] (12 步 SOP 首次应用)/ [[fable-v1-english-leakage-traps]] (英文泄漏)/ [[wellinsight-protagonist-age-ladder]] (年龄阶梯) / [[fable-antagonist-humanity-pattern]] (反派转友) / [[karpathy-claudemd-work-discipline]] (通用纪律) / [[sage-should-apply-ae-pattern]] (跨 agent 应用)

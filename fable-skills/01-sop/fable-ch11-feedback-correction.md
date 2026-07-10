@@ -1,13 +1,13 @@
 ---
 name: fable-ch11-feedback-correction-pattern
-description: "Fable ch11 用户反馈 5 整改范式(2026-06-29 沉淀) — 用户对第11章反馈'故事逻辑和语序混乱',ch12 应用 5 整改一次 0 修复;跨章通用的故事质量 5 条铁律"
+description: "Fable ch11 用户反馈 5 整改范式(2024-06-29 沉淀) — 用户对第11章反馈'故事逻辑和语序混乱',ch12 应用 5 整改一次 0 修复;跨章通用的故事质量 5 条铁律"
 metadata:
   node_type: memory
   type: feedback
   originSessionId: 35d6f6f6-8b6b-4cb5-9d6f-a385dab6bca6
 ---
 
-# Fable ch11 用户反馈 5 整改范式(2026-06-29)
+# Fable ch11 用户反馈 5 整改范式(2024-06-29)
 
 ## Why: 为什么这个值得独立沉淀
 
@@ -221,4 +221,3 @@ metadata:
 
 **Why**: 5 整改是把 ch11 用户反馈"软质量"问题量化为"硬规则", 跨章复用, 后续章节无 ch11 那种"故事逻辑+语序混乱"反馈。
 
-**Link**: 关联 [[fable-write-sop]] (12 步 SOP)/ [[chapter12-rl-alignment-fable-rendered]] (5 整改首次应用)/ [[chapter11-evaluation-iteration-fable-rendered]] (反馈来源)/ [[user-feedback-fable-web-design]] (用户对寓言网页 7 大设计要求)/ [[fable-antagonist-humanity-pattern]] (反派转友)

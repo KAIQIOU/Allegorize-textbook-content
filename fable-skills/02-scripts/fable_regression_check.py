@@ -23,40 +23,33 @@ import sys
 import os
 from pathlib import Path
 
-# 输出目录:env 变量优先,默认 WellInsight/reports/ (包内 smoke test 用)
+# 输出目录:env 变量优先,默认 reports/ (包内 smoke test 用)
 DEFAULT_REPORT_DIR = Path(r"reports")
 REPORT_DIR = Path(os.environ.get('FABLE_REPORT_DIR', str(DEFAULT_REPORT_DIR)))
-
 
 def has_sticky_toc(c: str) -> bool:
     """检查是否有 sticky-toc(基于 DOM class 名,不是注释)"""
     return 'class="sticky-toc"' in c
 
-
 def has_hero(c: str) -> bool:
     """检查是否有 hero 区(基于 DOM class 名)"""
     return 'class="hero"' in c
-
 
 def has_opening_hook(c: str) -> bool:
     """检查是否有开篇钩子(基于 hero-desc 或第一个 h2)"""
     return 'hero-desc' in c or 'chapter-tag' in c
 
-
 def has_finale(c: str) -> bool:
     """检查是否有终章(基于 chapter-tag 含'终章'或 h2 含数字 06)"""
     return '终章' in c or re.search(r'<h2><span class="num">0[56]</span>', c) is not None
-
 
 def has_summary(c: str) -> bool:
     """检查是否有一句话总结(基于 summary-box DOM 类)"""
     return 'class="summary-box"' in c or '一句话总结' in c
 
-
 def has_coverage(c: str) -> bool:
     """检查是否有概念地图(基于 coverage 或 doctors-grid DOM 类)"""
     return 'class="coverage"' in c or 'class="doctors-grid"' in c or '概念地图' in c
-
 
 def check_file(fn: Path) -> dict:
     c = fn.read_text(encoding='utf-8')
@@ -92,7 +85,6 @@ def check_file(fn: Path) -> dict:
         'missing': missing,
         'pass': md_bold == 0 and correct_class == 0 and not missing,
     }
-
 
 def main():
     files = sorted(set(REPORT_DIR.glob('第0[1-9]章*.html')) | set(REPORT_DIR.glob('第1[0-6]章*.html')))
@@ -139,7 +131,6 @@ def main():
         print(f'   2. .correct → 替换 `<li class="correct">` 为 `<li>`,并删除对应 CSS')
         print(f'   3. 缺分节 → 用 DOM class 名确认(sticky-toc / hero / summary-box / coverage / doctors-grid)')
         sys.exit(1)
-
 
 if __name__ == '__main__':
     main()
